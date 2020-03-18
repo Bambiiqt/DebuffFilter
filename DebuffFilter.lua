@@ -906,3 +906,5 @@ end
 DebuffFilter:SetScript("OnEvent",OnEvent)
 DebuffFilter:RegisterEvent("VARIABLES_LOADED")
 _G.DebuffFilter = DebuffFilter
+
+--Test
