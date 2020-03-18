@@ -1,0 +1,8 @@
+﻿## Interface: 80000
+## Title: DebuffFilter
+## X-Curse-Project-Name: DebuffFilter
+## X-Curse-Project-ID: DebuffFilter
+
+
+DebuffFilter.xml
+DebuffFilter.lua
