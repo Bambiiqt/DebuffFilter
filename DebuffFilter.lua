@@ -301,6 +301,8 @@ local spellIds = {
 	[267034] = "Bigger", -- Whispers of Power
 	[274633] = "Bigger", -- Sundering Blow
 	[268317] = "Bigger", -- Rip Mind
+	[268315] = "Bigger", -- Rip Mind
+	[140038] = "Bigger", -- Abyssal Strike
 
 --MOTHERLODE
 	[269298] = "Bigger", -- Widowmaker
