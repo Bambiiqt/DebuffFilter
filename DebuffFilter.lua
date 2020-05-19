@@ -268,6 +268,7 @@ local spellIds = {
 	[263371] = "Bigger", -- Conduction
 	[267027] = "Bigger", -- Cytotoxin
 	[272699] = "Bigger", -- Venomous Spit
+	[268007] = "Biggest", -- Heart Attack
 
 --ATAL'DAZAR
 	[255558] = "Bigger", -- Tainted Blood
@@ -307,6 +308,9 @@ local spellIds = {
 --MOTHERLODE
 	[269298] = "Bigger", -- Widowmaker
 	[259853] = "Bigger", -- Chemical Burn
+
+--Operation - Junkyard
+	[299438] = "Bigger", -- Sledgehammer
 
 --Operation - Workshop
 	[294929] = "Biggest", -- Blazing Chomp (Boss 3)
