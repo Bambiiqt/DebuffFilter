@@ -106,7 +106,7 @@ local spellIds = {
 	[195901]= "Warning", --Adapted
 	[288756]= "Warning", --Gladiator's Safeguard
 
-	[315179]= "Warning", --Inevitable Doom
+	[315179]= "Biggest", --Inevitable Doom
 	[315161]= "Warning", --Eye of Corruption
 	[319695]= "Warning", --Grand Delusions
 ---GENERAL DANGER---
@@ -145,6 +145,7 @@ local spellIds = {
 	--ROGUE
 	[79140] = "Biggest", -- Vendetta
 	[198259] ="Biggest", --Plunder Armor
+	[207736] = "Big", -- Shadowy Duel
 	--[197091] ="Biggest", --Neurotoxin
 	[197051] = "Warning", --Mind-Numbing Poison
 	--LOCK
@@ -258,10 +259,11 @@ local spellIds = {
 
 --TOL DAGOR
 	[258079] = "Bigger", -- Massive Chomp
-	[258128] = "Bigger", -- Debilitating Shout
+	[258128] = "Biggest", -- Debilitating Shout
 	[257028] = "Bigger", -- Fuselighter
 	[256038] = "Bigger", -- Deadeye
 	[256105] = "Bigger", -- Explosive Burst
+	[265889] = "Bigger", -- Torch Strike
 
 --TEMPLE OF SETHRALISS
 	[266923] = "Bigger", -- Galvanize
@@ -306,8 +308,12 @@ local spellIds = {
 	[140038] = "Bigger", -- Abyssal Strike
 
 --MOTHERLODE
+	[270882] = "Bigger", -- Blazing Azerite (Boss 1)
+	[257544] = "Bigger", -- Jagged Cut (Boss 2)
+	[257582] = "Priority", -- Raging Gaze (Boss 2)
+	[259853] = "Bigger", -- Chemical Burn (Boss 3)
 	[269298] = "Bigger", -- Widowmaker
-	[259853] = "Bigger", -- Chemical Burn
+	[263202] = "Bigger", -- Rocklance
 
 --Operation - Junkyard
 	[299438] = "Bigger", -- Sledgehammer
