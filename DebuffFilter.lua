@@ -76,7 +76,7 @@ end
 
 -- data from LoseControl
 local spellIds = {
-	--[6788] = "Biggest", -- Weakend Soul
+
 --DONT SHOW
 	[57723] = "Hide", --Exhaustion
 	[57724] = "Hide", --Sated
@@ -87,8 +87,10 @@ local spellIds = {
 	[295339] = "Hide", --Will to Survive
 	[306474] = "Hide", --Recharging
 	[313471] = "Hide", --Faceless Masks
+	[110310] = "Hide", --Dampening
 ---Priority--
 	[317265] = "Priority", --Infinite Stars
+	[318187] = "Priority", --Gushing Wounds
 ---WARNINGS---
   --DEATH KNIGHT
   [123981] = "Warning", --Perdition
@@ -146,6 +148,7 @@ local spellIds = {
 	[79140] = "Biggest", -- Vendetta
 	[198259] ="Biggest", --Plunder Armor
 	[207736] = "Big", -- Shadowy Duel
+	[212183] = "Big", -- Smoke Bomb
 	--[197091] ="Biggest", --Neurotoxin
 	[197051] = "Warning", --Mind-Numbing Poison
 	--LOCK
@@ -320,9 +323,8 @@ local spellIds = {
 
 --Operation - Workshop
 	[294929] = "Biggest", -- Blazing Chomp (Boss 3)
-	[6788] = "Big",
-
 }
+
 local function isBiggestDebuff(unit, index, filter)
     local name, icon, _, _, duration, expirationTime, _, _, _, spellId = UnitAura(unit, index, "HARMFUL");
 		if spellIds[spellId] == "Biggest"  then
