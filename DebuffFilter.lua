@@ -140,6 +140,7 @@ local spellIds = {
   --PALLY
 	--[206891] = "Big", -- Focused Assault
   --PRIEST
+	--[322461] = "Big" --Thoughtstolen
 	--[205369] = "Bigger", -- Mind Bomb
 	--[199845] = "Bigger", --Psyflay
 	--[247777] = "Big", --Mind Trauma
@@ -169,6 +170,10 @@ local spellIds = {
 	[206649] = "Bigger", -- Eye of Leotheras
 	--[206491] = "Big", -- Nemesis
 	--[207744] = "Big", -- Fiery Brand
+
+	--COVENANTS
+	[323673] = "Bigger", -- Priest Venthyr Mindgames
+
 	--TRINKETS
 	--[293491] = "Biggest", -- Cyclotronic Blast
 	[302144] = "Bigger", -- Gladiator’s Maledict S2
