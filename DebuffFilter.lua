@@ -88,6 +88,7 @@ local spellIds = {
 	[306474] = "Hide", --Recharging
 	[313471] = "Hide", --Faceless Masks
 	[110310] = "Hide", --Dampening
+	[338906] = "Hide", -- The Jailer's Chains
 ---Priority--
 	[317265] = "Priority", --Infinite Stars
 	[318187] = "Priority", --Gushing Wounds
@@ -172,7 +173,7 @@ local spellIds = {
 	--[207744] = "Big", -- Fiery Brand
 
 	--COVENANTS
-	[323673] = "Bigger", -- Priest Venthyr Mindgames
+	[323673] = "Big", -- Priest Venthyr Mindgames
 
 	--TRINKETS
 	--[293491] = "Biggest", -- Cyclotronic Blast
@@ -327,7 +328,13 @@ local spellIds = {
 	[299438] = "Bigger", -- Sledgehammer
 
 --Operation - Workshop
-	[294929] = "Biggest", -- Blazing Chomp (Boss 3)
+	[294929] = "Biggest", -- Death Blast
+	[303678] = "Biggest", -- Shrapnel 20% Stacking Increased Dmg Taken
+	[329326] = "Biggest", -- Dark Binding
+
+
+--Torghast
+	[296839] = "Bigger", -- Sledgehammer
 }
 
 local function isBiggestDebuff(unit, index, filter)
@@ -471,7 +478,7 @@ function DebuffFilter:UpdateAura(uid)
 				while debuffNum <= debuffnumber do
 					local debuffName = UnitDebuff(uid, index, filter);
 					if ( debuffName ) then
-							if isBiggerDebuff(uid, index, nil) then
+							if isBiggerDebuff(uid, index, nil) and not isBiggestDebuff(uid, index, nil) then
 								local debuffFrame = v.debuffFrames[debuffNum]
 								local name, icon, count, debuffType, duration, expirationTime, unitCaster, canStealOrPurge, _, spellId;
 								name, icon, count, debuffType, duration, expirationTime, unitCaster, canStealOrPurge, _, spellId = UnitDebuff(uid, index, filter);
@@ -522,7 +529,7 @@ function DebuffFilter:UpdateAura(uid)
 				while debuffNum <= debuffnumber do
 					local debuffName = UnitDebuff(uid, index, filter);
 					if ( debuffName ) then
-							if isBigDebuff(uid, index, nil) then
+							if isBigDebuff(uid, index, nil) and not isBiggestDebuff(uid, index, nil) and not isBiggerDebuff(uid, index, nil) then
 								local debuffFrame = v.debuffFrames[debuffNum]
 								local name, icon, count, debuffType, duration, expirationTime, unitCaster, canStealOrPurge, _, spellId;
 								name, icon, count, debuffType, duration, expirationTime, unitCaster, canStealOrPurge, _, spellId = UnitDebuff(uid, index, filter);
@@ -573,7 +580,7 @@ function DebuffFilter:UpdateAura(uid)
 				while debuffNum <= debuffnumber do
 					local debuffName = UnitDebuff(uid, index, filter);
 					if ( debuffName ) then
-							if CompactUnitFrame_UtilIsBossDebuff(uid, index, filter) then
+							if CompactUnitFrame_UtilIsBossDebuff(uid, index, filter) and not isBiggestDebuff(uid, index, nil) and not isBiggerDebuff(uid, index, nil) and not isBigDebuff(uid, index, nil) then
 								local debuffFrame = v.debuffFrames[debuffNum]
 								local name, icon, count, debuffType, duration, expirationTime, unitCaster, canStealOrPurge, _, spellId;
 								name, icon, count, debuffType, duration, expirationTime, unitCaster, canStealOrPurge, _, spellId = UnitDebuff(uid, index, filter);
@@ -625,7 +632,7 @@ function DebuffFilter:UpdateAura(uid)
 				while debuffNum <= debuffnumber do
 					local debuffName = UnitBuff(uid, index, filter);
 					if ( debuffName ) then
-							if CompactUnitFrame_UtilIsBossAura(uid, index, filter) then
+							if CompactUnitFrame_UtilIsBossAura(uid, index, filter) and not isBiggestDebuff(uid, index, nil) and not isBiggerDebuff(uid, index, nil) and not isBigDebuff(uid, index, nil) and not CompactUnitFrame_UtilIsBossDebuff(uid, index, nil) then
 								local debuffFrame = v.debuffFrames[debuffNum]
 								local name, icon, count, debuffType, duration, expirationTime, unitCaster, canStealOrPurge, _, spellId;
 								name, icon, count, debuffType, duration, expirationTime, unitCaster, canStealOrPurge, _, spellId = UnitBuff(uid, index, filter);
@@ -676,7 +683,7 @@ function DebuffFilter:UpdateAura(uid)
 				while debuffNum <= debuffnumber do
 					local debuffName = UnitDebuff(uid, index, nil)
 					if ( debuffName ) then
-							if  isWarning(uid, index, nil) then
+							if  isWarning(uid, index, nil) and not isBiggestDebuff(uid, index, nil) and not isBiggerDebuff(uid, index, nil) and not isBigDebuff(uid, index, nil) and not CompactUnitFrame_UtilIsBossDebuff(uid, index, nil) and not CompactUnitFrame_UtilIsBossAura(uid, index, nil) then
 								local debuffFrame = v.debuffFrames[debuffNum]
 								local name, icon, count, debuffType, duration, expirationTime, unitCaster, canStealOrPurge, _, spellId;
 								name, icon, count, debuffType, duration, expirationTime, unitCaster, canStealOrPurge, _, spellId = UnitDebuff(uid, index, filter);
@@ -727,7 +734,7 @@ function DebuffFilter:UpdateAura(uid)
 				while debuffNum <= debuffnumber do
 					local debuffName = UnitDebuff(uid, index, nil)
 					if ( debuffName ) then
-							if isPriority(uid, index, nil) then
+							if isPriority(uid, index, nil) and not isBiggestDebuff(uid, index, nil) and not isBiggerDebuff(uid, index, nil) and not isBigDebuff(uid, index, nil) and not CompactUnitFrame_UtilIsBossDebuff(uid, index, nil) and not CompactUnitFrame_UtilIsBossAura(uid, index, nil) and not isWarning(uid, index, nil) then
 								local debuffFrame = v.debuffFrames[debuffNum]
 								local name, icon, count, debuffType, duration, expirationTime, unitCaster, canStealOrPurge, _, spellId;
 								name, icon, count, debuffType, duration, expirationTime, unitCaster, canStealOrPurge, _, spellId = UnitDebuff(uid, index, filter);
@@ -777,7 +784,7 @@ function DebuffFilter:UpdateAura(uid)
 				while debuffNum <= debuffnumber and hidedebuffs==0 do
 					local debuffName = UnitDebuff(uid, index, filter)
 					if ( debuffName ) then
-						if ( isDebuff(uid, index, nil) and not isBiggestDebuff(uid, index, nil) and not isBiggerDebuff(uid, index, nil) and not isBigDebuff(uid, index, nil)  and not CompactUnitFrame_UtilIsBossDebuff(uid, index, filter, false) and not isWarning(uid, index, nil) and not isPriority(uid, index, nil)) then
+						if ( isDebuff(uid, index, nil) and not isBiggestDebuff(uid, index, nil) and not isBiggerDebuff(uid, index, nil) and not isBigDebuff(uid, index, nil) and not CompactUnitFrame_UtilIsBossDebuff(uid, index, nil) and not CompactUnitFrame_UtilIsBossAura(uid, index, nil) and not isWarning(uid, index, nil) and not isPriority(uid, index, nil)) then
 							local debuffFrame = v.debuffFrames[debuffNum]
 							local debuffFrame = v.debuffFrames[debuffNum]
 							local name, icon, count, debuffType, duration, expirationTime, unitCaster, canStealOrPurge, _, spellId;
