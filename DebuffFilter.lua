@@ -162,7 +162,7 @@ local spellIds = {
 	--[48181] = "Big", -- Haunt
 	--[234877] = "Big", -- Curse of Shadows
 	--[196414] = "Big", -- Eradication
-		[233582] = "Warning", --Entrenched Flame
+	[233582] = "Warning", --Entrenched Flame
   --WARRIOR
   --[198819] = "Bigger", -- Sharpen
   --[236273] = "Big", -- Duel
@@ -201,6 +201,10 @@ local spellIds = {
 	--Urg'roth, Breaker of Heroes
 	[314308] = "Bigger", --Spirit Breaker
 
+--TORGHAST
+	[296839] = "Bigger", -- Sledgehammer
+	[294526] = "Bigger", -- Curse of Frailty
+
 --VISIONS OF ORG
 	[297315] = "Bigger", -- Void Buffet
 	[298510] = "Bigger", -- Aqiri Mind Toxin
@@ -238,7 +242,7 @@ local spellIds = {
 	[260703] = "Bigger", -- Unstable Runic Mark (260703)
 	[268088] = "Bigger", --Aura of Dread (268088)[Doesnt Work!]
 	[260741] = "Bigger", --Jagged Nettles (260741)
-	------- RIght Room 1
+	------- Right Room 1
 	[263943] = "Biggest", --Etch
 	[263905] = "Bigger", --Marking Cleave
 	[264520] = "Big", --Serving Serpent
@@ -333,8 +337,7 @@ local spellIds = {
 	[329326] = "Biggest", -- Dark Binding
 
 
---Torghast
-	[296839] = "Bigger", -- Sledgehammer
+
 }
 
 local function isBiggestDebuff(unit, index, filter)
