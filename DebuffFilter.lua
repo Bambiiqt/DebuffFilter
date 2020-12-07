@@ -173,7 +173,7 @@ local spellIds = {
 	--[207744] = "Big", -- Fiery Brand
 
 	--COVENANTS
-	[323673] = "Big", -- Priest Venthyr Mindgames
+	[323673] = "Big", -- Priest Mindgames (Venthyr)
 
 	--TRINKETS
 	--[293491] = "Biggest", -- Cyclotronic Blast
