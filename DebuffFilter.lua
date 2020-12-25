@@ -146,6 +146,7 @@ local spellIds = {
 	--[199845] = "Bigger", --Psyflay
 	--[247777] = "Big", --Mind Trauma
 	--[214621] = "Big", --Schism
+	[335467] = "Big", --Devouring Plague
 	--ROGUE
 	[79140] = "Biggest", -- Vendetta
 	[198259] ="Biggest", --Plunder Armor
@@ -162,7 +163,8 @@ local spellIds = {
 	--[48181] = "Big", -- Haunt
 	--[234877] = "Big", -- Curse of Shadows
 	--[196414] = "Big", -- Eradication
-	[233582] = "Warning", --Entrenched Flame
+	[325640] = "Big", --Soulrot (Nightfae)
+	--[233582] = "Warning", --Entrenched Flame
   --WARRIOR
   --[198819] = "Bigger", -- Sharpen
   --[236273] = "Big", -- Duel
@@ -174,6 +176,8 @@ local spellIds = {
 
 	--COVENANTS
 	[323673] = "Big", -- Priest Mindgames (Venthyr)
+	[314793] = "Big", -- Mage Mirrors of Torment (Venthyr)
+	[320224] = "Biggest", --Potender (Nightfae)
 
 	--TRINKETS
 	--[293491] = "Biggest", -- Cyclotronic Blast
