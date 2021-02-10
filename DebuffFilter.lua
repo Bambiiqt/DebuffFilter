@@ -121,6 +121,7 @@ local spellIds = {
 	--[203268] = "Big", -- Sticky Tar
 	--[131894] = "Big", -- A Murder of Crows
   --SHAMAN
+	[188389] =  "Warning", --Flame Shock
 	--[208997] = "Big", -- Counterstrike Totem
 	--[206647] = "Big", -- Electrocute
 	--DEATH KNIGHT
