@@ -178,6 +178,7 @@ local spellIds = {
 	--COVENANTS
 	[323673] = "Big", -- Priest Mindgames (Venthyr)
 	[314793] = "Big", -- Mage Mirrors of Torment (Venthyr)
+	[328305] = "Big", -- Rogue Sepsis (NightFae)
 	[320224] = "Biggest", --Potender (Nightfae)
 
 	--TRINKETS
