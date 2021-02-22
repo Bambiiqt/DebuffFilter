@@ -7,12 +7,24 @@ DebuffFilter.cache = {}
 local DEFAULT_BUFF = 3
 local DEFAULT_DEBUFF = 3
 
+local strfind = string.find
+local strmatch = string.match
+local tblinsert = table.insert
+local tblremove= table.remove
+local mathfloor = math.floor
+local mathabs = math.abs
+local bit_band = bit.band
+local tblsort = table.sort
+local Ctimer = C_Timer.After
+local substring = string.sub
+
 function DebuffFilter:OnLoad()
 
 	self:RegisterEvent("PLAYER_ENTERING_WORLD")
 	self:RegisterEvent("PLAYER_REGEN_DISABLED")
 	self:RegisterEvent("PLAYER_REGEN_ENABLED")
 	self:RegisterEvent("UNIT_AURA")
+	self:RegisterEvent("COMBAT_LOG_EVENT_UNFILTERED")
 	CompactRaidFrameContainer:HookScript("OnEvent", DebuffFilter.OnRosterUpdate)
 	CompactRaidFrameContainer:HookScript("OnHide", DebuffFilter.ResetStyle)
 	CompactRaidFrameContainer:HookScript("OnShow", DebuffFilter.OnRosterUpdate)
@@ -164,8 +176,8 @@ local spellIds = {
 	--[48181] = "Big", -- Haunt
 	--[234877] = "Big", -- Curse of Shadows
 	--[196414] = "Big", -- Eradication
-	[325640] = "Big", --Soulrot (Nightfae)
 	--[233582] = "Warning", --Entrenched Flame
+		[205179] =  "Warning", --Phantom Singularity
   --WARRIOR
   --[198819] = "Bigger", -- Sharpen
   --[236273] = "Big", -- Duel
@@ -179,6 +191,7 @@ local spellIds = {
 	[323673] = "Big", -- Priest Mindgames (Venthyr)
 	[314793] = "Big", -- Mage Mirrors of Torment (Venthyr)
 	[328305] = "Big", -- Rogue Sepsis (NightFae)
+	[325640] = "Big", --Soulrot (Nightfae)
 	[320224] = "Biggest", --Potender (Nightfae)
 
 	--TRINKETS
@@ -345,6 +358,47 @@ local spellIds = {
 
 
 }
+
+local SmokeBombAuras = {}
+local DuelAura = {}
+
+function DebuffFilter:CLEU()
+		local _, event, _, sourceGUID, sourceName, sourceFlags, _, destGUID, _, _, _, spellId, _, _, _, _, spellSchool = CombatLogGetCurrentEventInfo()
+	-----------------------------------------------------------------------------------------------------------------
+	--SmokeBomb Check
+	-----------------------------------------------------------------------------------------------------------------
+	if ((event == "SPELL_CAST_SUCCESS") and (spellId == 212182)) then
+		if (sourceGUID ~= nil) then
+		local duration = 5
+		local expirationTime = GetTime() + duration
+			if (SmokeBombAuras[sourceGUID] == nil) then
+				SmokeBombAuras[sourceGUID] = {}
+			end
+			SmokeBombAuras[sourceGUID] = { ["duration"] = duration, ["expirationTime"] = expirationTime }
+			Ctimer(duration + 1, function()	-- execute in some close next frame to accurate use of UnitAura function
+			SmokeBombAuras[sourceGUID] = nil
+			end)
+		end
+	end
+
+	-----------------------------------------------------------------------------------------------------------------
+	--Shaodwy Duel Enemy Check
+	-----------------------------------------------------------------------------------------------------------------
+	if ((event == "SPELL_CAST_SUCCESS") and (spellId == 207736)) then
+		if sourceGUID and (bit_band(sourceFlags, COMBATLOG_OBJECT_REACTION_HOSTILE) == COMBATLOG_OBJECT_REACTION_HOSTILE) then
+			if (DuelAura[sourceGUID] == nil) then
+				DuelAura[sourceGUID] = {}
+			end
+			if (DuelAura[destGUID] == nil) then
+				DuelAura[destGUID] = {}
+			end
+			Ctimer(duration + 1, function()
+			DuelAura[sourceGUID] = nil
+			DuelAura[destGUID] = nil
+			end)
+		end
+	end
+end
 
 local function isBiggestDebuff(unit, index, filter)
     local name, icon, _, _, duration, expirationTime, _, _, _, spellId = UnitAura(unit, index, "HARMFUL");
@@ -553,6 +607,35 @@ function DebuffFilter:UpdateAura(uid)
 								debuffFrame:SetScript("OnLeave", function(self)
 									GameTooltip:Hide()
 								end)
+
+								----------------------------------------------------------------------------------------------------------------------------------------------
+								--SmokeBomb
+								----------------------------------------------------------------------------------------------------------------------------------------------
+								if spellId == 212183 then -- Smoke Bomb
+									if unitCaster and SmokeBombAuras[UnitGUID(unitCaster)] then
+										if UnitIsEnemy("player", unitCaster) then --still returns true for an enemy currently under mindcontrol I can add your fix.
+											duration = SmokeBombAuras[UnitGUID(unitCaster)].duration --Add a check, i rogue bombs in stealth there is a unitCaster but the cleu doesnt regester a time
+											expirationTime = SmokeBombAuras[UnitGUID(unitCaster)].expirationTime
+											debuffFrame.icon:SetDesaturated(1) --Destaurate Icon
+											debuffFrame.icon:SetVertexColor(1, .25, 0); --Red Hue Set For Icon
+										elseif not UnitIsEnemy("player", unitCaster) then --Add a check, i rogue bombs in stealth there is a unitCaster but the cleu doesnt regester a time
+											duration = SmokeBombAuras[UnitGUID(unitCaster)].duration --Add a check, i rogue bombs in stealth there is a unitCaster but the cleu doesnt regester a time
+											expirationTime = SmokeBombAuras[UnitGUID(unitCaster)].expirationTime
+										end
+									end
+								end
+
+								-----------------------------------------------------------------------------------------------------------------
+								--Enemy Duel
+								-----------------------------------------------------------------------------------------------------------------
+								if spellId == 207736 then --Shodowey Duel enemy on friendly, friendly frame (red)
+									if DuelAura[UnitGUID(uid)] then --enemyDuel
+										debuffFrame.icon:SetDesaturated(1) --Destaurate Icon
+										debuffFrame.icon:SetVertexColor(1, .25, 0); --Red Hue Set For Icon
+									else
+									end
+								end
+
 								if count then
 								if ( count > 1 ) then
 								local countText = count;
@@ -905,11 +988,10 @@ local function OnEvent(self,event,...)
 	if event == "VARIABLES_LOADED" then self:OnLoad()
 	elseif event == "GROUP_ROSTER_UPDATE" or event == "UNIT_PET" then self:OnRosterUpdate()
 	elseif event == "PLAYER_ENTERING_WORLD" then self:OnRosterUpdate()
-	elseif event == "UNIT_AURA" then self:UpdateAura(...) end
+	elseif event == "COMBAT_LOG_EVENT_UNFILTERED" then self:CLEU()
+elseif event == "UNIT_AURA" then self:UpdateAura(...) end
 end
 
 DebuffFilter:SetScript("OnEvent",OnEvent)
 DebuffFilter:RegisterEvent("VARIABLES_LOADED")
 _G.DebuffFilter = DebuffFilter
-
---Test
