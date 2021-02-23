@@ -392,6 +392,7 @@ function DebuffFilter:CLEU()
 			if (DuelAura[destGUID] == nil) then
 				DuelAura[destGUID] = {}
 			end
+			duration = 6
 			Ctimer(duration + 1, function()
 			DuelAura[sourceGUID] = nil
 			DuelAura[destGUID] = nil
@@ -495,6 +496,8 @@ function DebuffFilter:UpdateAura(uid)
 							name, icon, count, debuffType, duration, expirationTime, unitCaster, canStealOrPurge, _, spellId = UnitDebuff(uid, index, filter);
 							debuffFrame.filter = filter;
 							debuffFrame.icon:SetTexture(icon);
+							debuffFrame.icon:SetDesaturated(nil) --Destaurate Icon
+							debuffFrame.icon:SetVertexColor(1, 1, 1);
 							debuffFrame.SpellId = spellId
 							debuffFrame:SetScript("OnEnter", function(self)
 								GameTooltip:SetOwner (self, "ANCHOR_RIGHT")
@@ -547,6 +550,8 @@ function DebuffFilter:UpdateAura(uid)
 								name, icon, count, debuffType, duration, expirationTime, unitCaster, canStealOrPurge, _, spellId = UnitDebuff(uid, index, filter);
 								debuffFrame.filter = filter;
 								debuffFrame.icon:SetTexture(icon);
+								debuffFrame.icon:SetDesaturated(nil) --Destaurate Icon
+								debuffFrame.icon:SetVertexColor(1, 1, 1);
 								debuffFrame.SpellId = spellId
 								debuffFrame:SetScript("OnEnter", function(self)
 									GameTooltip:SetOwner (self, "ANCHOR_RIGHT")
@@ -598,6 +603,8 @@ function DebuffFilter:UpdateAura(uid)
 								name, icon, count, debuffType, duration, expirationTime, unitCaster, canStealOrPurge, _, spellId = UnitDebuff(uid, index, filter);
 								debuffFrame.filter = filter;
 								debuffFrame.icon:SetTexture(icon);
+								debuffFrame.icon:SetDesaturated(nil) --Destaurate Icon
+								debuffFrame.icon:SetVertexColor(1, 1, 1);
 								debuffFrame.SpellId = spellId
 								debuffFrame:SetScript("OnEnter", function(self)
 									GameTooltip:SetOwner (self, "ANCHOR_RIGHT")
@@ -607,6 +614,7 @@ function DebuffFilter:UpdateAura(uid)
 								debuffFrame:SetScript("OnLeave", function(self)
 									GameTooltip:Hide()
 								end)
+
 
 								----------------------------------------------------------------------------------------------------------------------------------------------
 								--SmokeBomb
@@ -635,6 +643,7 @@ function DebuffFilter:UpdateAura(uid)
 									else
 									end
 								end
+
 
 								if count then
 								if ( count > 1 ) then
@@ -678,6 +687,8 @@ function DebuffFilter:UpdateAura(uid)
 								name, icon, count, debuffType, duration, expirationTime, unitCaster, canStealOrPurge, _, spellId = UnitDebuff(uid, index, filter);
 								debuffFrame.filter = filter;
 								debuffFrame.icon:SetTexture(icon);
+								debuffFrame.icon:SetDesaturated(nil) --Destaurate Icon
+								debuffFrame.icon:SetVertexColor(1, 1, 1);
 								debuffFrame.SpellId = spellId
 								debuffFrame:SetScript("OnEnter", function(self)
 									GameTooltip:SetOwner (self, "ANCHOR_RIGHT")
@@ -730,6 +741,8 @@ function DebuffFilter:UpdateAura(uid)
 								name, icon, count, debuffType, duration, expirationTime, unitCaster, canStealOrPurge, _, spellId = UnitBuff(uid, index, filter);
 								debuffFrame.filter = filter;
 								debuffFrame.icon:SetTexture(icon);
+								debuffFrame.icon:SetDesaturated(nil) --Destaurate Icon
+								debuffFrame.icon:SetVertexColor(1, 1, 1);
 								debuffFrame.SpellId = spellId
 								debuffFrame:SetScript("OnEnter", function(self)
 									GameTooltip:SetOwner (self, "ANCHOR_RIGHT")
@@ -781,6 +794,8 @@ function DebuffFilter:UpdateAura(uid)
 								name, icon, count, debuffType, duration, expirationTime, unitCaster, canStealOrPurge, _, spellId = UnitDebuff(uid, index, filter);
 								debuffFrame.filter = filter;
 								debuffFrame.icon:SetTexture(icon);
+								debuffFrame.icon:SetDesaturated(nil) --Destaurate Icon
+								debuffFrame.icon:SetVertexColor(1, 1, 1);
 								debuffFrame.SpellId = spellId
 								debuffFrame:SetScript("OnEnter", function(self)
 									GameTooltip:SetOwner (self, "ANCHOR_RIGHT")
@@ -832,6 +847,8 @@ function DebuffFilter:UpdateAura(uid)
 								name, icon, count, debuffType, duration, expirationTime, unitCaster, canStealOrPurge, _, spellId = UnitDebuff(uid, index, filter);
 								debuffFrame.filter = filter;
 								debuffFrame.icon:SetTexture(icon);
+								debuffFrame.icon:SetDesaturated(nil) --Destaurate Icon
+								debuffFrame.icon:SetVertexColor(1, 1, 1);
 								debuffFrame.SpellId = spellId
 								debuffFrame:SetScript("OnEnter", function(self)
 									GameTooltip:SetOwner (self, "ANCHOR_RIGHT")
@@ -883,6 +900,8 @@ function DebuffFilter:UpdateAura(uid)
 							name, icon, count, debuffType, duration, expirationTime, unitCaster, canStealOrPurge, _, spellId = UnitDebuff(uid, index, filter);
 							debuffFrame.filter = filter;
 							debuffFrame.icon:SetTexture(icon);
+							debuffFrame.icon:SetDesaturated(nil) --Destaurate Icon
+							debuffFrame.icon:SetVertexColor(1, 1, 1);
 							debuffFrame.SpellId = spellId
 							debuffFrame:SetScript("OnEnter", function(self)
 								GameTooltip:SetOwner (self, "ANCHOR_RIGHT")
