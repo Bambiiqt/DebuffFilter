@@ -127,15 +127,16 @@ local spellIds = {
 ---GENERAL DANGER---
   --HUNTER
 	--[209967] = "Biggest", -- Dire Beast: Basilisk
-	--[202797] = "Bigger", -- Viper Sting
-	--[202914] = "Bigger", -- Spider Sting
-	--[202900] = "Big", -- Scorpid Sting
 	--[203268] = "Big", -- Sticky Tar
 	--[131894] = "Big", -- A Murder of Crows
+		[212431] = "Big", -- Explosive Shot
+		[257284] = "Warning", -- Hunter's Mark
+
   --SHAMAN
 	[188389] =  "Warning", --Flame Shock
 	--[208997] = "Big", -- Counterstrike Totem
 	--[206647] = "Big", -- Electrocute
+
 	--DEATH KNIGHT
 	--[77606] = "Biggest", -- Dark Simulacrum
 	--[130736] = "Big", -- Soul Reaper
@@ -143,16 +144,21 @@ local spellIds = {
 	[233397] = "Warning", -- Delirium
 	[214975] = "Warning", -- Heartstop Aura
 	[199719] = "Warning", -- Heartstop Aura
+
 	--DRUID
 	--[232559] = "Big", -- Thorns
 	--[236021] = "Big", -- Ferocious Wound
 	--[200947] = "Big", -- Encroaching Vines
+	[58180] = "Warning", --Infected Wounds (PvP MS)
+
 	--MONK
 	[115080] = "Biggest", -- Touch of Death
 	[122470] = "Bigger", -- Touch of Karma
 	[124280] = "Big", -- Touch of Karma Dot
+
   --PALLY
 	--[206891] = "Big", -- Focused Assault
+
   --PRIEST
 	--[322461] = "Big" --Thoughtstolen
 	--[205369] = "Bigger", -- Mind Bomb
@@ -160,13 +166,13 @@ local spellIds = {
 	--[247777] = "Big", --Mind Trauma
 	--[214621] = "Big", --Schism
 	[335467] = "Big", --Devouring Plague
+
 	--ROGUE
-	[79140] = "Biggest", -- Vendetta
-	[198259] ="Biggest", --Plunder Armor
+	[79140]  = "Biggest", -- Vendetta
 	[207736] = "Big", -- Shadowy Duel
 	[212183] = "Big", -- Smoke Bomb
-	--[197091] ="Biggest", --Neurotoxin
-	[197051] = "Warning", --Mind-Numbing Poison
+	[8680] = "Warning", --Wound Poison
+
 	--LOCK
 	--[80240] = "Bigger", -- Havoc
 	--[200587] = "Bigger", -- Fel Fissure
@@ -177,22 +183,25 @@ local spellIds = {
 	--[234877] = "Big", -- Curse of Shadows
 	--[196414] = "Big", -- Eradication
 	--[233582] = "Warning", --Entrenched Flame
-		[205179] =  "Warning", --Phantom Singularity
+		[205179] = "Warning", --Phantom Singularity
+
   --WARRIOR
   --[198819] = "Bigger", -- Sharpen
   --[236273] = "Big", -- Duel
   --[208086] = "Big", -- Colossus Smash
+
 	--DEMON HUNTER
-	[206649] = "Bigger", -- Eye of Leotheras
 	--[206491] = "Big", -- Nemesis
 	--[207744] = "Big", -- Fiery Brand
 
 	--COVENANTS
-	[323673] = "Big", -- Priest Mindgames (Venthyr)
-	[314793] = "Big", -- Mage Mirrors of Torment (Venthyr)
-	[328305] = "Big", -- Rogue Sepsis (NightFae)
-	[325640] = "Big", --Soulrot (Nightfae)
 	[320224] = "Biggest", --Potender (Nightfae)
+	[327140] = "Biggest", --Forgeborne Reveries (Necrolord)
+	[323673] = "Big", -- Priest: Mindgames (Venthyr)
+	[314793] = "Big", -- Mage: Mirrors of Torment (Venthyr)
+	[323654] = "Big", -- Rogue: Flagellation (Venthyer)
+	[328305] = "Big", -- Rogue: Sepsis (NightFae)
+	[325640] = "Big", -- Warlock: Soulrot (Nightfae)
 
 	--TRINKETS
 	--[293491] = "Biggest", -- Cyclotronic Blast
@@ -200,6 +209,8 @@ local spellIds = {
 	[294127] = "Bigger", -- Gladiator’s Maledict S2
 	[305249] = "Bigger", -- Gladiator’s Maledict S3 (Absorb)
 	[305252] = "Bigger", -- Gladiator’s Maledict S3 (On Hit Dot)
+	[305249] = "Bigger", -- Gladiator’s Maledict S3 (Absorb)
+	[358259] = "Bigger", -- Gladiator’s Maledict S2 Slands (Absorb)
 	[271465] = "Big", -- Rotcrusted Voodoo Doll
 	[313148] = "Big", -- Obsidian Claw
 	[318476] = "Big", -- Obsidian Claw
@@ -438,6 +449,7 @@ local bgBigspellIds = {
 	[205369] = "True",		-- Mind Bomb
 	[200196] = "True",		-- Holy Word: Chastise
 	[200200] = "True",		-- Holy Word: Chastise (talent)
+	[358861] = "True",		-- Void Volley: Horrify
 
 	[2094] = "True",		-- Blind
 	[1833] = "True",		-- Cheap Shot
@@ -477,6 +489,7 @@ local bgBigspellIds = {
 
 	[331866] = "True",    -- Door of Shadows Fear (Venthyr)
 	[332423] = "True",    -- Sparkling Driftglobe Core 35% Stun (Kyrian)
+	[324263] = "True",    -- Sulfuric Emission (Necro)
 	[20549] = "True",		-- War Stomp (tauren racial)
 	[107079] = "True",		-- Quaking Palm (pandaren racial)
 	[255723] = "True",		-- Bull Rush (highmountain tauren racial)
@@ -521,6 +534,7 @@ local bgBigspellIds = {
 	[105771] = "True",  -- Charge (root)
 	[199042] = "True", -- Thunderstruck
 	[323996] = "True", -- The Hunt
+	[354051] = "True", -- Nimble Steps
 }
 
 local bgWarningspellIds = {
@@ -582,7 +596,7 @@ function DebuffFilter:CLEU()
 			if (DuelAura[destGUID] == nil) then
 				DuelAura[destGUID] = {}
 			end
-			duration = 6
+			duration = 5
 			Ctimer(duration + 1, function()
 			DuelAura[sourceGUID] = nil
 			DuelAura[destGUID] = nil
@@ -643,11 +657,18 @@ local function CompactUnitFrame_UtilIsBossAura(unit, index, filter)
 end
 
 local function isWarning(unit, index, filter)
-    local name, icon, _, _, duration, expirationTime, _, _, _, spellId = UnitAura(unit, index, "HARMFUL");
+    local name, icon, count, _, duration, expirationTime, _, _, _, spellId = UnitAura(unit, index, "HARMFUL");
 		local inInstance, instanceType = IsInInstance()
 		if instanceType=="pvp" and bgWarningspellIds[spellId] then
 			return true
 		elseif spellIds[spellId] == "Warning"  then
+			if spellId == 58180 or spellId == 8680 then -- Only Warning if Two Stacks of MS
+				if count == 2 then
+					return true
+				else
+					return false
+				end
+			end
 			return true
 		else
 			return false
