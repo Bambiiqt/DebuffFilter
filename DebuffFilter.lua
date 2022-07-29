@@ -182,6 +182,7 @@ local spellIds = {
 	--[48181] = "Big", -- Haunt
 	--[234877] = "Big", -- Curse of Shadows
 	--[196414] = "Big", -- Eradication
+		[603] = "Warning", -- Doom (Demo)
 	--[233582] = "Warning", --Entrenched Flame
 		[205179] = "Warning", --Phantom Singularity
 
@@ -189,6 +190,7 @@ local spellIds = {
   --[198819] = "Bigger", -- Sharpen
   --[236273] = "Big", -- Duel
   --[208086] = "Big", -- Colossus Smash
+--[354788] = "Warning", --Slaughterhouse (Stacking MS)
 
 	--DEMON HUNTER
 	--[206491] = "Big", -- Nemesis
@@ -202,6 +204,11 @@ local spellIds = {
 	[323654] = "Big", -- Rogue: Flagellation (Venthyer)
 	[328305] = "Big", -- Rogue: Sepsis (NightFae)
 	[325640] = "Big", -- Warlock: Soulrot (Nightfae)
+	[324149] = "Big", -- Hunter: Flayed Shot (Venthyer)
+	[325216] = "Big", -- Bonedust Brew (Necro)
+	[325203] = "Big", --Unholy Transfusion (Necro)
+	[325733] = "Big", -- Adpative Swarm (Necro)
+	[317009] = "Big", -- DH: Sinful Brand(Venthyer)
 
 	--TRINKETS
 	--[293491] = "Biggest", -- Cyclotronic Blast
@@ -210,7 +217,8 @@ local spellIds = {
 	[305249] = "Bigger", -- Gladiator’s Maledict S3 (Absorb)
 	[305252] = "Bigger", -- Gladiator’s Maledict S3 (On Hit Dot)
 	[305249] = "Bigger", -- Gladiator’s Maledict S3 (Absorb)
-	[358259] = "Bigger", -- Gladiator’s Maledict S2 Slands (Absorb)
+	[356657] = "Bigger", -- Shackles of Malediction [Gladiator’s Maledict S2 Slands (DMG)]
+	[358259] = "Big", -- Gladiator’s Maledict S2 Slands (Absorb)
 	[271465] = "Big", -- Rotcrusted Voodoo Doll
 	[313148] = "Big", -- Obsidian Claw
 	[318476] = "Big", -- Obsidian Claw
@@ -662,7 +670,7 @@ local function isWarning(unit, index, filter)
 		if instanceType=="pvp" and bgWarningspellIds[spellId] then
 			return true
 		elseif spellIds[spellId] == "Warning"  then
-			if spellId == 58180 or spellId == 8680 then -- Only Warning if Two Stacks of MS
+			if spellId == 58180 or spellId == 8680  or spellId == 354788 then -- Only Warning if Two Stacks of MS
 				if count == 2 then
 					return true
 				else
