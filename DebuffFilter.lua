@@ -579,7 +579,7 @@ function DebuffFilter:CLEU()
 	-----------------------------------------------------------------------------------------------------------------
 	--SmokeBomb Check
 	-----------------------------------------------------------------------------------------------------------------
-	if ((event == "SPELL_CAST_SUCCESS") and (spellId == 212182)) then
+		if ((event == "SPELL_CAST_SUCCESS") and (spellId == 212182 or spellId == 359053)) then
 		if (sourceGUID ~= nil) then
 		local duration = 5
 		local expirationTime = GetTime() + duration
@@ -596,7 +596,7 @@ function DebuffFilter:CLEU()
 	-----------------------------------------------------------------------------------------------------------------
 	--Shaodwy Duel Enemy Check
 	-----------------------------------------------------------------------------------------------------------------
-	if ((event == "SPELL_CAST_SUCCESS") and (spellId == 207736)) then
+	if (event == "SPELL_CAST_SUCCESS") and (spellId == 207736) then
 		if sourceGUID and (bit_band(sourceFlags, COMBATLOG_OBJECT_REACTION_HOSTILE) == COMBATLOG_OBJECT_REACTION_HOSTILE) then
 			if (DuelAura[sourceGUID] == nil) then
 				DuelAura[sourceGUID] = {}
