@@ -375,7 +375,6 @@ local spellIds = {
 	[329326] = "Biggest", -- Dark Binding
 
 
-
 }
 
 local bgBiggerspellIds = {
@@ -635,9 +634,23 @@ local function isBiggerDebuff(unit, index, filter)
 end
 
 local function isBigDebuff(unit, index, filter)
-  local name, icon, _, _, duration, expirationTime, _, _, _, spellId = UnitAura(unit, index, "HARMFUL");
+  local name, icon, _, _, duration, expirationTime, source, _, _, spellId = UnitAura(unit, index, "HARMFUL");
 	local inInstance, instanceType = IsInInstance()
-	if instanceType=="pvp" and bgBigspellIds[spellId] then
+	if instanceType =="arena" then
+		if (spellId == 325216) then --BoneDust Brew
+			local i, specID
+			if strfind(source, "1") then i = 1 elseif strfind(source, "2") then i = 2 elseif strfind(source, "3") then i = 3 	elseif (UnitGUID(source) == UnitGUID("arena1")) then i = 1 elseif (UnitGUID(source) == UnitGUID("arena2")) then i = 2 elseif (UnitGUID(source) == UnitGUID("arena3")) then i = 3 end
+				specID = GetArenaOpponentSpec(i);
+			if specID then
+				if (specID == 270) then --Monk: Brewmaster: 268 / Windwalker: 269 / Mistweaver: 270
+					spellIds[spellId] = "Warning"
+				else
+					spellIds[spellId] = "Big"
+				end
+			end
+		end
+	end
+	if instanceType =="pvp" and bgBigspellIds[spellId] then
 		return true
 	elseif spellIds[spellId] == "Big"  then
 		return true
