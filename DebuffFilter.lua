@@ -184,7 +184,7 @@ local spellIds = {
 	--[196414] = "Big", -- Eradication
 		[603] = "Warning", -- Doom (Demo)
 	--[233582] = "Warning", --Entrenched Flame
-		[205179] = "Warning", --Phantom Singularity
+		[205179] = "Big", --Phantom Singularity
 
   --WARRIOR
   --[198819] = "Bigger", -- Sharpen
@@ -638,14 +638,20 @@ local function isBigDebuff(unit, index, filter)
 	local inInstance, instanceType = IsInInstance()
 	if instanceType =="arena" then
 		if (spellId == 325216) then --BoneDust Brew
-			local i, specID
-			if strfind(source, "1") then i = 1 elseif strfind(source, "2") then i = 2 elseif strfind(source, "3") then i = 3 	elseif (UnitGUID(source) == UnitGUID("arena1")) then i = 1 elseif (UnitGUID(source) == UnitGUID("arena2")) then i = 2 elseif (UnitGUID(source) == UnitGUID("arena3")) then i = 3 end
-				specID = GetArenaOpponentSpec(i);
-			if specID then
-				if (specID == 270) then --Monk: Brewmaster: 268 / Windwalker: 269 / Mistweaver: 270
-					spellIds[spellId] = "Warning"
+			local id, specID
+			if source then
+				if strfind(source, "nameplate") then
+					if (UnitGUID(source) == UnitGUID("arena1")) then id = 1 elseif (UnitGUID(source) == UnitGUID("arena2")) then id = 2 elseif (UnitGUID(source) == UnitGUID("arena3")) then id = 3 end
 				else
-					spellIds[spellId] = "Big"
+					if strfind(source, "arena1") then id = 1 elseif strfind(source, "arena2") then id = 2 elseif strfind(source, "arena3") then id = 3 end
+				end
+				specID = GetArenaOpponentSpec(id)
+				if specID then
+					if (specID == 270) then --Monk: Brewmaster: 268 / Windwalker: 269 / Mistweaver: 270
+						spellIds[spellId] = "Warning"
+					else
+						spellIds[spellId] = "Big"
+					end
 				end
 			end
 		end
