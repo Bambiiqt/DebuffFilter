@@ -102,8 +102,8 @@ local spellIds = {
 	[110310] = "Hide", --Dampening
 	[338906] = "Hide", -- The Jailer's Chains
 ---Priority--
-	[317265] = "Priority", --Infinite Stars
-	[318187] = "Priority", --Gushing Wounds
+--	[317265] = "Priority", --Infinite Stars
+--	[318187] = "Priority", --Gushing Wounds
 ---WARNINGS---
   --DEATH KNIGHT
   [123981] = "Warning", --Perdition
@@ -121,9 +121,6 @@ local spellIds = {
 	[195901]= "Warning", --Adapted
 	[288756]= "Warning", --Gladiator's Safeguard
 
-	[315179]= "Biggest", --Inevitable Doom
-	[315161]= "Warning", --Eye of Corruption
-	[319695]= "Warning", --Grand Delusions
 ---GENERAL DANGER---
   --HUNTER
 	--[209967] = "Biggest", -- Dire Beast: Basilisk
@@ -211,17 +208,9 @@ local spellIds = {
 	[317009] = "Big", -- DH: Sinful Brand(Venthyer)
 
 	--TRINKETS
-	--[293491] = "Biggest", -- Cyclotronic Blast
-	[302144] = "Bigger", -- Gladiator’s Maledict S2
-	[294127] = "Bigger", -- Gladiator’s Maledict S2
-	[305249] = "Bigger", -- Gladiator’s Maledict S3 (Absorb)
-	[305252] = "Bigger", -- Gladiator’s Maledict S3 (On Hit Dot)
-	[305249] = "Bigger", -- Gladiator’s Maledict S3 (Absorb)
-	[356657] = "Bigger", -- Shackles of Malediction [Gladiator’s Maledict S2 Slands (DMG)]
-	[358259] = "Big", -- Gladiator’s Maledict S2 Slands (Absorb)
-	[271465] = "Big", -- Rotcrusted Voodoo Doll
-	[313148] = "Big", -- Obsidian Claw
-	[318476] = "Big", -- Obsidian Claw
+
+
+
 
 ---PVE---
 --RAID
