@@ -615,7 +615,7 @@ local function isBiggerDebuff(unit, index, filter)
 	local inInstance, instanceType = IsInInstance()
 	if instanceType=="pvp" and bgBiggerspellIds[spellId] then
 		return true
-	elseif spellIds[spellId] == "Bigger"  then
+	elseif spellIds[spellId] == "Bigger"  and instanceType ~="pvp" then
 		return true
 	else
 		return false
@@ -647,7 +647,7 @@ local function isBigDebuff(unit, index, filter)
 	end
 	if instanceType =="pvp" and bgBigspellIds[spellId] then
 		return true
-	elseif spellIds[spellId] == "Big"  then
+	elseif spellIds[spellId] == "Big"  and instanceType ~="pvp" then
 		return true
 	else
 		return false
@@ -677,7 +677,7 @@ local function isWarning(unit, index, filter)
 		local inInstance, instanceType = IsInInstance()
 		if instanceType=="pvp" and bgWarningspellIds[spellId] then
 			return true
-		elseif spellIds[spellId] == "Warning"  then
+		elseif spellIds[spellId] == "Warning"  and instanceType ~="pvp" then
 			if spellId == 58180 or spellId == 8680  or spellId == 354788 then -- Only Warning if Two Stacks of MS
 				if count == 2 then
 					return true
