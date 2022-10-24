@@ -4,7 +4,7 @@ local debuffnumber = 3
 DebuffFilter = CreateFrame("Frame")
 DebuffFilter.cache = {}
 
-local DEFAULT_BUFF = 3
+local DEFAULT_BUFF = 4
 local DEFAULT_DEBUFF = 3
 
 local strfind = string.find
@@ -18,71 +18,75 @@ local tblsort = table.sort
 local Ctimer = C_Timer.After
 local substring = string.sub
 
-function DebuffFilter:OnLoad()
+local SmokeBombAuras = {}
+local DuelAura = {}
 
-	self:RegisterEvent("PLAYER_ENTERING_WORLD")
-	self:RegisterEvent("PLAYER_REGEN_DISABLED")
-	self:RegisterEvent("PLAYER_REGEN_ENABLED")
-	self:RegisterEvent("UNIT_AURA")
-	self:RegisterEvent("COMBAT_LOG_EVENT_UNFILTERED")
-	CompactRaidFrameContainer:HookScript("OnEvent", DebuffFilter.OnRosterUpdate)
-	CompactRaidFrameContainer:HookScript("OnHide", DebuffFilter.ResetStyle)
-	CompactRaidFrameContainer:HookScript("OnShow", DebuffFilter.OnRosterUpdate)
+local PriorityBuff = {}
+for i = 1, DEFAULT_BUFF do
+	if not PriorityBuff[i] then PriorityBuff[i] = {} end
 end
 
--- When roster updated, auto apply arena style or reset style
-function DebuffFilter:OnRosterUpdate()
-	local _,areaType = IsInInstance()
-	if not CompactRaidFrameContainer:IsVisible() then return end
-	local n = GetNumGroupMembers()
-	if n <= 40 then DebuffFilter:ApplyStyle() else DebuffFilter:ResetStyle() end
-end
+PriorityBuff[1] = {
+"Power Infusion",
+"Power Word: Fortitude",
+"Beacon of Light",
+"Beacon of Faith",
+774, --Rejuv
+}
 
--- If in raid reset style
-function DebuffFilter:OnZoneChanged()
-	local _,areaType = IsInInstance()
-	self:ResetStyle()
-	--if areaType ~= "raid" then self:ApplyStyle() end
-end
+PriorityBuff[2] = {
+"Renew",
+"Attonement",
+155777, --Rejuc Germ
+"Spring Blossoms",
+"Glimmer of Light",
+}
 
-hooksecurefunc("CompactRaidFrameContainer_SetFlowSortFunction", function(_,_)
-	DebuffFilter:ResetStyle()
-	DebuffFilter:OnRosterUpdate()
-end)
+PriorityBuff[3] = {
+"Power Word: Shield",
+"Prayer of Mending",
+"Lifebloom",
+"Bestow Faith",
+216328, --LightGrace
+"Focused Growth", --Focused Growth (Honor Talent)
+}
 
-function DebuffFilter:ApplyStyle() ----- Find A Way to Always Show Debuffs
-	if CompactRaidFrameManager.container.groupMode == "flush" then
-		for i = 1,80 do
-			local f = _G["CompactRaidFrame"..i]
-			if f and not self.cache[f] and f.inUse and f.maxBuffs ~= 0 and #f.buffFrames == DEFAULT_BUFF and f.unit and not strfind(f.unit,"pet") and not strfind(f.unit,"target") then
-				self:ApplyFrame(f)
-				self:UpdateAura(f.unit)
-			end
-			if f and not f.inUse and self.cache[f] then
-				self:ResetFrame(f)
-			end
-		end
-	elseif CompactRaidFrameManager.container.groupMode == "discrete" then
-		for i = 1,8 do
-			for j = 1,5 do
-				local f = _G["CompactRaidGroup"..i.."Member"..j]
-				if f and not self.cache[f] and f.maxBuffs ~= 0 and #f.buffFrames == DEFAULT_BUFF and f.unit and not strfind(f.unit,"pet") and not strfind(f.unit,"target") then
-					self:ApplyFrame(f)
-					self:UpdateAura(f.unit)
-				end
-				if f and not f.unit and self.cache[f] then
-					self:ResetFrame(f)
-				end
-				local f = _G["CompactPartyFrameMember"..j] --- Does
-				if f and not self.cache[f] and f.maxBuffs ~= 0 and #f.buffFrames == DEFAULT_BUFF and f.unit and not strfind(f.unit,"pet") and not strfind(f.unit,"target") then
-					self:ApplyFrame(f)
-					self:UpdateAura(f.unit)
-				end
-				if f and not f.unit and self.cache[f] then
-					self:ResetFrame(f)
-				end
-			end
-		end
+--Lower Right on Icon 1
+PriorityBuff[4] = {
+"Arcane Intellect",
+"Arcane Brilliance",
+"Dalaran Brilliance",
+}
+
+--Lower Left on Icon 1
+PriorityBuff[5] = {
+
+}
+
+--Upper Left on Icon 1
+PriorityBuff[6] = {
+
+}
+--Upper Right on Icon 1
+PriorityBuff[7] = {
+	264761, --War-Scroll of Battle Shout
+	6673, --Battle Shout
+}
+
+--UPPER RIGHT PRIO COUNT
+PriorityBuff[8] = {
+
+}
+--UPPER LEFT PRIO COUNT
+PriorityBuff[9] = {
+
+}
+
+local Buff = {}
+for i = 1, DEFAULT_BUFF do
+	for k, v in ipairs(PriorityBuff[i]) do
+		if not Buff[i] then Buff[i] = {} end
+		Buff[i][v] = k
 	end
 end
 
@@ -559,8 +563,80 @@ local bgWarningspellIds = {
 
 }
 
-local SmokeBombAuras = {}
-local DuelAura = {}
+
+function DebuffFilter:OnLoad()
+
+	self:RegisterEvent("PLAYER_ENTERING_WORLD")
+	self:RegisterEvent("PLAYER_REGEN_DISABLED")
+	self:RegisterEvent("PLAYER_REGEN_ENABLED")
+	self:RegisterEvent("UNIT_AURA")
+	self:RegisterEvent("COMBAT_LOG_EVENT_UNFILTERED")
+	CompactRaidFrameContainer:HookScript("OnEvent", DebuffFilter.OnRosterUpdate)
+	CompactRaidFrameContainer:HookScript("OnHide", DebuffFilter.ResetStyle)
+	CompactRaidFrameContainer:HookScript("OnShow", DebuffFilter.OnRosterUpdate)
+end
+
+-- When roster updated, auto apply arena style or reset style
+function DebuffFilter:OnRosterUpdate()
+	local _,areaType = IsInInstance()
+	if not CompactRaidFrameContainer:IsVisible() then return end
+	local n = GetNumGroupMembers()
+	if n <= 40 then DebuffFilter:ApplyStyle() else DebuffFilter:ResetStyle() end
+end
+
+-- If in raid reset style
+function DebuffFilter:OnZoneChanged()
+	local _,areaType = IsInInstance()
+	self:ResetStyle()
+	--if areaType ~= "raid" then self:ApplyStyle() end
+end
+
+
+hooksecurefunc("CompactRaidFrameContainer_SetFlowSortFunction", function(_,_)
+	DebuffFilter:ResetStyle()
+	DebuffFilter:OnRosterUpdate()
+end)
+
+function DebuffFilter:ApplyStyle() ----- Find A Way to Always Show Debuffs
+	if CompactRaidFrameManager.container.groupMode == "flush" then
+		for i = 1,80 do
+			local f = _G["CompactRaidFrame"..i]
+			if f and not self.cache[f] and f.unit and not strfind(f.unit,"target") then --not strfind(f.unit,"pet") then
+				self:ApplyFrame(f)
+				self:UpdateAura(f.unit)
+				self:UpdateBuffAura(f.unit)
+			end
+			if f and not f.inUse and self.cache[f] then
+				self:ResetFrame(f)
+			end
+		end
+	elseif CompactRaidFrameManager.container.groupMode == "discrete" then
+		for i = 1,8 do
+			for j = 1,5 do
+				local f = _G["CompactRaidGroup"..i.."Member"..j]
+				--CompactUnitFrame_HideAllDispelDebuffs(f)
+				if f and not self.cache[f] and f.unit and not strfind(f.unit,"target") then --not strfind(f.unit,"pet") then
+					self:ApplyFrame(f)
+					self:UpdateAura(f.unit)
+					self:UpdateBuffAura(f.unit)
+				end
+				if f and not f.unit and self.cache[f] then
+					self:ResetFrame(f)
+				end
+				local f = _G["CompactPartyFrameMember"..j] --- Does
+				--CompactUnitFrame_HideAllDispelDebuffs(f)
+				if f and not self.cache[f] and f.unit  and not strfind(f.unit,"target") then --not strfind(f.unit,"pet") then
+					self:ApplyFrame(f)
+					self:UpdateAura(f.unit)
+					self:UpdateBuffAura(f.unit)
+				end
+				if f and not f.unit and self.cache[f] then
+					self:ResetFrame(f)
+				end
+			end
+		end
+	end
+end
 
 function DebuffFilter:CLEU()
 		local _, event, _, sourceGUID, sourceName, sourceFlags, _, destGUID, _, _, _, spellId, _, _, _, _, spellSchool = CombatLogGetCurrentEventInfo()
@@ -601,7 +677,7 @@ function DebuffFilter:CLEU()
 	end
 end
 
-local function isBiggestDebuff(unit, index, filter)
+local function isBiggestDebuff(unit, index, filter, f)
   local name, icon, _, _, duration, expirationTime, _, _, _, spellId = UnitAura(unit, index, "HARMFUL");
 	if spellIds[spellId] == "Biggest"  then
 		return true
@@ -610,10 +686,10 @@ local function isBiggestDebuff(unit, index, filter)
 	end
 end
 
-local function isBiggerDebuff(unit, index, filter)
+local function isBiggerDebuff(unit, index, filter, f)
   local name, icon, _, _, duration, expirationTime, _, _, _, spellId = UnitAura(unit, index, "HARMFUL");
 	local inInstance, instanceType = IsInInstance()
-	if instanceType=="pvp" and bgBiggerspellIds[spellId] then
+	if (instanceType =="pvp" or strfind(f.unit,"pet")) and bgBigspellIds[spellId] then
 		return true
 	elseif spellIds[spellId] == "Bigger"  and instanceType ~="pvp" then
 		return true
@@ -622,7 +698,7 @@ local function isBiggerDebuff(unit, index, filter)
 	end
 end
 
-local function isBigDebuff(unit, index, filter)
+local function isBigDebuff(unit, index, filter, f)
   local name, icon, _, _, duration, expirationTime, source, _, _, spellId = UnitAura(unit, index, "HARMFUL");
 	local inInstance, instanceType = IsInInstance()
 	if instanceType =="arena" then
@@ -645,7 +721,7 @@ local function isBigDebuff(unit, index, filter)
 			end
 		end
 	end
-	if instanceType =="pvp" and bgBigspellIds[spellId] then
+	if (instanceType =="pvp" or strfind(f.unit,"pet")) and bgBigspellIds[spellId] then
 		return true
 	elseif spellIds[spellId] == "Big"  and instanceType ~="pvp" then
 		return true
@@ -654,7 +730,7 @@ local function isBigDebuff(unit, index, filter)
 	end
 end
 
-local function CompactUnitFrame_UtilIsBossDebuff(unit, index, filter)
+local function CompactUnitFrame_UtilIsBossDebuff(unit, index, filter, f)
   local name, icon, _, _, duration, expirationTime, _, _, _, spellId, _, isBossDeBuff = UnitAura(unit, index, "HARMFUL");
 	if isBossDeBuff then
 		return true
@@ -663,7 +739,7 @@ local function CompactUnitFrame_UtilIsBossDebuff(unit, index, filter)
 	end
 end
 
-local function CompactUnitFrame_UtilIsBossAura(unit, index, filter)
+local function CompactUnitFrame_UtilIsBossAura(unit, index, filter, f)
   local name, icon, _, _, duration, expirationTime, _, _, _, spellId, _, isBossDeBuff = UnitAura(unit, index, "HELPFUL");
 	if isBossDeBuff then
 		return true
@@ -672,10 +748,10 @@ local function CompactUnitFrame_UtilIsBossAura(unit, index, filter)
 	end
 end
 
-local function isWarning(unit, index, filter)
+local function isWarning(unit, index, filter, f)
     local name, icon, count, _, duration, expirationTime, _, _, _, spellId = UnitAura(unit, index, "HARMFUL");
 		local inInstance, instanceType = IsInInstance()
-		if instanceType=="pvp" and bgWarningspellIds[spellId] then
+		if (instanceType =="pvp" or strfind(f.unit,"pet")) and bgBigspellIds[spellId] then
 			return true
 		elseif spellIds[spellId] == "Warning"  and instanceType ~="pvp" then
 			if spellId == 58180 or spellId == 8680  or spellId == 354788 then -- Only Warning if Two Stacks of MS
@@ -691,7 +767,7 @@ local function isWarning(unit, index, filter)
 		end
 	end
 
-local function isPriority(unit, index, filter)
+local function isPriority(unit, index, filter, f)
     local name, icon, _, _, duration, expirationTime, _, _, _, spellId = UnitAura(unit, index, "HARMFUL");
 		if spellIds[spellId] == "Priority" then
 		return true
@@ -700,7 +776,7 @@ local function isPriority(unit, index, filter)
 	end
 end
 
-local function isDebuff(unit, index, filter)
+local function isDebuff(unit, index, filter, f)
     local name, icon, _, _, duration, expirationTime, _, _, _, spellId = UnitAura(unit, index, "HARMFUL");
 		if spellIds[spellId] == "Hide" then
 		return false
@@ -709,6 +785,17 @@ local function isDebuff(unit, index, filter)
 	  return true
 	end
 end
+
+local function isBuff(unit, index, filter, j)
+  local name, icon, _, _, duration, expirationTime, _, _, _, spellId = UnitAura(unit, index, "HELPFUL");
+	if Buff[j][spellId] or Buff[j][name] then
+		return true
+	else
+	  return false
+	end
+end
+
+
 -- Update aura for each unit
 function DebuffFilter:UpdateAura(uid)
 	for f,v in pairs(self.cache) do
@@ -724,7 +811,7 @@ function DebuffFilter:UpdateAura(uid)
 				while debuffNum <= debuffnumber do
 					local debuffName = UnitDebuff(uid, index, nil)
 					if ( debuffName ) then
-							if isBiggestDebuff(uid, index, nil) then
+							if isBiggestDebuff(uid, index, nil, f) then
 							local debuffFrame = v.debuffFrames[debuffNum]
 							local name, icon, count, debuffType, duration, expirationTime, unitCaster, canStealOrPurge, _, spellId;
 							name, icon, count, debuffType, duration, expirationTime, unitCaster, canStealOrPurge, _, spellId = UnitDebuff(uid, index, filter);
@@ -778,7 +865,7 @@ function DebuffFilter:UpdateAura(uid)
 				while debuffNum <= debuffnumber do
 					local debuffName = UnitDebuff(uid, index, filter);
 					if ( debuffName ) then
-							if isBiggerDebuff(uid, index, nil) and not isBiggestDebuff(uid, index, nil) then
+							if isBiggerDebuff(uid, index, nil, f) and not isBiggestDebuff(uid, index, nil, f) then
 								local debuffFrame = v.debuffFrames[debuffNum]
 								local name, icon, count, debuffType, duration, expirationTime, unitCaster, canStealOrPurge, _, spellId;
 								name, icon, count, debuffType, duration, expirationTime, unitCaster, canStealOrPurge, _, spellId = UnitDebuff(uid, index, filter);
@@ -831,7 +918,7 @@ function DebuffFilter:UpdateAura(uid)
 				while debuffNum <= debuffnumber do
 					local debuffName = UnitDebuff(uid, index, filter);
 					if ( debuffName ) then
-							if isBigDebuff(uid, index, nil) and not isBiggestDebuff(uid, index, nil) and not isBiggerDebuff(uid, index, nil) then
+							if isBigDebuff(uid, index, nil, f) and not isBiggestDebuff(uid, index, nil, f) and not isBiggerDebuff(uid, index, nil, f) then
 								local debuffFrame = v.debuffFrames[debuffNum]
 								local name, icon, count, debuffType, duration, expirationTime, unitCaster, canStealOrPurge, _, spellId;
 								name, icon, count, debuffType, duration, expirationTime, unitCaster, canStealOrPurge, _, spellId = UnitDebuff(uid, index, filter);
@@ -915,7 +1002,7 @@ function DebuffFilter:UpdateAura(uid)
 				while debuffNum <= debuffnumber do
 					local debuffName = UnitDebuff(uid, index, filter);
 					if ( debuffName ) then
-							if CompactUnitFrame_UtilIsBossDebuff(uid, index, filter) and not isBiggestDebuff(uid, index, nil) and not isBiggerDebuff(uid, index, nil) and not isBigDebuff(uid, index, nil) then
+							if CompactUnitFrame_UtilIsBossDebuff(uid, index, filter) and not isBiggestDebuff(uid, index, nil, f) and not isBiggerDebuff(uid, index, nil, f) and not isBigDebuff(uid, index, nil, f) then
 								local debuffFrame = v.debuffFrames[debuffNum]
 								local name, icon, count, debuffType, duration, expirationTime, unitCaster, canStealOrPurge, _, spellId;
 								name, icon, count, debuffType, duration, expirationTime, unitCaster, canStealOrPurge, _, spellId = UnitDebuff(uid, index, filter);
@@ -969,48 +1056,48 @@ function DebuffFilter:UpdateAura(uid)
 				while debuffNum <= debuffnumber do
 					local debuffName = UnitBuff(uid, index, filter);
 					if ( debuffName ) then
-							if CompactUnitFrame_UtilIsBossAura(uid, index, filter) and not isBiggestDebuff(uid, index, nil) and not isBiggerDebuff(uid, index, nil) and not isBigDebuff(uid, index, nil) and not CompactUnitFrame_UtilIsBossDebuff(uid, index, nil) then
-								local debuffFrame = v.debuffFrames[debuffNum]
-								local name, icon, count, debuffType, duration, expirationTime, unitCaster, canStealOrPurge, _, spellId;
-								name, icon, count, debuffType, duration, expirationTime, unitCaster, canStealOrPurge, _, spellId = UnitBuff(uid, index, filter);
-								debuffFrame.filter = filter;
-								debuffFrame.icon:SetTexture(icon);
-								debuffFrame.icon:SetDesaturated(nil) --Destaurate Icon
-								debuffFrame.icon:SetVertexColor(1, 1, 1);
-								debuffFrame.SpellId = spellId
-								debuffFrame:SetScript("OnEnter", function(self)
-									GameTooltip:SetOwner (self, "ANCHOR_RIGHT")
-									GameTooltip:SetSpellByID(self.SpellId)
-									GameTooltip:Show()
-								end)
-								debuffFrame:SetScript("OnLeave", function(self)
-									GameTooltip:Hide()
-								end)
-								if count then
-								if ( count > 1 ) then
-								local countText = count;
-								if ( count >= 100 ) then
-								 countText = BUFF_STACKS_OVERFLOW;
-								end
-								debuffFrame.count:Show();
-								debuffFrame.count:SetText(countText);
-								else
-								debuffFrame.count:Hide();
-								end
-								end
-								debuffFrame:SetID(index);
-								local enabled = expirationTime and expirationTime ~= 0;
-								if enabled then
-								local startTime = expirationTime - duration;
-								CooldownFrame_Set(debuffFrame.cooldown, startTime, duration, true);
-								else
-								CooldownFrame_Clear(debuffFrame.cooldown);
-								end
-								local color = DebuffTypeColor[debuffType] or DebuffTypeColor["none"];
-								debuffFrame.border:SetVertexColor(color.r, color.g, color.b);
-								debuffFrame:SetSize(f.buffFrames[3]:GetSize()*1.4,f.buffFrames[3]:GetSize()*1.4);
-								debuffFrame:Show();
-								debuffNum = debuffNum + 1
+						if CompactUnitFrame_UtilIsBossAura(uid, index, filter) and not isBiggestDebuff(uid, index, nil, f) and not isBiggerDebuff(uid, index, nil, f) and not isBigDebuff(uid, index, nil, f) and not CompactUnitFrame_UtilIsBossDebuff(uid, index, nil, f) then
+							local debuffFrame = v.debuffFrames[debuffNum]
+							local name, icon, count, debuffType, duration, expirationTime, unitCaster, canStealOrPurge, _, spellId;
+							name, icon, count, debuffType, duration, expirationTime, unitCaster, canStealOrPurge, _, spellId = UnitBuff(uid, index, filter);
+							debuffFrame.filter = filter;
+							debuffFrame.icon:SetTexture(icon);
+							debuffFrame.icon:SetDesaturated(nil) --Destaurate Icon
+							debuffFrame.icon:SetVertexColor(1, 1, 1);
+							debuffFrame.SpellId = spellId
+							debuffFrame:SetScript("OnEnter", function(self)
+								GameTooltip:SetOwner (self, "ANCHOR_RIGHT")
+								GameTooltip:SetSpellByID(self.SpellId)
+								GameTooltip:Show()
+							end)
+							debuffFrame:SetScript("OnLeave", function(self)
+								GameTooltip:Hide()
+							end)
+							if count then
+							if ( count > 1 ) then
+							local countText = count;
+							if ( count >= 100 ) then
+							 countText = BUFF_STACKS_OVERFLOW;
+							end
+							debuffFrame.count:Show();
+							debuffFrame.count:SetText(countText);
+							else
+							debuffFrame.count:Hide();
+							end
+							end
+							debuffFrame:SetID(index);
+							local enabled = expirationTime and expirationTime ~= 0;
+							if enabled then
+							local startTime = expirationTime - duration;
+							CooldownFrame_Set(debuffFrame.cooldown, startTime, duration, true);
+							else
+							CooldownFrame_Clear(debuffFrame.cooldown);
+							end
+							local color = DebuffTypeColor[debuffType] or DebuffTypeColor["none"];
+							debuffFrame.border:SetVertexColor(color.r, color.g, color.b);
+							debuffFrame:SetSize(f.buffFrames[3]:GetSize()*1.4,f.buffFrames[3]:GetSize()*1.4);
+							debuffFrame:Show();
+							debuffNum = debuffNum + 1
 						end
 					else
 						break
@@ -1022,48 +1109,48 @@ function DebuffFilter:UpdateAura(uid)
 				while debuffNum <= debuffnumber do
 					local debuffName = UnitDebuff(uid, index, nil)
 					if ( debuffName ) then
-							if  isWarning(uid, index, nil) and not isBiggestDebuff(uid, index, nil) and not isBiggerDebuff(uid, index, nil) and not isBigDebuff(uid, index, nil) and not CompactUnitFrame_UtilIsBossDebuff(uid, index, nil) and not CompactUnitFrame_UtilIsBossAura(uid, index, nil) then
-								local debuffFrame = v.debuffFrames[debuffNum]
-								local name, icon, count, debuffType, duration, expirationTime, unitCaster, canStealOrPurge, _, spellId;
-								name, icon, count, debuffType, duration, expirationTime, unitCaster, canStealOrPurge, _, spellId = UnitDebuff(uid, index, filter);
-								debuffFrame.filter = filter;
-								debuffFrame.icon:SetTexture(icon);
-								debuffFrame.icon:SetDesaturated(nil) --Destaurate Icon
-								debuffFrame.icon:SetVertexColor(1, 1, 1);
-								debuffFrame.SpellId = spellId
-								debuffFrame:SetScript("OnEnter", function(self)
-									GameTooltip:SetOwner (self, "ANCHOR_RIGHT")
-									GameTooltip:SetSpellByID(self.SpellId)
-									GameTooltip:Show()
-								end)
-								debuffFrame:SetScript("OnLeave", function(self)
-									GameTooltip:Hide()
-								end)
-								if count then
-								if ( count > 1 ) then
-								local countText = count;
-								if ( count >= 100 ) then
-								 countText = BUFF_STACKS_OVERFLOW;
-								end
-								debuffFrame.count:Show();
-								debuffFrame.count:SetText(countText);
-								else
-								debuffFrame.count:Hide();
-								end
-								end
-								debuffFrame:SetID(index);
-								local enabled = expirationTime and expirationTime ~= 0;
-								if enabled then
-								local startTime = expirationTime - duration;
-								CooldownFrame_Set(debuffFrame.cooldown, startTime, duration, true);
-								else
-								CooldownFrame_Clear(debuffFrame.cooldown);
-								end
-								local color = DebuffTypeColor[debuffType] or DebuffTypeColor["none"];
-								debuffFrame.border:SetVertexColor(color.r, color.g, color.b);
-								debuffFrame:SetSize(f.buffFrames[3]:GetSize()*1.15,f.buffFrames[3]:GetSize()*1.15);
-								debuffFrame:Show();
-								debuffNum = debuffNum + 1
+						if  isWarning(uid, index, nil, f) and not isBiggestDebuff(uid, index, nil, f) and not isBiggerDebuff(uid, index, nil, f) and not isBigDebuff(uid, index, nil, f) and not CompactUnitFrame_UtilIsBossDebuff(uid, index, nil, f) and not CompactUnitFrame_UtilIsBossAura(uid, index, nil, f) then
+							local debuffFrame = v.debuffFrames[debuffNum]
+							local name, icon, count, debuffType, duration, expirationTime, unitCaster, canStealOrPurge, _, spellId;
+							name, icon, count, debuffType, duration, expirationTime, unitCaster, canStealOrPurge, _, spellId = UnitDebuff(uid, index, filter);
+							debuffFrame.filter = filter;
+							debuffFrame.icon:SetTexture(icon);
+							debuffFrame.icon:SetDesaturated(nil) --Destaurate Icon
+							debuffFrame.icon:SetVertexColor(1, 1, 1);
+							debuffFrame.SpellId = spellId
+							debuffFrame:SetScript("OnEnter", function(self)
+								GameTooltip:SetOwner (self, "ANCHOR_RIGHT")
+								GameTooltip:SetSpellByID(self.SpellId)
+								GameTooltip:Show()
+							end)
+							debuffFrame:SetScript("OnLeave", function(self)
+								GameTooltip:Hide()
+							end)
+							if count then
+							if ( count > 1 ) then
+							local countText = count;
+							if ( count >= 100 ) then
+							 countText = BUFF_STACKS_OVERFLOW;
+							end
+							debuffFrame.count:Show();
+							debuffFrame.count:SetText(countText);
+							else
+							debuffFrame.count:Hide();
+							end
+							end
+							debuffFrame:SetID(index);
+							local enabled = expirationTime and expirationTime ~= 0;
+							if enabled then
+							local startTime = expirationTime - duration;
+							CooldownFrame_Set(debuffFrame.cooldown, startTime, duration, true);
+							else
+							CooldownFrame_Clear(debuffFrame.cooldown);
+							end
+							local color = DebuffTypeColor[debuffType] or DebuffTypeColor["none"];
+							debuffFrame.border:SetVertexColor(color.r, color.g, color.b);
+							debuffFrame:SetSize(f.buffFrames[3]:GetSize()*1.15,f.buffFrames[3]:GetSize()*1.15);
+							debuffFrame:Show();
+							debuffNum = debuffNum + 1
 						end
 					else
 						break
@@ -1075,48 +1162,48 @@ function DebuffFilter:UpdateAura(uid)
 				while debuffNum <= debuffnumber do
 					local debuffName = UnitDebuff(uid, index, nil)
 					if ( debuffName ) then
-							if isPriority(uid, index, nil) and not isBiggestDebuff(uid, index, nil) and not isBiggerDebuff(uid, index, nil) and not isBigDebuff(uid, index, nil) and not CompactUnitFrame_UtilIsBossDebuff(uid, index, nil) and not CompactUnitFrame_UtilIsBossAura(uid, index, nil) and not isWarning(uid, index, nil) then
-								local debuffFrame = v.debuffFrames[debuffNum]
-								local name, icon, count, debuffType, duration, expirationTime, unitCaster, canStealOrPurge, _, spellId;
-								name, icon, count, debuffType, duration, expirationTime, unitCaster, canStealOrPurge, _, spellId = UnitDebuff(uid, index, filter);
-								debuffFrame.filter = filter;
-								debuffFrame.icon:SetTexture(icon);
-								debuffFrame.icon:SetDesaturated(nil) --Destaurate Icon
-								debuffFrame.icon:SetVertexColor(1, 1, 1);
-								debuffFrame.SpellId = spellId
-								debuffFrame:SetScript("OnEnter", function(self)
-									GameTooltip:SetOwner (self, "ANCHOR_RIGHT")
-									GameTooltip:SetSpellByID(self.SpellId)
-									GameTooltip:Show()
-								end)
-								debuffFrame:SetScript("OnLeave", function(self)
-									GameTooltip:Hide()
-								end)
-								if count then
-								if ( count > 1 ) then
-								local countText = count;
-								if ( count >= 100 ) then
-								 countText = BUFF_STACKS_OVERFLOW;
-								end
-								debuffFrame.count:Show();
-								debuffFrame.count:SetText(countText);
-								else
-								debuffFrame.count:Hide();
-								end
-								end
-								debuffFrame:SetID(index);
-								local enabled = expirationTime and expirationTime ~= 0;
-								if enabled then
-								local startTime = expirationTime - duration;
-								CooldownFrame_Set(debuffFrame.cooldown, startTime, duration, true);
-								else
-								CooldownFrame_Clear(debuffFrame.cooldown);
-								end
-								local color = DebuffTypeColor[debuffType] or DebuffTypeColor["none"];
-								debuffFrame.border:SetVertexColor(color.r, color.g, color.b);
-								debuffFrame:SetSize(f.buffFrames[3]:GetSize()*1,f.buffFrames[3]:GetSize()*1);
-								debuffFrame:Show();
-								debuffNum = debuffNum + 1
+						if isPriority(uid, index, nil, f) and not isBiggestDebuff(uid, index, nil, f) and not isBiggerDebuff(uid, index, nil, f) and not isBigDebuff(uid, index, nil, f) and not CompactUnitFrame_UtilIsBossDebuff(uid, index, nil, f) and not CompactUnitFrame_UtilIsBossAura(uid, index, nil, f) and not isWarning(uid, index, nil, f) then
+							local debuffFrame = v.debuffFrames[debuffNum]
+							local name, icon, count, debuffType, duration, expirationTime, unitCaster, canStealOrPurge, _, spellId;
+							name, icon, count, debuffType, duration, expirationTime, unitCaster, canStealOrPurge, _, spellId = UnitDebuff(uid, index, filter);
+							debuffFrame.filter = filter;
+							debuffFrame.icon:SetTexture(icon);
+							debuffFrame.icon:SetDesaturated(nil) --Destaurate Icon
+							debuffFrame.icon:SetVertexColor(1, 1, 1);
+							debuffFrame.SpellId = spellId
+							debuffFrame:SetScript("OnEnter", function(self)
+								GameTooltip:SetOwner (self, "ANCHOR_RIGHT")
+								GameTooltip:SetSpellByID(self.SpellId)
+								GameTooltip:Show()
+							end)
+							debuffFrame:SetScript("OnLeave", function(self)
+								GameTooltip:Hide()
+							end)
+							if count then
+							if ( count > 1 ) then
+							local countText = count;
+							if ( count >= 100 ) then
+							 countText = BUFF_STACKS_OVERFLOW;
+							end
+							debuffFrame.count:Show();
+							debuffFrame.count:SetText(countText);
+							else
+							debuffFrame.count:Hide();
+							end
+							end
+							debuffFrame:SetID(index);
+							local enabled = expirationTime and expirationTime ~= 0;
+							if enabled then
+							local startTime = expirationTime - duration;
+							CooldownFrame_Set(debuffFrame.cooldown, startTime, duration, true);
+							else
+							CooldownFrame_Clear(debuffFrame.cooldown);
+							end
+							local color = DebuffTypeColor[debuffType] or DebuffTypeColor["none"];
+							debuffFrame.border:SetVertexColor(color.r, color.g, color.b);
+							debuffFrame:SetSize(f.buffFrames[3]:GetSize()*1,f.buffFrames[3]:GetSize()*1);
+							debuffFrame:Show();
+							debuffNum = debuffNum + 1
 						end
 					else
 						break
@@ -1127,7 +1214,7 @@ function DebuffFilter:UpdateAura(uid)
 				while debuffNum <= debuffnumber and hidedebuffs==0 do
 					local debuffName = UnitDebuff(uid, index, filter)
 					if ( debuffName ) then
-						if ( isDebuff(uid, index, nil) and not isBiggestDebuff(uid, index, nil) and not isBiggerDebuff(uid, index, nil) and not isBigDebuff(uid, index, nil) and not CompactUnitFrame_UtilIsBossDebuff(uid, index, nil) and not CompactUnitFrame_UtilIsBossAura(uid, index, nil) and not isWarning(uid, index, nil) and not isPriority(uid, index, nil)) then
+						if ( isDebuff(uid, index, nil, f) and not isBiggestDebuff(uid, index, nil, f) and not isBiggerDebuff(uid, index, nil, f) and not isBigDebuff(uid, index, nil, f) and not CompactUnitFrame_UtilIsBossDebuff(uid, index, nil, f) and not CompactUnitFrame_UtilIsBossAura(uid, index, nil, f) and not isWarning(uid, index, nil, f) and not isPriority(uid, index, nil, f)) then
 							local debuffFrame = v.debuffFrames[debuffNum]
 							local debuffFrame = v.debuffFrames[debuffNum]
 							local name, icon, count, debuffType, duration, expirationTime, unitCaster, canStealOrPurge, _, spellId;
@@ -1186,22 +1273,131 @@ function DebuffFilter:UpdateAura(uid)
 		end
 	end
 end
+
+function DebuffFilter:UpdateBuffAura(uid)
+	for f,v in pairs(self.cache) do
+		if f.unit == uid then
+			local filter = nil
+			local buffNum = 1
+			local index, buff, backCount
+			for j = 1, DEFAULT_BUFF do
+				for i = 1, 32 do
+					local buffName, _, count, _, _, _, unitCaster, _, _, spellId = UnitBuff(uid, i, nil)
+					if ( buffName ) then
+						if isBuff(uid, i, nil, j) then
+							if j == 3 and (buffName == "Prayer of Mending" or buffName == "Focused Growth") and unitCaster == "player" then backCount = count end 	--Prayer of mending hack
+							if Buff[j][buffName] then
+								 Buff[j][spellId] =  Buff[j][buffName]
+							end
+							if  Buff[j][spellId] then
+								if not buff or  Buff[j][spellId] <  Buff[j][buff] then
+									buff = spellId
+									index = i
+								end
+							end
+						end
+					else
+						break
+					end
+				end
+				if index then
+					local name, icon, count, buffType, duration, expirationTime, unitCaster, canStealOrPurge, _, spellId = UnitBuff(uid, index, filter);
+					if j == 1 or j == 4 or J == 5 or j == 6 or j == 7 or j == 8 or j == 9 or unitCaster == "player" then
+						local buffFrame = v.buffFrames[j]
+						buffFrame.icon:SetTexture(icon);
+						buffFrame.icon:SetDesaturated(nil) --Destaurate Icon
+						buffFrame.icon:SetVertexColor(1, 1, 1);
+						buffFrame.SpellId = spellId
+						buffFrame:SetScript("OnEnter", function(self)
+							GameTooltip:SetOwner (self, "ANCHOR_RIGHT")
+							GameTooltip:SetSpellByID(self.SpellId)
+							GameTooltip:Show()
+						end)
+						buffFrame:SetScript("OnLeave", function(self)
+							GameTooltip:Hide()
+						end)
+						if count or backCount then
+							if backCount then count = backCount end
+							if ( count > 1 ) then
+								local countText = count;
+								if ( count >= 100 ) then
+								 countText = BUFF_STACKS_OVERFLOW;
+								end
+									buffFrame.count:Show();
+									buffFrame.count:SetText(countText);
+							else
+								buffFrame.count:Hide();
+							end
+						end
+						if j == 3 then
+							buffFrame.count:ClearAllPoints()
+							buffFrame.count:SetFont("Fonts\\FRIZQT__.TTF", 12, "OUTLINE") --, MONOCHROME")
+							buffFrame.count:SetPoint("TOPRIGHT", -10, 6.5);
+							buffFrame.count:SetJustifyH("RIGHT");
+							buffFrame.count:SetTextColor(1, 1 ,0, 1)
+						end
+						if j == 8 then
+							buffFrame.count:ClearAllPoints()
+							buffFrame.count:SetFont("Fonts\\FRIZQT__.TTF", 13, "OUTLINE") --, MONOCHROME")
+							buffFrame.count:SetPoint("BOTTOMRIGHT", 2, -7);
+							buffFrame.count:SetJustifyH("RIGHT");
+							buffFrame.icon:SetVertexColor(1, 1, 1, 0); --Hide Icon for NOW till You MERGE BOR & BOL
+							--buffFrame.count:SetTextColor(0, 0 ,0, 1)
+						end
+						if j == 9 then
+							buffFrame.count:ClearAllPoints()
+							buffFrame.count:SetFont("Fonts\\FRIZQT__.TTF", 13, "OUTLINE") --, MONOCHROME")
+							buffFrame.count:SetPoint("BOTTOMRIGHT", 2, -7);
+							buffFrame.count:SetJustifyH("RIGHT");
+							buffFrame.icon:SetVertexColor(1, 1, 1, 0); --Hide Icon for NOW till You MERGE BOR & BOL
+							--buffFrame.count:SetTextColor(0, 0 ,0, 1)
+						end
+						if j == 4 or J == 5 or j == 6 or j == 7 then
+							SetPortraitToTexture(buffFrame.icon, icon)
+							buffFrame.icon:SetTexCoord(0.07, 0.93, 0.07, 0.93);
+						end
+						buffFrame:SetID(j);
+						local startTime = expirationTime - duration;
+						if duration > 59.5 then
+							CooldownFrame_Clear(buffFrame.cooldown);
+						else
+							CooldownFrame_Set(buffFrame.cooldown, startTime, duration, true);
+						end
+						buffFrame:SetSize(f.buffFrames[3]:GetSize()*1,f.buffFrames[3]:GetSize()*1);
+						buffFrame:Show();
+					end
+				else
+					local buffFrame = v.buffFrames[j];
+					if buffFrame then
+						buffFrame:Hide()
+					end
+				end
+			index = nil; buff = nil; backCount= nil
+			end
+		end
+	end
+end
+
 -- Apply style for each frame
 function DebuffFilter:ApplyFrame(f)
 	self.cache[f] = {}
 	local scf = self.cache[f]
 	f:SetScript("OnSizeChanged",function() DebuffFilter:ResetFrame(f) DebuffFilter:ApplyFrame(f) end)
+	if not scf.buffFrames then scf.buffFrames = {} end
 	if not scf.debuffFrames then scf.debuffFrames = {} end
 	for j = 1, debuffnumber do
 		if not scf.debuffFrames[j] then
-			scf.debuffFrames[j] = CreateFrame("Button",nil,UIParent,"CompactDebuffTemplate")
+			scf.debuffFrames[j] = CreateFrame("Button", nil, UIParent,"CompactDebuffTemplate")
 			scf.debuffFrames[j].unit = f.unit
 			scf.debuffFrames[j].baseSize = f.buffFrames[3]:GetSize()
-			--scf.debuffFrames[j]:EnableMouse(false)
 			if j == 1 then
 				scf.debuffFrames[j]:ClearAllPoints()
 				scf.debuffFrames[j]:SetParent(f)
-				scf.debuffFrames[j]:SetPoint("BOTTOMLEFT", f, "BOTTOMLEFT",3,10)
+				if strfind(f.unit,"pet") then
+					scf.debuffFrames[j]:SetPoint("BOTTOMLEFT", f, "BOTTOMLEFT",3, 3)
+				else
+					scf.debuffFrames[j]:SetPoint("BOTTOMLEFT", f, "BOTTOMLEFT",3,10)
+				end
 			else
 				scf.debuffFrames[j]:SetParent(f)
 				scf.debuffFrames[j]:SetPoint("BOTTOMLEFT",scf.debuffFrames[j-1],"BOTTOMRIGHT",0,0)
@@ -1213,7 +1409,96 @@ function DebuffFilter:ApplyFrame(f)
 	end
 	for j = 1,#f.debuffFrames do
 		f.debuffFrames[j]:Hide()
-		f.debuffFrames[j]:SetScript("OnShow",f.debuffFrames[j].Hide)
+		f.debuffFrames[j]:SetScript("OnShow", f.debuffFrames[j].Hide)
+	end
+
+	for j = 1, DEFAULT_BUFF do
+		if not scf.buffFrames[j] then
+			scf.buffFrames[j] = CreateFrame("Button" ,nil, UIParent, "CompactAuraTemplate")
+			scf.buffFrames[j].unit = f.unit
+			scf.buffFrames[j].baseSize = f.buffFrames[3]:GetSize()
+			scf.buffFrames[j].cooldown:SetDrawSwipe(false)
+			if j == 1 then --Buff One
+				scf.buffFrames[j]:ClearAllPoints()
+				scf.buffFrames[j]:SetParent(f)
+				if strfind(f.unit,"pet") then
+					scf.buffFrames[j]:SetPoint("BOTTOMRIGHT", f, "BOTTOMRIGHT", -2.5, 3)
+				else
+					scf.buffFrames[j]:SetPoint("BOTTOMRIGHT", f, "BOTTOMRIGHT", -2.5, 9.5)
+				end
+			elseif j == 2 then --Buff Two
+				scf.buffFrames[j]:ClearAllPoints()
+				scf.buffFrames[j]:SetParent(f)
+				scf.buffFrames[j]:SetPoint("BOTTOMRIGHT", scf.buffFrames[j-1], "BOTTOMLEFT", 0, 0)
+			elseif j ==3 then --Buff Three
+				scf.buffFrames[j]:ClearAllPoints()
+				scf.buffFrames[j]:SetParent(f)
+				scf.buffFrames[j]:SetPoint("BOTTOMRIGHT", scf.buffFrames[j-1], "BOTTOMLEFT", 0, 0)
+			elseif j ==4 then --Buff Four () --Lower RIght
+				scf.buffFrames[j]:ClearAllPoints()
+				scf.buffFrames[j]:SetParent(f)
+				if not strfind(f.unit,"pet") then
+				scf.buffFrames[j]:SetPoint("BOTTOMRIGHT", scf.buffFrames[1], "BOTTOMRIGHT", -5, 5)
+				end
+				scf.buffFrames[j]:SetScale(.265)
+				scf.buffFrames[j]:SetFrameLevel(3)
+				scf.buffFrames[j]:SetFrameStrata("HIGH")
+			elseif j ==5 then --Buff Four () --Lower Left
+				scf.buffFrames[j]:ClearAllPoints()
+				scf.buffFrames[j]:SetParent(f)
+				if not strfind(f.unit,"pet") then
+				scf.buffFrames[j]:SetPoint("BOTTOMLEFT", scf.buffFrames[1], "BOTTOMLEFT", 5, 5)
+				end
+				scf.buffFrames[j]:SetScale(.265)
+				scf.buffFrames[j]:SetFrameLevel(3)
+				scf.buffFrames[j]:SetFrameStrata("HIGH")
+			elseif j ==6 then --Buff Six () --Upeer lEft
+				scf.buffFrames[j]:ClearAllPoints()
+				scf.buffFrames[j]:SetParent(f)
+				if not strfind(f.unit,"pet") then
+				scf.buffFrames[j]:SetPoint("TOPLEFT", scf.buffFrames[1], "TOPLEFT", 5, -5)
+				end
+				scf.buffFrames[j]:SetScale(.265)
+				scf.buffFrames[j]:SetFrameLevel(3)
+				scf.buffFrames[j]:SetFrameStrata("HIGH")
+			elseif j ==7 then --Buff Four ()
+				scf.buffFrames[j]:ClearAllPoints()
+				scf.buffFrames[j]:SetParent(f)
+				if not strfind(f.unit,"pet") then
+				scf.buffFrames[j]:SetPoint("TOPRIGHT", scf.buffFrames[1], "TOPRIGHT", -5, -5)
+				end
+				scf.buffFrames[j]:SetScale(.265)
+				scf.buffFrames[j]:SetFrameLevel(3)
+				scf.buffFrames[j]:SetFrameStrata("HIGH")
+			elseif j ==8 then --Upper Right Count Only
+				scf.buffFrames[j]:ClearAllPoints()
+				scf.buffFrames[j]:SetParent(f)
+				if not strfind(f.unit,"pet") then
+				scf.buffFrames[j]:SetPoint("TOPRIGHT", f, "TOPRIGHT", -2, -1.5)
+				end
+				scf.buffFrames[j]:SetScale(1.15)
+				scf.buffFrames[j]:SetFrameLevel(3)
+				scf.buffFrames[j]:SetFrameStrata("HIGH")
+			elseif j ==9 then --Upper Left Count Only
+				scf.buffFrames[j]:ClearAllPoints()
+				scf.buffFrames[j]:SetParent(f)
+				if not strfind(f.unit,"pet") then
+				scf.buffFrames[j]:SetPoint("TOPLEFT", f, "TOPLEFT", 2, -1.5)
+				end
+				scf.buffFrames[j]:SetScale(1.15)
+				scf.buffFrames[j]:SetFrameLevel(3)
+				scf.buffFrames[j]:SetFrameStrata("HIGH")
+			end
+			scf.buffFrames[j]:SetSize(f.buffFrames[3]:GetSize())
+			scf.buffFrames[j]:Hide()
+		end
+	end
+	for j = 1,#f.buffFrames do
+		f.buffFrames[j]:Hide()
+		f.dispelDebuffFrames[1]:SetAlpha(0); --Hides Dispel Icons in Upper Right
+		f.dispelDebuffFrames[2]:SetAlpha(0); --Hides Dispel Icons in Upper Right
+		f.dispelDebuffFrames[3]:SetAlpha(0); --Hides Dispel Icons in Upper Right
+		f.buffFrames[j]:SetScript("OnShow", f.buffFrames[j].Hide)
 	end
 end
 -- Reset to the original style
@@ -1224,15 +1509,24 @@ function DebuffFilter:ResetStyle()
 end
 -- Reset style to each cached frame
 function DebuffFilter:ResetFrame(f)
-		for k,v in pairs(self.cache[f].debuffFrames) do
+	for k,v in pairs(self.cache[f].debuffFrames) do
 		if v then
-				v:Hide()
+			v:Hide()
 		end
+	end
+	for k,v in pairs(self.cache[f].buffFrames) do
+		if v then
+			v:Hide()
 		end
+	end
 	f:SetScript("OnSizeChanged",nil)
 	for j = 1,#f.debuffFrames do
 		f.debuffFrames[j]:SetScript("OnShow",nil)
 	end
+	for j = 1,#f.buffFrames do
+		f.buffFrames[j]:SetScript("OnShow",nil)
+	end
+
 	self.cache[f] = nil
 end
 
@@ -1240,9 +1534,10 @@ end
 local function OnEvent(self,event,...)
 	if event == "VARIABLES_LOADED" then self:OnLoad()
 	elseif event == "GROUP_ROSTER_UPDATE" or event == "UNIT_PET" then self:OnRosterUpdate()
-	elseif event == "PLAYER_ENTERING_WORLD" then self:OnRosterUpdate()
+	elseif event == "PLAYER_ENTERING_WORLD" then self:ResetStyle(); self:OnRosterUpdate()
+	elseif event == "ZONE_CHANGED_NEW_AREA" then 	Ctimer(1, function() self:ResetStyle();self:OnRosterUpdate() end) self:ResetStyle(); self:OnRosterUpdate()
 	elseif event == "COMBAT_LOG_EVENT_UNFILTERED" then self:CLEU()
-elseif event == "UNIT_AURA" then self:UpdateAura(...) end
+	elseif event == "UNIT_AURA" then self:UpdateAura(...); self:UpdateBuffAura(...) end
 end
 
 DebuffFilter:SetScript("OnEvent",OnEvent)
