@@ -36,7 +36,7 @@ PriorityBuff[1] = {
 
 PriorityBuff[2] = {
 "Renew",
-"Attonement",
+"Atonement",
 155777, --Rejuc Germ
 "Spring Blossoms",
 "Glimmer of Light",
@@ -592,9 +592,15 @@ function DebuffFilter:OnZoneChanged()
 end
 
 
-hooksecurefunc("CompactRaidFrameContainer_SetFlowSortFunction", function(_,_)
+hooksecurefunc(CompactRaidFrameContainer, "SetFlowSortFunction", function(...)
 	DebuffFilter:ResetStyle()
 	DebuffFilter:OnRosterUpdate()
+end)
+
+hooksecurefunc(CompactRaidFrameContainer, "SetGroupMode", function(groupMode)
+	DebuffFilter:ResetStyle()
+	DebuffFilter:OnRosterUpdate()
+	print(CompactRaidFrameContainer.groupMode)
 end)
 
 function DebuffFilter:ApplyStyle() ----- Find A Way to Always Show Debuffs
@@ -1535,7 +1541,7 @@ local function OnEvent(self,event,...)
 	if event == "VARIABLES_LOADED" then self:OnLoad()
 	elseif event == "GROUP_ROSTER_UPDATE" or event == "UNIT_PET" then self:OnRosterUpdate()
 	elseif event == "PLAYER_ENTERING_WORLD" then self:ResetStyle(); self:OnRosterUpdate()
-	elseif event == "ZONE_CHANGED_NEW_AREA" then 	Ctimer(1, function() self:ResetStyle();self:OnRosterUpdate() end) self:ResetStyle(); self:OnRosterUpdate()
+	elseif event == "ZONE_CHANGED_NEW_AREA" then 	Ctimer(1, function() self:ResetStyle(); self:OnRosterUpdate() end) self:ResetStyle(); self:OnRosterUpdate()
 	elseif event == "COMBAT_LOG_EVENT_UNFILTERED" then self:CLEU()
 	elseif event == "UNIT_AURA" then self:UpdateAura(...); self:UpdateBuffAura(...) end
 end
