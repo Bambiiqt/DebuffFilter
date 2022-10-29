@@ -574,14 +574,18 @@ function DebuffFilter:OnLoad()
 	CompactRaidFrameContainer:HookScript("OnEvent", DebuffFilter.OnRosterUpdate)
 	CompactRaidFrameContainer:HookScript("OnHide", DebuffFilter.ResetStyle)
 	CompactRaidFrameContainer:HookScript("OnShow", DebuffFilter.OnRosterUpdate)
+	CompactPartyFrame:HookScript("OnHide", DebuffFilter.ResetStyle)
+	CompactPartyFrame:HookScript("OnShow", DebuffFilter.OnRosterUpdate)
 end
 
 -- When roster updated, auto apply arena style or reset style
 function DebuffFilter:OnRosterUpdate()
-	local _,areaType = IsInInstance()
-	if not CompactRaidFrameContainer:IsVisible() then return end
-	local n = GetNumGroupMembers()
-	if n <= 40 then DebuffFilter:ApplyStyle() else DebuffFilter:ResetStyle() end
+	if CompactRaidFrameContainer:IsVisible() then
+		local n = GetNumGroupMembers()
+		if n <= 40 then DebuffFilter:ApplyStyle() else DebuffFilter:ResetStyle() end
+	elseif CompactPartyFrame:IsVisible() then
+		DebuffFilter:ApplyStyle()
+	end
 end
 
 -- If in raid reset style
@@ -600,8 +604,14 @@ end)
 hooksecurefunc(CompactRaidFrameContainer, "SetGroupMode", function(groupMode)
 	DebuffFilter:ResetStyle()
 	DebuffFilter:OnRosterUpdate()
-	print(CompactRaidFrameContainer.groupMode)
 end)
+
+hooksecurefunc("CompactPartyFrame_SetFlowSortFunction", function()
+	DebuffFilter:ResetStyle()
+	DebuffFilter:OnRosterUpdate()
+end)
+
+
 
 function DebuffFilter:ApplyStyle() ----- Find A Way to Always Show Debuffs
 	if CompactRaidFrameManager.container.groupMode == "flush" then
@@ -629,17 +639,19 @@ function DebuffFilter:ApplyStyle() ----- Find A Way to Always Show Debuffs
 				if f and not f.unit and self.cache[f] then
 					self:ResetFrame(f)
 				end
-				local f = _G["CompactPartyFrameMember"..j] --- Does
-				--CompactUnitFrame_HideAllDispelDebuffs(f)
-				if f and not self.cache[f] and f.unit  and not strfind(f.unit,"target") then --not strfind(f.unit,"pet") then
-					self:ApplyFrame(f)
-					self:UpdateAura(f.unit)
-					self:UpdateBuffAura(f.unit)
-				end
-				if f and not f.unit and self.cache[f] then
-					self:ResetFrame(f)
-				end
 			end
+		end
+	end
+	for j = 1,5 do
+		local f = _G["CompactPartyFrameMember"..j] --- Does
+		--CompactUnitFrame_HideAllDispelDebuffs(f)
+		if f and not self.cache[f] and f.unit  and not strfind(f.unit,"target") then --not strfind(f.unit,"pet") then
+			self:ApplyFrame(f)
+			self:UpdateAura(f.unit)
+			self:UpdateBuffAura(f.unit)
+		end
+		if f and not f.unit and self.cache[f] then
+			self:ResetFrame(f)
 		end
 	end
 end
@@ -827,8 +839,8 @@ function DebuffFilter:UpdateAura(uid)
 							debuffFrame.icon:SetVertexColor(1, 1, 1);
 							debuffFrame.SpellId = spellId
 							debuffFrame:SetScript("OnEnter", function(self)
-								GameTooltip:SetOwner (self, "ANCHOR_RIGHT")
-								GameTooltip:SetSpellByID(self.SpellId)
+								GameTooltip:SetOwner (debuffFrame.icon, "ANCHOR_RIGHT")
+								GameTooltip:SetSpellByID(spellId)
 								GameTooltip:Show()
 							end)
 							debuffFrame:SetScript("OnLeave", function(self)
@@ -881,8 +893,8 @@ function DebuffFilter:UpdateAura(uid)
 								debuffFrame.icon:SetVertexColor(1, 1, 1);
 								debuffFrame.SpellId = spellId
 								debuffFrame:SetScript("OnEnter", function(self)
-									GameTooltip:SetOwner (self, "ANCHOR_RIGHT")
-									GameTooltip:SetSpellByID(self.SpellId)
+									GameTooltip:SetOwner (debuffFrame.icon, "ANCHOR_RIGHT")
+									GameTooltip:SetSpellByID(spellId)
 									GameTooltip:Show()
 								end)
 								debuffFrame:SetScript("OnLeave", function(self)
@@ -934,8 +946,8 @@ function DebuffFilter:UpdateAura(uid)
 								debuffFrame.icon:SetVertexColor(1, 1, 1);
 								debuffFrame.SpellId = spellId
 								debuffFrame:SetScript("OnEnter", function(self)
-									GameTooltip:SetOwner (self, "ANCHOR_RIGHT")
-									GameTooltip:SetSpellByID(self.SpellId)
+									GameTooltip:SetOwner (debuffFrame.icon, "ANCHOR_RIGHT")
+									GameTooltip:SetSpellByID(spellId)
 									GameTooltip:Show()
 								end)
 								debuffFrame:SetScript("OnLeave", function(self)
@@ -1018,8 +1030,8 @@ function DebuffFilter:UpdateAura(uid)
 								debuffFrame.icon:SetVertexColor(1, 1, 1);
 								debuffFrame.SpellId = spellId
 								debuffFrame:SetScript("OnEnter", function(self)
-									GameTooltip:SetOwner (self, "ANCHOR_RIGHT")
-									GameTooltip:SetSpellByID(self.SpellId)
+									GameTooltip:SetOwner (debuffFrame.icon, "ANCHOR_RIGHT")
+									GameTooltip:SetSpellByID(spellId)
 									GameTooltip:Show()
 								end)
 								debuffFrame:SetScript("OnLeave", function(self)
@@ -1072,8 +1084,8 @@ function DebuffFilter:UpdateAura(uid)
 							debuffFrame.icon:SetVertexColor(1, 1, 1);
 							debuffFrame.SpellId = spellId
 							debuffFrame:SetScript("OnEnter", function(self)
-								GameTooltip:SetOwner (self, "ANCHOR_RIGHT")
-								GameTooltip:SetSpellByID(self.SpellId)
+								GameTooltip:SetOwner (debuffFrame.icon, "ANCHOR_RIGHT")
+								GameTooltip:SetSpellByID(spellId)
 								GameTooltip:Show()
 							end)
 							debuffFrame:SetScript("OnLeave", function(self)
@@ -1125,8 +1137,8 @@ function DebuffFilter:UpdateAura(uid)
 							debuffFrame.icon:SetVertexColor(1, 1, 1);
 							debuffFrame.SpellId = spellId
 							debuffFrame:SetScript("OnEnter", function(self)
-								GameTooltip:SetOwner (self, "ANCHOR_RIGHT")
-								GameTooltip:SetSpellByID(self.SpellId)
+								GameTooltip:SetOwner (debuffFrame.icon, "ANCHOR_RIGHT")
+								GameTooltip:SetSpellByID(spellId)
 								GameTooltip:Show()
 							end)
 							debuffFrame:SetScript("OnLeave", function(self)
@@ -1178,8 +1190,8 @@ function DebuffFilter:UpdateAura(uid)
 							debuffFrame.icon:SetVertexColor(1, 1, 1);
 							debuffFrame.SpellId = spellId
 							debuffFrame:SetScript("OnEnter", function(self)
-								GameTooltip:SetOwner (self, "ANCHOR_RIGHT")
-								GameTooltip:SetSpellByID(self.SpellId)
+								GameTooltip:SetOwner (debuffFrame.icon, "ANCHOR_RIGHT")
+								GameTooltip:SetSpellByID(spellId)
 								GameTooltip:Show()
 							end)
 							debuffFrame:SetScript("OnLeave", function(self)
@@ -1231,8 +1243,8 @@ function DebuffFilter:UpdateAura(uid)
 							debuffFrame.icon:SetVertexColor(1, 1, 1);
 							debuffFrame.SpellId = spellId
 							debuffFrame:SetScript("OnEnter", function(self)
-								GameTooltip:SetOwner (self, "ANCHOR_RIGHT")
-								GameTooltip:SetSpellByID(self.SpellId)
+								GameTooltip:SetOwner (debuffFrame.icon, "ANCHOR_RIGHT")
+								GameTooltip:SetSpellByID(spellId)
 								GameTooltip:Show()
 							end)
 							debuffFrame:SetScript("OnLeave", function(self)
@@ -1315,8 +1327,8 @@ function DebuffFilter:UpdateBuffAura(uid)
 						buffFrame.icon:SetVertexColor(1, 1, 1);
 						buffFrame.SpellId = spellId
 						buffFrame:SetScript("OnEnter", function(self)
-							GameTooltip:SetOwner (self, "ANCHOR_RIGHT")
-							GameTooltip:SetSpellByID(self.SpellId)
+							GameTooltip:SetOwner (buffFrame.icon, "ANCHOR_RIGHT")
+							GameTooltip:SetSpellByID(spellId)
 							GameTooltip:Show()
 						end)
 						buffFrame:SetScript("OnLeave", function(self)
