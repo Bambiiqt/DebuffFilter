@@ -576,6 +576,7 @@ function DebuffFilter:OnLoad()
 	CompactRaidFrameContainer:HookScript("OnShow", DebuffFilter.OnRosterUpdate)
 	CompactPartyFrame:HookScript("OnHide", DebuffFilter.ResetStyle)
 	CompactPartyFrame:HookScript("OnShow", DebuffFilter.OnRosterUpdate)
+	EditModeManagerFrame:HookScript("OnHide", function() Ctimer(.001, function() DebuffFilter.ResetStyle() DebuffFilter.OnRosterUpdate() end) end)
 end
 
 -- When roster updated, auto apply arena style or reset style
@@ -606,11 +607,20 @@ hooksecurefunc(CompactRaidFrameContainer, "SetGroupMode", function(groupMode)
 	DebuffFilter:OnRosterUpdate()
 end)
 
+hooksecurefunc(CompactRaidFrameContainer, "TryUpdate", function(groupMode)
+	DebuffFilter:ResetStyle()
+	DebuffFilter:OnRosterUpdate()
+end)
+
 hooksecurefunc("CompactPartyFrame_SetFlowSortFunction", function()
 	DebuffFilter:ResetStyle()
 	DebuffFilter:OnRosterUpdate()
 end)
 
+hooksecurefunc("CompactPartyFrame_RefreshMembers", function()
+	DebuffFilter:ResetStyle()
+	DebuffFilter:OnRosterUpdate()
+end)
 
 
 function DebuffFilter:ApplyStyle() ----- Find A Way to Always Show Debuffs
