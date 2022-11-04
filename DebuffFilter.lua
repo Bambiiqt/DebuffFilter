@@ -4,7 +4,7 @@ local debuffnumber = 3
 DebuffFilter = CreateFrame("Frame")
 DebuffFilter.cache = {}
 
-local DEFAULT_BUFF = 4
+local DEFAULT_BUFF = 9 --This Number Needs to Equal the Number of tracked Table Buf
 local DEFAULT_DEBUFF = 3
 
 local strfind = string.find
@@ -28,15 +28,15 @@ end
 
 PriorityBuff[1] = {
 "Power Infusion",
-"Power Word: Fortitude",
+"Renew",
 "Beacon of Light",
 "Beacon of Faith",
 774, --Rejuv
 }
 
 PriorityBuff[2] = {
-"Renew",
 "Atonement",
+"Echo of Light",
 155777, --Rejuc Germ
 "Spring Blossoms",
 "Glimmer of Light",
@@ -51,35 +51,36 @@ PriorityBuff[3] = {
 "Focused Growth", --Focused Growth (Honor Talent)
 }
 
---Lower Right on Icon 1
+--Upper Circle Right on Icon 1
 PriorityBuff[4] = {
+"Power Word: Fortitude",
+}
+
+--Upper Circle Right on Icon 2
+PriorityBuff[5] = {
 "Arcane Intellect",
 "Arcane Brilliance",
 "Dalaran Brilliance",
 }
 
---Lower Left on Icon 1
-PriorityBuff[5] = {
-
-}
-
---Upper Left on Icon 1
+--Upper Circle Right on Icon 3
 PriorityBuff[6] = {
-
+"inputspellhere",
+--264761, --War-Scroll of Battle Shout
+--6673, --Battle Shout
 }
---Upper Right on Icon 1
+--Upper Circle Right on Icon 4
 PriorityBuff[7] = {
-	264761, --War-Scroll of Battle Shout
-	6673, --Battle Shout
+"inputspellhere",
 }
 
 --UPPER RIGHT PRIO COUNT
 PriorityBuff[8] = {
-
+"inputspellhere",
 }
 --UPPER LEFT PRIO COUNT
 PriorityBuff[9] = {
-
+"inputspellhere",
 }
 
 local Buff = {}
@@ -596,26 +597,43 @@ function DebuffFilter:OnZoneChanged()
 	--if areaType ~= "raid" then self:ApplyStyle() end
 end
 
-
-hooksecurefunc(CompactRaidFrameContainer, "SetFlowSortFunction", function(...)
+hooksecurefunc(EditModeManagerFrame, "UpdateRaidContainerFlow", function(groupMode)
 	DebuffFilter:ResetStyle()
 	DebuffFilter:OnRosterUpdate()
+	--print(groupMode)
 end)
+
 
 hooksecurefunc(CompactRaidFrameContainer, "SetGroupMode", function(groupMode)
 	DebuffFilter:ResetStyle()
 	DebuffFilter:OnRosterUpdate()
+	--print(groupMode)
 end)
 
-hooksecurefunc(CompactRaidFrameContainer, "TryUpdate", function(groupMode)
+hooksecurefunc(CompactRaidFrameContainer, "SetFlowFilterFunction", function(flowFilterFunc)
+	DebuffFilter:ResetStyle()
+	DebuffFilter:OnRosterUpdate()
+	--print(flowFilterFunc)
+end)
+
+
+hooksecurefunc(CompactRaidFrameContainer, "SetGroupFilterFunction", function(groupFilterFunc)
+	DebuffFilter:ResetStyle()
+	DebuffFilter:OnRosterUpdate()
+		--print(groupFilterFunc)
+end)
+
+hooksecurefunc(CompactRaidFrameContainer, "SetFlowSortFunction", function(flowSortFunc)
+	DebuffFilter:ResetStyle()
+	DebuffFilter:OnRosterUpdate()
+	--print(flowSortFunc)
+end)
+
+hooksecurefunc(CompactRaidFrameContainer, "TryUpdate", function()
 	DebuffFilter:ResetStyle()
 	DebuffFilter:OnRosterUpdate()
 end)
 
-hooksecurefunc("CompactPartyFrame_SetFlowSortFunction", function()
-	DebuffFilter:ResetStyle()
-	DebuffFilter:OnRosterUpdate()
-end)
 
 hooksecurefunc("CompactPartyFrame_RefreshMembers", function()
 	DebuffFilter:ResetStyle()
@@ -628,6 +646,7 @@ function DebuffFilter:ApplyStyle() ----- Find A Way to Always Show Debuffs
 		for i = 1,80 do
 			local f = _G["CompactRaidFrame"..i]
 			if f and not self.cache[f] and f.unit and not strfind(f.unit,"target") then --not strfind(f.unit,"pet") then
+				f.frame = "CompactRaidFrame"..i
 				self:ApplyFrame(f)
 				self:UpdateAura(f.unit)
 				self:UpdateBuffAura(f.unit)
@@ -642,6 +661,7 @@ function DebuffFilter:ApplyStyle() ----- Find A Way to Always Show Debuffs
 				local f = _G["CompactRaidGroup"..i.."Member"..j]
 				--CompactUnitFrame_HideAllDispelDebuffs(f)
 				if f and not self.cache[f] and f.unit and not strfind(f.unit,"target") then --not strfind(f.unit,"pet") then
+					f.frame = "CompactRaidGroup"..i.."Member"..j
 					self:ApplyFrame(f)
 					self:UpdateAura(f.unit)
 					self:UpdateBuffAura(f.unit)
@@ -656,6 +676,7 @@ function DebuffFilter:ApplyStyle() ----- Find A Way to Always Show Debuffs
 		local f = _G["CompactPartyFrameMember"..j] --- Does
 		--CompactUnitFrame_HideAllDispelDebuffs(f)
 		if f and not self.cache[f] and f.unit  and not strfind(f.unit,"target") then --not strfind(f.unit,"pet") then
+			f.frame = "CompactPartyFrameMember"..j
 			self:ApplyFrame(f)
 			self:UpdateAura(f.unit)
 			self:UpdateBuffAura(f.unit)
@@ -1303,17 +1324,18 @@ function DebuffFilter:UpdateAura(uid)
 end
 
 function DebuffFilter:UpdateBuffAura(uid)
+
 	for f,v in pairs(self.cache) do
 		if f.unit == uid then
 			local filter = nil
 			local buffNum = 1
-			local index, buff, backCount
+			local index, buff, backCount, X
 			for j = 1, DEFAULT_BUFF do
 				for i = 1, 32 do
 					local buffName, _, count, _, _, _, unitCaster, _, _, spellId = UnitBuff(uid, i, nil)
 					if ( buffName ) then
 						if isBuff(uid, i, nil, j) then
-							if j == 3 and (buffName == "Prayer of Mending" or buffName == "Focused Growth") and unitCaster == "player" then backCount = count end 	--Prayer of mending hack
+							if (buffName == "Prayer of Mending" or buffName == "Focused Growth") and unitCaster == "player" then backCount = count end 	--Prayer of mending hack
 							if Buff[j][buffName] then
 								 Buff[j][spellId] =  Buff[j][buffName]
 							end
@@ -1330,8 +1352,34 @@ function DebuffFilter:UpdateBuffAura(uid)
 				end
 				if index then
 					local name, icon, count, buffType, duration, expirationTime, unitCaster, canStealOrPurge, _, spellId = UnitBuff(uid, index, filter);
-					if j == 1 or j == 4 or J == 5 or j == 6 or j == 7 or j == 8 or j == 9 or unitCaster == "player" then
+					if j == 1 or j == 4 or j == 5 or j == 6 or j == 7 or j == 8 or j == 9 or unitCaster == "player" then
 						local buffFrame = v.buffFrames[j]
+
+						if j == 4 or j == 5 or j == 6 or j == 7 then
+							if not X then
+								v.buffFrames[4]:Hide();v.buffFrames[5]:Hide();v.buffFrames[6]:Hide();v.buffFrames[7]:Hide();
+								j = 4
+								buffFrame = v.buffFrames[j]; X = j
+								--Optimize This so id doesnt fire if the buffs expiration has not changed
+							Ctimer(.01, function()
+								local frame = f.frame.."BuffOverlayRight"
+								if _G[frame] and _G[frame].icon:IsVisible() then
+									v.buffFrames[j]:ClearAllPoints()
+									v.buffFrames[j]:SetPoint("RIGHT", f, "RIGHT", -5.5, 10)
+									--_G[frame].icon:HookScript("OnShow",  function() v.buffFrames[j]:ClearAllPoints() v.buffFrames[j]:SetPoint("RIGHT", f, "RIGHT", -5.5, 8) end)
+									--_G[frame].icon:HookScript("OnHide",  function() v.buffFrames[j]:ClearAllPoints() v.buffFrames[j]:SetPoint("TOPRIGHT", f, "TOPRIGHT", -5.5, -6.5) end)
+								else
+									v.buffFrames[j]:ClearAllPoints()
+									v.buffFrames[j]:SetPoint("TOPRIGHT", f, "TOPRIGHT", -5.5, -6.5)
+								end
+							end)
+
+							else
+						   buffFrame = v.buffFrames[X+1]
+							 X = X + 1
+							end
+						end
+
 						buffFrame.icon:SetTexture(icon);
 						buffFrame.icon:SetDesaturated(nil) --Destaurate Icon
 						buffFrame.icon:SetVertexColor(1, 1, 1);
@@ -1357,7 +1405,7 @@ function DebuffFilter:UpdateBuffAura(uid)
 								buffFrame.count:Hide();
 							end
 						end
-						if j == 3 then
+						if backCount then
 							buffFrame.count:ClearAllPoints()
 							buffFrame.count:SetFont("Fonts\\FRIZQT__.TTF", 12, "OUTLINE") --, MONOCHROME")
 							buffFrame.count:SetPoint("TOPRIGHT", -10, 6.5);
@@ -1366,23 +1414,23 @@ function DebuffFilter:UpdateBuffAura(uid)
 						end
 						if j == 8 then
 							buffFrame.count:ClearAllPoints()
-							buffFrame.count:SetFont("Fonts\\FRIZQT__.TTF", 13, "OUTLINE") --, MONOCHROME")
-							buffFrame.count:SetPoint("BOTTOMRIGHT", 2, -7);
+							buffFrame.count:SetFont("Fonts\\FRIZQT__.TTF", 11, "OUTLINE") --, MONOCHROME")
+							buffFrame.count:SetPoint("BOTTOMRIGHT", 2, -5);
 							buffFrame.count:SetJustifyH("RIGHT");
 							buffFrame.icon:SetVertexColor(1, 1, 1, 0); --Hide Icon for NOW till You MERGE BOR & BOL
 							--buffFrame.count:SetTextColor(0, 0 ,0, 1)
 						end
 						if j == 9 then
 							buffFrame.count:ClearAllPoints()
-							buffFrame.count:SetFont("Fonts\\FRIZQT__.TTF", 13, "OUTLINE") --, MONOCHROME")
-							buffFrame.count:SetPoint("BOTTOMRIGHT", 2, -7);
+							buffFrame.count:SetFont("Fonts\\FRIZQT__.TTF", 11, "OUTLINE") --, MONOCHROME")
+							buffFrame.count:SetPoint("BOTTOMRIGHT", 2, -5);
 							buffFrame.count:SetJustifyH("RIGHT");
 							buffFrame.icon:SetVertexColor(1, 1, 1, 0); --Hide Icon for NOW till You MERGE BOR & BOL
 							--buffFrame.count:SetTextColor(0, 0 ,0, 1)
 						end
-						if j == 4 or J == 5 or j == 6 or j == 7 then
+						if j == 4 or j == 5 or j == 6 or j == 7 then
 							SetPortraitToTexture(buffFrame.icon, icon)
-							buffFrame.icon:SetTexCoord(0.07, 0.93, 0.07, 0.93);
+							--buffFrame.icon:SetTexCoord(0.07, 0.93, 0.07, 0.93);
 						end
 						buffFrame:SetID(j);
 						local startTime = expirationTime - duration;
@@ -1462,47 +1510,61 @@ function DebuffFilter:ApplyFrame(f)
 				scf.buffFrames[j]:ClearAllPoints()
 				scf.buffFrames[j]:SetParent(f)
 				scf.buffFrames[j]:SetPoint("BOTTOMRIGHT", scf.buffFrames[j-1], "BOTTOMLEFT", 0, 0)
-			elseif j ==4 then --Buff Four () --Lower RIght
+			elseif j == 4 or j == 5 or j == 6 or j == 7 then
+				scf.buffFrames[j]:ClearAllPoints()
+				scf.buffFrames[j]:SetParent(f)
+				if j == 4 then
+					if not strfind(f.unit,"pet") then
+						scf.buffFrames[j]:SetPoint("TOPRIGHT", f, "TOPRIGHT", -5.5, -6.5)
+					end
+				else
+					scf.buffFrames[j]:SetPoint("RIGHT", scf.buffFrames[j -1], "LEFT", 0, 0)
+				end
+					scf.buffFrames[j]:SetScale(.4)
+					scf.buffFrames[j]:SetFrameLevel(3)
+					scf.buffFrames[j]:SetFrameStrata("HIGH")
+
+			--[[elseif j == 4 then --Buff Four () --Small Lower RIght
 				scf.buffFrames[j]:ClearAllPoints()
 				scf.buffFrames[j]:SetParent(f)
 				if not strfind(f.unit,"pet") then
-				scf.buffFrames[j]:SetPoint("BOTTOMRIGHT", scf.buffFrames[1], "BOTTOMRIGHT", -5, 5)
+						scf.buffFrames[j]:SetPoint("RIGHT", f, "RIGHT", -10, 3)
+				end
+				scf.buffFrames[j]:SetScale(.5)
+				scf.buffFrames[j]:SetFrameLevel(3)
+				scf.buffFrames[j]:SetFrameStrata("HIGH")
+			elseif j ==5, then --Buff Four () --Small Lower Left
+				scf.buffFrames[j]:ClearAllPoints()
+				scf.buffFrames[j]:SetParent(f)
+				if not strfind(f.unit,"pet") then
+					scf.buffFrames[j]:SetPoint("BOTTOMLEFT", scf.buffFrames[1], "BOTTOMLEFT", 5, 5)
 				end
 				scf.buffFrames[j]:SetScale(.265)
 				scf.buffFrames[j]:SetFrameLevel(3)
 				scf.buffFrames[j]:SetFrameStrata("HIGH")
-			elseif j ==5 then --Buff Four () --Lower Left
+			elseif j ==6 then --Buff Six () --Small Upper lEft
 				scf.buffFrames[j]:ClearAllPoints()
 				scf.buffFrames[j]:SetParent(f)
 				if not strfind(f.unit,"pet") then
-				scf.buffFrames[j]:SetPoint("BOTTOMLEFT", scf.buffFrames[1], "BOTTOMLEFT", 5, 5)
+					scf.buffFrames[j]:SetPoint("TOPLEFT", scf.buffFrames[1], "TOPLEFT", 5, -5)
 				end
 				scf.buffFrames[j]:SetScale(.265)
 				scf.buffFrames[j]:SetFrameLevel(3)
 				scf.buffFrames[j]:SetFrameStrata("HIGH")
-			elseif j ==6 then --Buff Six () --Upeer lEft
+			elseif j ==7 then --Buff Seven () Small Upper Right
 				scf.buffFrames[j]:ClearAllPoints()
 				scf.buffFrames[j]:SetParent(f)
 				if not strfind(f.unit,"pet") then
-				scf.buffFrames[j]:SetPoint("TOPLEFT", scf.buffFrames[1], "TOPLEFT", 5, -5)
+					scf.buffFrames[j]:SetPoint("TOPRIGHT", scf.buffFrames[1], "TOPRIGHT", -5, -5)
 				end
 				scf.buffFrames[j]:SetScale(.265)
 				scf.buffFrames[j]:SetFrameLevel(3)
-				scf.buffFrames[j]:SetFrameStrata("HIGH")
-			elseif j ==7 then --Buff Four ()
-				scf.buffFrames[j]:ClearAllPoints()
-				scf.buffFrames[j]:SetParent(f)
-				if not strfind(f.unit,"pet") then
-				scf.buffFrames[j]:SetPoint("TOPRIGHT", scf.buffFrames[1], "TOPRIGHT", -5, -5)
-				end
-				scf.buffFrames[j]:SetScale(.265)
-				scf.buffFrames[j]:SetFrameLevel(3)
-				scf.buffFrames[j]:SetFrameStrata("HIGH")
+				scf.buffFrames[j]:SetFrameStrata("HIGH")]]
 			elseif j ==8 then --Upper Right Count Only
 				scf.buffFrames[j]:ClearAllPoints()
 				scf.buffFrames[j]:SetParent(f)
 				if not strfind(f.unit,"pet") then
-				scf.buffFrames[j]:SetPoint("TOPRIGHT", f, "TOPRIGHT", -2, -1.5)
+					scf.buffFrames[j]:SetPoint("TOPRIGHT", f, "TOPRIGHT", -2, -1.5)
 				end
 				scf.buffFrames[j]:SetScale(1.15)
 				scf.buffFrames[j]:SetFrameLevel(3)
@@ -1511,7 +1573,7 @@ function DebuffFilter:ApplyFrame(f)
 				scf.buffFrames[j]:ClearAllPoints()
 				scf.buffFrames[j]:SetParent(f)
 				if not strfind(f.unit,"pet") then
-				scf.buffFrames[j]:SetPoint("TOPLEFT", f, "TOPLEFT", 2, -1.5)
+					scf.buffFrames[j]:SetPoint("TOPLEFT", f, "TOPLEFT", 2, -1.5)
 				end
 				scf.buffFrames[j]:SetScale(1.15)
 				scf.buffFrames[j]:SetFrameLevel(3)
