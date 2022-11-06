@@ -564,7 +564,6 @@ local bgWarningspellIds = {
 
 }
 
-
 function DebuffFilter:OnLoad()
 
 	self:RegisterEvent("PLAYER_ENTERING_WORLD")
@@ -603,19 +602,17 @@ hooksecurefunc(EditModeManagerFrame, "UpdateRaidContainerFlow", function(groupMo
 	--print(groupMode)
 end)
 
-
 hooksecurefunc(CompactRaidFrameContainer, "SetGroupMode", function(groupMode)
 	DebuffFilter:ResetStyle()
 	DebuffFilter:OnRosterUpdate()
 	--print(groupMode)
 end)
 
-hooksecurefunc(CompactRaidFrameContainer, "SetFlowFilterFunction", function(flowFilterFunc)
+hooksecurefunc(CompactRaidFrameContainer, "SetFlowFilterFunction", function(flowFilterFu)
 	DebuffFilter:ResetStyle()
 	DebuffFilter:OnRosterUpdate()
 	--print(flowFilterFunc)
 end)
-
 
 hooksecurefunc(CompactRaidFrameContainer, "SetGroupFilterFunction", function(groupFilterFunc)
 	DebuffFilter:ResetStyle()
@@ -626,7 +623,6 @@ end)
 hooksecurefunc(CompactRaidFrameContainer, "SetFlowSortFunction", function(flowSortFunc)
 	DebuffFilter:ResetStyle()
 	DebuffFilter:OnRosterUpdate()
-	--print(flowSortFunc)
 end)
 
 hooksecurefunc(CompactRaidFrameContainer, "TryUpdate", function()
@@ -634,12 +630,10 @@ hooksecurefunc(CompactRaidFrameContainer, "TryUpdate", function()
 	DebuffFilter:OnRosterUpdate()
 end)
 
-
 hooksecurefunc("CompactPartyFrame_RefreshMembers", function()
 	DebuffFilter:ResetStyle()
 	DebuffFilter:OnRosterUpdate()
 end)
-
 
 function DebuffFilter:ApplyStyle() ----- Find A Way to Always Show Debuffs
 	if CompactRaidFrameManager.container.groupMode == "flush" then
