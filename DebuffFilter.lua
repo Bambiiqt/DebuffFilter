@@ -27,7 +27,7 @@ for i = 1, DEFAULT_BUFF do
 end
 
 PriorityBuff[1] = {
-"Power Infusion",
+--"Power Infusion",
 "Renew",
 "Beacon of Light",
 "Beacon of Faith",
