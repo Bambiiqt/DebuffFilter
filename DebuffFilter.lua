@@ -624,16 +624,17 @@ hooksecurefunc(CompactRaidFrameContainer, "SetFlowSortFunction", function(flowSo
 	DebuffFilter:ResetStyle()
 	DebuffFilter:OnRosterUpdate()
 end)
-
-hooksecurefunc(CompactRaidFrameContainer, "TryUpdate", function()
+--[[
+hooksecurefunc(CompactRaidFrameContainer, "TryUpdate", function() --HIGH CPU
 	DebuffFilter:ResetStyle()
 	DebuffFilter:OnRosterUpdate()
 end)
 
-hooksecurefunc("CompactPartyFrame_RefreshMembers", function()
+hooksecurefunc("CompactPartyFrame_RefreshMembers", function() --HIGH CPU
 	DebuffFilter:ResetStyle()
 	DebuffFilter:OnRosterUpdate()
 end)
+]]
 
 function DebuffFilter:ApplyStyle() ----- Find A Way to Always Show Debuffs
 	if CompactRaidFrameManager.container.groupMode == "flush" then
@@ -1444,6 +1445,7 @@ function DebuffFilter:UpdateBuffAura(uid)
 				end
 			index = nil; buff = nil; backCount= nil
 			end
+			break
 		end
 	end
 end
