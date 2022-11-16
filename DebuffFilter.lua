@@ -564,83 +564,13 @@ local bgWarningspellIds = {
 
 }
 
-function DebuffFilter:OnLoad()
 
-	self:RegisterEvent("PLAYER_ENTERING_WORLD")
-	self:RegisterEvent("PLAYER_REGEN_DISABLED")
-	self:RegisterEvent("PLAYER_REGEN_ENABLED")
-	self:RegisterEvent("UNIT_AURA")
-	self:RegisterEvent("COMBAT_LOG_EVENT_UNFILTERED")
-	CompactRaidFrameContainer:HookScript("OnEvent", DebuffFilter.OnRosterUpdate)
-	CompactRaidFrameContainer:HookScript("OnHide", DebuffFilter.ResetStyle)
-	CompactRaidFrameContainer:HookScript("OnShow", DebuffFilter.OnRosterUpdate)
-	CompactPartyFrame:HookScript("OnHide", DebuffFilter.ResetStyle)
-	CompactPartyFrame:HookScript("OnShow", DebuffFilter.OnRosterUpdate)
-	EditModeManagerFrame:HookScript("OnHide", function() Ctimer(.001, function() DebuffFilter.ResetStyle() DebuffFilter.OnRosterUpdate() end) end)
-end
-
--- When roster updated, auto apply arena style or reset style
-function DebuffFilter:OnRosterUpdate()
-	if CompactRaidFrameContainer:IsVisible() then
-		local n = GetNumGroupMembers()
-		if n <= 40 then DebuffFilter:ApplyStyle() else DebuffFilter:ResetStyle() end
-	elseif CompactPartyFrame:IsVisible() then
-		DebuffFilter:ApplyStyle()
-	end
-end
-
--- If in raid reset style
-function DebuffFilter:OnZoneChanged()
-	local _,areaType = IsInInstance()
-	self:ResetStyle()
-	--if areaType ~= "raid" then self:ApplyStyle() end
-end
-
-hooksecurefunc(EditModeManagerFrame, "UpdateRaidContainerFlow", function(groupMode)
-	DebuffFilter:ResetStyle()
-	DebuffFilter:OnRosterUpdate()
-	--print(groupMode)
-end)
-
-hooksecurefunc(CompactRaidFrameContainer, "SetGroupMode", function(groupMode)
-	DebuffFilter:ResetStyle()
-	DebuffFilter:OnRosterUpdate()
-	--print(groupMode)
-end)
-
-hooksecurefunc(CompactRaidFrameContainer, "SetFlowFilterFunction", function(flowFilterFu)
-	DebuffFilter:ResetStyle()
-	DebuffFilter:OnRosterUpdate()
-	--print(flowFilterFunc)
-end)
-
-hooksecurefunc(CompactRaidFrameContainer, "SetGroupFilterFunction", function(groupFilterFunc)
-	DebuffFilter:ResetStyle()
-	DebuffFilter:OnRosterUpdate()
-		--print(groupFilterFunc)
-end)
-
-hooksecurefunc(CompactRaidFrameContainer, "SetFlowSortFunction", function(flowSortFunc)
-	DebuffFilter:ResetStyle()
-	DebuffFilter:OnRosterUpdate()
-end)
---[[
-hooksecurefunc(CompactRaidFrameContainer, "TryUpdate", function() --HIGH CPU
-	DebuffFilter:ResetStyle()
-	DebuffFilter:OnRosterUpdate()
-end)
-
-hooksecurefunc("CompactPartyFrame_RefreshMembers", function() --HIGH CPU
-	DebuffFilter:ResetStyle()
-	DebuffFilter:OnRosterUpdate()
-end)
-]]
 
 function DebuffFilter:ApplyStyle() ----- Find A Way to Always Show Debuffs
 	if CompactRaidFrameManager.container.groupMode == "flush" then
 		for i = 1,80 do
 			local f = _G["CompactRaidFrame"..i]
-			if f and not self.cache[f] and f.unit and not strfind(f.unit,"target") then --not strfind(f.unit,"pet") then
+			if f and not self.cache[f] and f.unit and f.inUse and not strfind(f.unit,"target") then --not strfind(f.unit,"pet") then
 				f.frame = "CompactRaidFrame"..i
 				self:ApplyFrame(f)
 				self:UpdateAura(f.unit)
@@ -654,7 +584,6 @@ function DebuffFilter:ApplyStyle() ----- Find A Way to Always Show Debuffs
 		for i = 1,8 do
 			for j = 1,5 do
 				local f = _G["CompactRaidGroup"..i.."Member"..j]
-				--CompactUnitFrame_HideAllDispelDebuffs(f)
 				if f and not self.cache[f] and f.unit and not strfind(f.unit,"target") then --not strfind(f.unit,"pet") then
 					f.frame = "CompactRaidGroup"..i.."Member"..j
 					self:ApplyFrame(f)
@@ -668,9 +597,8 @@ function DebuffFilter:ApplyStyle() ----- Find A Way to Always Show Debuffs
 		end
 	end
 	for j = 1,5 do
-		local f = _G["CompactPartyFrameMember"..j] --- Does
-		--CompactUnitFrame_HideAllDispelDebuffs(f)
-		if f and not self.cache[f] and f.unit  and not strfind(f.unit,"target") then --not strfind(f.unit,"pet") then
+		local f = _G["CompactPartyFrameMember"..j]
+		if f and not self.cache[f] and f.unit and not strfind(f.unit,"target") then --not strfind(f.unit,"pet") then
 			f.frame = "CompactPartyFrameMember"..j
 			self:ApplyFrame(f)
 			self:UpdateAura(f.unit)
@@ -1616,16 +1544,38 @@ function DebuffFilter:ResetFrame(f)
 	self.cache[f] = nil
 end
 
+
+
 -- Event handling
 local function OnEvent(self,event,...)
-	if event == "VARIABLES_LOADED" then self:OnLoad()
-	elseif event == "GROUP_ROSTER_UPDATE" or event == "UNIT_PET" then self:OnRosterUpdate()
-	elseif event == "PLAYER_ENTERING_WORLD" then self:ResetStyle(); self:OnRosterUpdate()
-	elseif event == "ZONE_CHANGED_NEW_AREA" then 	Ctimer(1, function() self:ResetStyle(); self:OnRosterUpdate() end) self:ResetStyle(); self:OnRosterUpdate()
+	if event == "GROUP_ROSTER_UPDATE" or event == "UNIT_PET" then self:ApplyStyle()
+	elseif event == "PLAYER_ENTERING_WORLD" then  Ctimer(5, function() self:ResetStyle(); self:ApplyStyle() end) self:ResetStyle(); self:ApplyStyle()
+	elseif event == "ZONE_CHANGED_NEW_AREA" then 	Ctimer(5, function() self:ResetStyle(); self:ApplyStyle() end) self:ResetStyle(); self:ApplyStyle()
 	elseif event == "COMBAT_LOG_EVENT_UNFILTERED" then self:CLEU()
 	elseif event == "UNIT_AURA" then self:UpdateAura(...); self:UpdateBuffAura(...) end
 end
 
 DebuffFilter:SetScript("OnEvent",OnEvent)
-DebuffFilter:RegisterEvent("VARIABLES_LOADED")
-_G.DebuffFilter = DebuffFilter
+DebuffFilter:RegisterEvent("GROUP_ROSTER_UPDATE")
+DebuffFilter:RegisterEvent("PLAYER_ENTERING_WORLD")
+DebuffFilter:RegisterEvent("ZONE_CHANGED_NEW_AREA")
+DebuffFilter:RegisterEvent("UNIT_AURA")
+DebuffFilter:RegisterEvent("COMBAT_LOG_EVENT_UNFILTERED")
+--_G.DebuffFilter = DebuffFilter
+
+BambiUI_ResetDebuffFilter = CreateFrame('CheckButton', 'BambiUI_ResetDebuffFilter', BambiUI_ResetDebuffFilter, 'UICheckButtonTemplate');
+BambiUI_ResetDebuffFilter:SetScript('OnClick', function() DebuffFilter:ApplyStyle() print("Reset DebuffFilter Frames") end);
+
+
+hooksecurefunc(CompactRaidFrameContainer, "SetGroupMode", function() DebuffFilter:ResetStyle();	DebuffFilter:ApplyStyle() end)
+hooksecurefunc(CompactRaidFrameContainer, "SetFlowFilterFunction", function() DebuffFilter:ResetStyle();	DebuffFilter:ApplyStyle() end)
+hooksecurefunc(CompactRaidFrameContainer, "SetGroupFilterFunction", function() DebuffFilter:ResetStyle();	DebuffFilter:ApplyStyle() end)
+hooksecurefunc(CompactRaidFrameContainer, "SetFlowSortFunction", function() DebuffFilter:ResetStyle();	DebuffFilter:ApplyStyle() end)
+hooksecurefunc("CompactPartyFrame_SetFlowSortFunction", function() DebuffFilter:ResetStyle();	DebuffFilter:ApplyStyle() end)
+
+--CompactRaidFrameContainer:HookScript("OnHide", function(self) DebuffFilter:ResetStyle() DebuffFilter:ApplyStyle() end)
+--CompactRaidFrameContainer:HookScript("OnShow", function(self) DebuffFilter:ResetStyle() DebuffFilter:ApplyStyle() end)
+--CompactPartyFrame:HookScript("OnHide", function(self) DebuffFilter:ResetStyle() DebuffFilter:ApplyStyle() end)
+--CompactPartyFrame:HookScript("OnShow", function(self) DebuffFilter:ResetStyle() DebuffFilter:ApplyStyle() end)
+
+EditModeManagerFrame:HookScript("OnHide", function() Ctimer(.001, function() DebuffFilter:ResetStyle() DebuffFilter:ApplyStyle() end) end)
