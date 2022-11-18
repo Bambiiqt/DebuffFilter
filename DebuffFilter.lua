@@ -788,7 +788,7 @@ local function CooldownFrame_Clear(self)
 end
 
 local function SetdebuffFrame(f, debuffFrame, uid, index, filter, scale)
-	local name, icon, count, debuffType, duration, expirationTime, unitCaster, canStealOrPurge, _, spellId = UnitDebuff(uid, index, filter);
+	local name, icon, count, debuffType, duration, expirationTime, unitCaster, canStealOrPurge, _, spellId = UnitAura(uid, index, filter);
 	debuffFrame.filter = filter;
 	debuffFrame.icon:SetTexture(icon);
 	debuffFrame.icon:SetDesaturated(nil) --Destaurate Icon
@@ -872,7 +872,7 @@ function DebuffFilter:UpdateAura(uid)
 					if ( debuffName ) then
 							if isBiggestDebuff(uid, index, filter) then
 							local debuffFrame = v.debuffFrames[debuffNum]
-							SetdebuffFrame(debuffFrame, uid, index, filter, BIGGEST)
+							SetdebuffFrame(debuffFrame, uid, index, "HARMFUL", BIGGEST)
 							debuffNum = debuffNum + 1
 						end
 					else
@@ -887,7 +887,7 @@ function DebuffFilter:UpdateAura(uid)
 					if ( debuffName ) then
 							if isBiggerDebuff(uid, index, filter) and not isBiggestDebuff(uid, index, filter) then
 								local debuffFrame = v.debuffFrames[debuffNum]
-								SetdebuffFrame(f, debuffFrame, uid, index, filter, BIGGEST)
+								SetdebuffFrame(f, debuffFrame, uid, index, "HARMFUL", BIGGEST)
 								debuffNum = debuffNum + 1
 						end
 					else
@@ -902,7 +902,7 @@ function DebuffFilter:UpdateAura(uid)
 					if ( debuffName ) then
 							if isBigDebuff(uid, index, filter) and not isBiggestDebuff(uid, index, filter) and not isBiggerDebuff(uid, index, filter) then
 								local debuffFrame = v.debuffFrames[debuffNum]
-								SetdebuffFrame(f, debuffFrame, uid, index, filter, BIG)
+								SetdebuffFrame(f, debuffFrame, uid, index, "HARMFUL", BIG)
 								debuffNum = debuffNum + 1
 						end
 					else
@@ -917,7 +917,7 @@ function DebuffFilter:UpdateAura(uid)
 					if ( debuffName ) then
 							if CompactUnitFrame_UtilIsBossDebuff(uid, index, filter) and not isBiggestDebuff(uid, index, filter) and not isBiggerDebuff(uid, index, filter) and not isBigDebuff(uid, index, filter) then
 								local debuffFrame = v.debuffFrames[debuffNum]
-								SetdebuffFrame(f, debuffFrame, uid, index, filter, BOSSDEBUFF)
+								SetdebuffFrame(f, debuffFrame, uid, index, "HARMFUL", BOSSDEBUFF)
 								debuffNum = debuffNum + 1
 						end
 					else
@@ -932,7 +932,7 @@ function DebuffFilter:UpdateAura(uid)
 					if ( debuffName ) then
 						if CompactUnitFrame_UtilIsBossAura(uid, index, filter) and not isBiggestDebuff(uid, index, filter) and not isBiggerDebuff(uid, index, filter) and not isBigDebuff(uid, index, filter) and not CompactUnitFrame_UtilIsBossDebuff(uid, index, filter) then
 							local debuffFrame = v.debuffFrames[debuffNum]
-							SetdebuffFrame(f, debuffFrame, uid, index, filter, BOSSBUFF)
+							SetdebuffFrame(f, debuffFrame, uid, index, "HELPFUL", BOSSBUFF)
 							debuffNum = debuffNum + 1
 						end
 					else
@@ -947,7 +947,7 @@ function DebuffFilter:UpdateAura(uid)
 					if ( debuffName ) then
 						if  isWarning(uid, index, filter) and not isBiggestDebuff(uid, index, filter) and not isBiggerDebuff(uid, index, filter) and not isBigDebuff(uid, index, filter) and not CompactUnitFrame_UtilIsBossDebuff(uid, index, filter) and not CompactUnitFrame_UtilIsBossAura(uid, index, filter) then
 							local debuffFrame = v.debuffFrames[debuffNum]
-							SetdebuffFrame(f, debuffFrame, uid, index, filter, WARNING)
+							SetdebuffFrame(f, debuffFrame, uid, index, "HARMFUL", WARNING)
 							debuffNum = debuffNum + 1
 						end
 					else
@@ -962,7 +962,7 @@ function DebuffFilter:UpdateAura(uid)
 					if ( debuffName ) then
 						if isPriority(uid, index, filter) and not isBiggestDebuff(uid, index, filter) and not isBiggerDebuff(uid, index, filter) and not isBigDebuff(uid, index, filter) and not CompactUnitFrame_UtilIsBossDebuff(uid, index, filter) and not CompactUnitFrame_UtilIsBossAura(uid, index, filter) and not isWarning(uid, index, filter) then
 							local debuffFrame = v.debuffFrames[debuffNum]
-							SetdebuffFrame(f, debuffFrame, uid, index, filter, PRIORITY)
+							SetdebuffFrame(f, debuffFrame, uid, index, "HARMFUL", PRIORITY)
 							debuffNum = debuffNum + 1
 						end
 					else
@@ -976,7 +976,7 @@ function DebuffFilter:UpdateAura(uid)
 					if ( debuffName ) then
 						if ( isDebuff(uid, index, filter) and not isBiggestDebuff(uid, index, filter) and not isBiggerDebuff(uid, index, filter) and not isBigDebuff(uid, index, filter) and not CompactUnitFrame_UtilIsBossDebuff(uid, index, filter) and not CompactUnitFrame_UtilIsBossAura(uid, index, filter) and not isWarning(uid, index, filter) and not isPriority(uid, index, filter)) then
 							local debuffFrame = v.debuffFrames[debuffNum]
-							SetdebuffFrame(f, debuffFrame, uid, index, filter, 1)
+							SetdebuffFrame(f, debuffFrame, uid, index, "HARMFUL", 1)
 							debuffNum = debuffNum + 1
 						end
 					else
@@ -1276,11 +1276,11 @@ BambiUI_ResetDebuffFilter = CreateFrame('CheckButton', 'BambiUI_ResetDebuffFilte
 BambiUI_ResetDebuffFilter:SetScript('OnClick', function() DebuffFilter:ApplyStyle() print("Reset DebuffFilter Frames") end);
 
 
-hooksecurefunc(CompactRaidFrameContainer, "SetGroupMode", function()	DebuffFilter:ApplyStyle() end)
-hooksecurefunc(CompactRaidFrameContainer, "SetFlowFilterFunction", function()	DebuffFilter:ApplyStyle() end)
-hooksecurefunc(CompactRaidFrameContainer, "SetGroupFilterFunction", function() DebuffFilter:ApplyStyle() end)
-hooksecurefunc(CompactRaidFrameContainer, "SetFlowSortFunction", function()	DebuffFilter:ApplyStyle() end)
-hooksecurefunc("CompactPartyFrame_SetFlowSortFunction", function() DebuffFilter:ApplyStyle() end)
+hooksecurefunc(CompactRaidFrameContainer, "SetGroupMode", function() DebuffFilter:ResetStyle()	DebuffFilter:ApplyStyle() end)
+hooksecurefunc(CompactRaidFrameContainer, "SetFlowFilterFunction", function() DebuffFilter:ResetStyle()	DebuffFilter:ApplyStyle() end)
+hooksecurefunc(CompactRaidFrameContainer, "SetGroupFilterFunction", function() DebuffFilter:ResetStyle() DebuffFilter:ApplyStyle() end)
+hooksecurefunc(CompactRaidFrameContainer, "SetFlowSortFunction", function() DebuffFilter:ResetStyle()	DebuffFilter:ApplyStyle() end)
+hooksecurefunc("CompactPartyFrame_SetFlowSortFunction", function() DebuffFilter:ResetStyle() DebuffFilter:ApplyStyle() end)
 
 CompactRaidFrameContainer:HookScript("OnHide", function(self) DebuffFilter:ApplyStyle() end)
 CompactRaidFrameContainer:HookScript("OnShow", function(self) DebuffFilter:ApplyStyle() end)
