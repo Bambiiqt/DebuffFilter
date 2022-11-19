@@ -1206,9 +1206,9 @@ function DebuffFilter:ApplyFrame(f)
 		f.buffFrames[j]:Hide() --Hides Blizzards Frames
 		f.buffFrames[j]:SetScript("OnShow", f.buffFrames[j].Hide)
 	end
-	for j = 1,#f.dispelDebuffFrames do --Hides Blizzards DIspel Dots
-		f.dispelDebuffFrames[j]:SetScript("OnShow", f.dispelDebuffFrames[j].Hide)
-	end
+	f.dispelDebuffFrames[1]:SetAlpha(0); --Hides Dispel Icons in Upper Right
+	f.dispelDebuffFrames[2]:SetAlpha(0); --Hides Dispel Icons in Upper Right
+	f.dispelDebuffFrames[3]:SetAlpha(0); --Hides Dispel Icons in Upper Right
 end
 -- Reset to the original style
 function DebuffFilter:ResetStyle()
