@@ -103,6 +103,7 @@ local spellIds = {
 
 --DONT SHOW
 	[57723] = "Hide", --Exhaustion
+	[390435] = "Hide", --Exhaustion
 	[57724] = "Hide", --Sated
 	[264689] = "Hide", --Fatigued
 	[80354] = "Hide", --Temporal Displacement
@@ -573,46 +574,47 @@ local bgWarningspellIds = {
 
 
 
-function DebuffFilter:ApplyStyle() ----- Find A Way to Always Show Debuffs
-	if CompactRaidFrameManager.container.groupMode == "flush" then
-		for i = 1,80 do
-			local f = _G["CompactRaidFrame"..i]
-			if f and not self.cache[f] and f.unit and f.inUse and not strfind(f.unit,"target") then --not strfind(f.unit,"pet") then
-				f.frame = "CompactRaidFrame"..i
-				self:ApplyFrame(f)
-				self:UpdateAura(f.unit)
-				self:UpdateBuffAura(f.unit)
-			end
-			if f and not f.inUse and self.cache[f] then
-				self:ResetFrame(f)
-			end
-		end
-	elseif CompactRaidFrameManager.container.groupMode == "discrete" then
-		for i = 1,8 do
-			for j = 1,5 do
-				local f = _G["CompactRaidGroup"..i.."Member"..j]
-				if f and not self.cache[f] and f.unit and not strfind(f.unit,"target") then --not strfind(f.unit,"pet") then
-					f.frame = "CompactRaidGroup"..i.."Member"..j
+function DebuffFilter:ApplyStyle()
+	if CompactRaidFrameContainer:IsShown() then
+		if CompactRaidFrameManager.container.groupMode == "flush" then
+			for i = 1,80 do
+				local f = _G["CompactRaidFrame"..i]
+				if f and f.unit and f.inUse and not self.cache[f] and not strfind(f.unit,"target") then --and not strfind(f.unit,"pet") then
+					f.frame = "CompactRaidFrame"..i
 					self:ApplyFrame(f)
 					self:UpdateAura(f.unit)
 					self:UpdateBuffAura(f.unit)
-				end
-				if f and not f.unit and self.cache[f] then
+				elseif f and self.cache[f] then
 					self:ResetFrame(f)
+				end
+			end
+		elseif CompactRaidFrameManager.container.groupMode == "discrete" then
+			for i = 1,8 do
+				for j = 1,5 do
+					local f = _G["CompactRaidGroup"..i.."Member"..j]
+					if f  and f.unit and not self.cache[f] and not strfind(f.unit,"target") then --not strfind(f.unit,"pet") then
+						f.frame = "CompactRaidGroup"..i.."Member"..j
+						self:ApplyFrame(f)
+						self:UpdateAura(f.unit)
+						self:UpdateBuffAura(f.unit)
+					elseif f and self.cache[f] then
+						self:ResetFrame(f)
+					end
 				end
 			end
 		end
 	end
-	for j = 1,5 do
-		local f = _G["CompactPartyFrameMember"..j]
-		if f and not self.cache[f] and f.unit and not strfind(f.unit,"target") then --not strfind(f.unit,"pet") then
-			f.frame = "CompactPartyFrameMember"..j
-			self:ApplyFrame(f)
-			self:UpdateAura(f.unit)
-			self:UpdateBuffAura(f.unit)
-		end
-		if f and not f.unit and self.cache[f] then
-			self:ResetFrame(f)
+	if CompactPartyFrame:IsShown() then
+		for j = 1,5 do
+			local f = _G["CompactPartyFrameMember"..j]
+			if f and f.unit and not self.cache[f] and not strfind(f.unit,"target") then --not strfind(f.unit,"pet") then
+				f.frame = "CompactPartyFrameMember"..j
+				self:ApplyFrame(f)
+				self:UpdateAura(f.unit)
+				self:UpdateBuffAura(f.unit)
+			elseif f and self.cache[f] then
+				self:ResetFrame(f)
+			end
 		end
 	end
 end
@@ -760,7 +762,6 @@ local function isDebuff(unit, index, filter)
 		if spellIds[spellId] == "Hide" then
 		return false
 	else
---print("isDebuff")
 	  return true
 	end
 end
@@ -859,7 +860,7 @@ end
 -- Update aura for each unit
 function DebuffFilter:UpdateAura(uid)
 	for f,v in pairs(self.cache) do
-			if f.unit == uid then
+			if f.unit == uid then -- away to check that the UID is the correct f.unit
 			local filter = nil
 			local debuffNum = 1
 			local index = 1
@@ -1031,7 +1032,7 @@ function DebuffFilter:UpdateBuffAura(uid)
 								v.buffFrames[4]:Hide();v.buffFrames[5]:Hide();v.buffFrames[6]:Hide();v.buffFrames[7]:Hide();
 								j = 4
 								buffFrame = v.buffFrames[j]; X = j
-							Ctimer(.01, function()
+							Ctimer(.025, function() --Unitil BOR and BOL is merged could have problems
 								local frame = f.frame.."BuffOverlayRight"
 								if _G[frame] and _G[frame].icon:IsVisible() then
 									v.buffFrames[j]:ClearAllPoints()
@@ -1133,96 +1134,80 @@ function DebuffFilter:ApplyFrame(f)
 	for j = 1, DEFAULT_DEBUFF do
 		if not scf.debuffFrames[j] then
 			scf.debuffFrames[j] = CreateFrame("Button", nil, UIParent,"CompactDebuffTemplate")
-			scf.debuffFrames[j].unit = f.unit
-			scf.debuffFrames[j].baseSize = f.buffFrames[3]:GetSize()
-			if j == 1 then
-				scf.debuffFrames[j]:ClearAllPoints()
-				scf.debuffFrames[j]:SetParent(f)
-				if strfind(f.unit,"pet") then
-					scf.debuffFrames[j]:SetPoint("BOTTOMLEFT", f, "BOTTOMLEFT",3, 3)
-				else
-					scf.debuffFrames[j]:SetPoint("BOTTOMLEFT", f, "BOTTOMLEFT",3,10)
-				end
-			else
-				scf.debuffFrames[j]:SetParent(f)
-				scf.debuffFrames[j]:SetPoint("BOTTOMLEFT",scf.debuffFrames[j-1],"BOTTOMRIGHT",0,0)
-			end
-			--f.debuffFrames[j]:SetSize(f.buffFrames[3]:GetSize())
-			scf.debuffFrames[j]:SetSize(f.buffFrames[3]:GetSize())
-			scf.debuffFrames[j]:Hide()
 		end
+		scf.debuffFrames[j]:ClearAllPoints()
+		scf.debuffFrames[j]:SetParent(f)
+		if j == 1 then
+			if strfind(f.unit,"pet") then
+				scf.debuffFrames[j]:SetPoint("BOTTOMLEFT", f, "BOTTOMLEFT",3, 3)
+			else
+				scf.debuffFrames[j]:SetPoint("BOTTOMLEFT", f, "BOTTOMLEFT",3,10)
+			end
+		else
+			scf.debuffFrames[j]:SetPoint("BOTTOMLEFT",scf.debuffFrames[j-1],"BOTTOMRIGHT",0,0)
+		end
+		scf.debuffFrames[j]:SetSize(f.buffFrames[3]:GetSize())  --ensures position is prelocked before showing , avoids the growing of row
+		scf.debuffFrames[j]:Hide()
 	end
 	for j = 1,#f.debuffFrames do
 		f.debuffFrames[j]:Hide()
-		f.debuffFrames[j]:SetScript("OnShow", f.debuffFrames[j].Hide)
+		f.debuffFrames[j]:SetScript("OnShow", f.debuffFrames[j].Hide) --Hides Blizzards Frames
 	end
 
 	for j = 1, DEFAULT_BUFF do
 		if not scf.buffFrames[j] then
 			scf.buffFrames[j] = CreateFrame("Button" ,nil, UIParent, "CompactAuraTemplate")
-			scf.buffFrames[j].unit = f.unit
-			scf.buffFrames[j].baseSize = f.buffFrames[3]:GetSize()
 			scf.buffFrames[j].cooldown:SetDrawSwipe(false)
-			if j == 1 then --Buff One
-				scf.buffFrames[j]:ClearAllPoints()
-				scf.buffFrames[j]:SetParent(f)
-				if strfind(f.unit,"pet") then
-					scf.buffFrames[j]:SetPoint("BOTTOMRIGHT", f, "BOTTOMRIGHT", -2.5, 3)
-				else
-					scf.buffFrames[j]:SetPoint("BOTTOMRIGHT", f, "BOTTOMRIGHT", -2.5, 9.5)
-				end
-			elseif j == 2 then --Buff Two
-				scf.buffFrames[j]:ClearAllPoints()
-				scf.buffFrames[j]:SetParent(f)
-				scf.buffFrames[j]:SetPoint("BOTTOMRIGHT", scf.buffFrames[j-1], "BOTTOMLEFT", 0, 0)
-			elseif j ==3 then --Buff Three
-				scf.buffFrames[j]:ClearAllPoints()
-				scf.buffFrames[j]:SetParent(f)
-				scf.buffFrames[j]:SetPoint("BOTTOMRIGHT", scf.buffFrames[j-1], "BOTTOMLEFT", 0, 0)
-			elseif j == 4 or j == 5 or j == 6 or j == 7 then
-				scf.buffFrames[j]:ClearAllPoints()
-				scf.buffFrames[j]:SetParent(f)
-				if j == 4 then
-					if not strfind(f.unit,"pet") then
-						scf.buffFrames[j]:SetPoint("TOPRIGHT", f, "TOPRIGHT", -5.5, -6.5)
-					end
-				else
-					if not strfind(f.unit,"pet") then
-						scf.buffFrames[j]:SetPoint("RIGHT", scf.buffFrames[j -1], "LEFT", 0, 0)
-					end
-				end
-					scf.buffFrames[j]:SetScale(.4)
-					scf.buffFrames[j]:SetFrameLevel(3)
-					scf.buffFrames[j]:SetFrameStrata("HIGH")
-			elseif j ==8 then --Upper Right Count Only
-				scf.buffFrames[j]:ClearAllPoints()
-				scf.buffFrames[j]:SetParent(f)
-				if not strfind(f.unit,"pet") then
-					scf.buffFrames[j]:SetPoint("TOPRIGHT", f, "TOPRIGHT", -2, -1.5)
-				end
-				scf.buffFrames[j]:SetScale(1.15)
-				scf.buffFrames[j]:SetFrameLevel(3)
-				scf.buffFrames[j]:SetFrameStrata("HIGH")
-			elseif j ==9 then --Upper Left Count Only
-				scf.buffFrames[j]:ClearAllPoints()
-				scf.buffFrames[j]:SetParent(f)
-				if not strfind(f.unit,"pet") then
-					scf.buffFrames[j]:SetPoint("TOPLEFT", f, "TOPLEFT", 2, -1.5)
-				end
-				scf.buffFrames[j]:SetScale(1.15)
-				scf.buffFrames[j]:SetFrameLevel(3)
-				scf.buffFrames[j]:SetFrameStrata("HIGH")
-			end
-			scf.buffFrames[j]:SetSize(f.buffFrames[3]:GetSize())
-			scf.buffFrames[j]:Hide()
 		end
+		scf.buffFrames[j]:ClearAllPoints()
+		scf.buffFrames[j]:SetParent(f)
+		if j == 1 then --Buff One
+			if strfind(f.unit,"pet") then
+				scf.buffFrames[j]:SetPoint("BOTTOMRIGHT", f, "BOTTOMRIGHT", -2.5, 3)
+			else
+				scf.buffFrames[j]:SetPoint("BOTTOMRIGHT", f, "BOTTOMRIGHT", -2.5, 9.5)
+			end
+		elseif j == 2 then --Buff Two
+			scf.buffFrames[j]:SetPoint("BOTTOMRIGHT", scf.buffFrames[j-1], "BOTTOMLEFT", 0, 0)
+		elseif j ==3 then --Buff Three
+			scf.buffFrames[j]:SetPoint("BOTTOMRIGHT", scf.buffFrames[j-1], "BOTTOMLEFT", 0, 0)
+		elseif j == 4 or j == 5 or j == 6 or j == 7 then
+			if j == 4 then
+				if not strfind(f.unit,"pet") then
+					scf.buffFrames[j]:SetPoint("TOPRIGHT", f, "TOPRIGHT", -5.5, -6.5)
+				end
+			else
+				if not strfind(f.unit,"pet") then
+					scf.buffFrames[j]:SetPoint("RIGHT", scf.buffFrames[j -1], "LEFT", 0, 0)
+				end
+			end
+				scf.buffFrames[j]:SetScale(.4)
+				scf.buffFrames[j]:SetFrameLevel(3)
+				scf.buffFrames[j]:SetFrameStrata("HIGH")
+		elseif j ==8 then --Upper Right Count Only)
+			if not strfind(f.unit,"pet") then
+				scf.buffFrames[j]:SetPoint("TOPRIGHT", f, "TOPRIGHT", -2, -1.5)
+			end
+			scf.buffFrames[j]:SetScale(1.15)
+			scf.buffFrames[j]:SetFrameLevel(3)
+			scf.buffFrames[j]:SetFrameStrata("HIGH")
+		elseif j ==9 then --Upper Left Count Only
+			if not strfind(f.unit,"pet") then
+				scf.buffFrames[j]:SetPoint("TOPLEFT", f, "TOPLEFT", 2, -1.5)
+			end
+			scf.buffFrames[j]:SetScale(1.15)
+			scf.buffFrames[j]:SetFrameLevel(3)
+			scf.buffFrames[j]:SetFrameStrata("HIGH")
+		end
+		scf.buffFrames[j]:SetSize(f.buffFrames[3]:GetSize()) --ensures position is prelocked before showing , avoids the growing of row
+		scf.buffFrames[j]:Hide()
 	end
 	for j = 1,#f.buffFrames do
-		f.buffFrames[j]:Hide()
-		f.dispelDebuffFrames[1]:SetAlpha(0); --Hides Dispel Icons in Upper Right
-		f.dispelDebuffFrames[2]:SetAlpha(0); --Hides Dispel Icons in Upper Right
-		f.dispelDebuffFrames[3]:SetAlpha(0); --Hides Dispel Icons in Upper Right
+		f.buffFrames[j]:Hide() --Hides Blizzards Frames
 		f.buffFrames[j]:SetScript("OnShow", f.buffFrames[j].Hide)
+	end
+	for j = 1,#f.dispelDebuffFrames do --Hides Blizzards DIspel Dots
+		f.dispelDebuffFrames[j]:SetScript("OnShow", f.dispelDebuffFrames[j].Hide)
 	end
 end
 -- Reset to the original style
@@ -1273,18 +1258,19 @@ DebuffFilter:RegisterEvent("UNIT_AURA")
 DebuffFilter:RegisterEvent("COMBAT_LOG_EVENT_UNFILTERED")
 
 BambiUI_ResetDebuffFilter = CreateFrame('CheckButton', 'BambiUI_ResetDebuffFilter', BambiUI_ResetDebuffFilter, 'UICheckButtonTemplate');
-BambiUI_ResetDebuffFilter:SetScript('OnClick', function() DebuffFilter:ApplyStyle() print("Reset DebuffFilter Frames") end);
+BambiUI_ResetDebuffFilter:SetScript('OnClick', function() DebuffFilter:ResetStyle() DebuffFilter:ApplyStyle() print("Reset DebuffFilter Frames") end); --manual hard reset
 
 
-hooksecurefunc(CompactRaidFrameContainer, "SetGroupMode", function() DebuffFilter:ResetStyle()	DebuffFilter:ApplyStyle() end)
-hooksecurefunc(CompactRaidFrameContainer, "SetFlowFilterFunction", function() DebuffFilter:ResetStyle()	DebuffFilter:ApplyStyle() end)
-hooksecurefunc(CompactRaidFrameContainer, "SetGroupFilterFunction", function() DebuffFilter:ResetStyle() DebuffFilter:ApplyStyle() end)
-hooksecurefunc(CompactRaidFrameContainer, "SetFlowSortFunction", function() DebuffFilter:ResetStyle()	DebuffFilter:ApplyStyle() end)
-hooksecurefunc("CompactPartyFrame_SetFlowSortFunction", function() DebuffFilter:ResetStyle() DebuffFilter:ApplyStyle() end)
+hooksecurefunc(CompactRaidFrameContainer, "SetGroupMode", function() DebuffFilter:ResetStyle() DebuffFilter:ApplyStyle() end) --handles swapping from group to non grouped in raid
+hooksecurefunc(CompactRaidFrameContainer, "SetFlowFilterFunction", function() DebuffFilter:ApplyStyle() end)
+hooksecurefunc(CompactRaidFrameContainer, "SetGroupFilterFunction", function() DebuffFilter:ApplyStyle() end)
+hooksecurefunc(CompactRaidFrameContainer, "SetFlowSortFunction", function() DebuffFilter:ApplyStyle() end)
+hooksecurefunc("CompactPartyFrame_SetFlowSortFunction", function() DebuffFilter:ApplyStyle() end)
 
-CompactRaidFrameContainer:HookScript("OnHide", function(self) DebuffFilter:ApplyStyle() end)
-CompactRaidFrameContainer:HookScript("OnShow", function(self) DebuffFilter:ApplyStyle() end)
-CompactPartyFrame:HookScript("OnHide", function(self) DebuffFilter:ApplyStyle() end)
-CompactPartyFrame:HookScript("OnShow", function(self) DebuffFilter:ApplyStyle() end)
+--handles swapping to raid and party
+CompactRaidFrameContainer:HookScript("OnHide", function(self) Ctimer(.001, function() DebuffFilter:ResetStyle() DebuffFilter:ApplyStyle() end) end)
+CompactRaidFrameContainer:HookScript("OnShow", function(self) Ctimer(.001, function() DebuffFilter:ResetStyle() DebuffFilter:ApplyStyle() end) end)
+CompactPartyFrame:HookScript("OnHide", function(self) Ctimer(.001, function() DebuffFilter:ResetStyle() DebuffFilter:ApplyStyle() end) end)
+CompactPartyFrame:HookScript("OnShow", function(self) Ctimer(.001, function() DebuffFilter:ResetStyle() DebuffFilter:ApplyStyle() end) end)
 
-EditModeManagerFrame:HookScript("OnHide", function() Ctimer(.001, function() DebuffFilter:ApplyStyle() end) end)
+EditModeManagerFrame:HookScript("OnHide", function() Ctimer(.001, function() DebuffFilter:ResetStyle() DebuffFilter:ApplyStyle() end) end)
