@@ -575,12 +575,24 @@ local bgWarningspellIds = {
 
 
 function DebuffFilter:ApplyStyle()
-	if CompactRaidFrameContainer:IsShown() then
-		if CompactRaidFrameManager.container.groupMode == "flush" then
-			for i = 1,80 do
-				local f = _G["CompactRaidFrame"..i]
-				if f and f.unit and f.inUse and not self.cache[f] and not strfind(f.unit,"target") then --and not strfind(f.unit,"pet") then
-					f.frame = "CompactRaidFrame"..i
+	if CompactRaidFrameManager.container.groupMode == "flush" then
+		for i = 1,80 do
+			local f = _G["CompactRaidFrame"..i]
+			if CompactRaidFrameContainer:IsShown() and f and f.unit and f.inUse and not self.cache[f] and not strfind(f.unit,"target") then --and not strfind(f.unit,"pet") then
+				f.frame = "CompactRaidFrame"..i
+				self:ApplyFrame(f)
+				self:UpdateAura(f.unit)
+				self:UpdateBuffAura(f.unit)
+			elseif f and self.cache[f] then
+				self:ResetFrame(f)
+			end
+		end
+	elseif CompactRaidFrameManager.container.groupMode == "discrete" then
+		for i = 1,8 do
+			for j = 1,5 do
+				local f = _G["CompactRaidGroup"..i.."Member"..j]
+				if CompactRaidFrameContainer:IsShown()  and f  and f.unit and not self.cache[f] and not strfind(f.unit,"target") then --not strfind(f.unit,"pet") then
+					f.frame = "CompactRaidGroup"..i.."Member"..j
 					self:ApplyFrame(f)
 					self:UpdateAura(f.unit)
 					self:UpdateBuffAura(f.unit)
@@ -588,33 +600,17 @@ function DebuffFilter:ApplyStyle()
 					self:ResetFrame(f)
 				end
 			end
-		elseif CompactRaidFrameManager.container.groupMode == "discrete" then
-			for i = 1,8 do
-				for j = 1,5 do
-					local f = _G["CompactRaidGroup"..i.."Member"..j]
-					if f  and f.unit and not self.cache[f] and not strfind(f.unit,"target") then --not strfind(f.unit,"pet") then
-						f.frame = "CompactRaidGroup"..i.."Member"..j
-						self:ApplyFrame(f)
-						self:UpdateAura(f.unit)
-						self:UpdateBuffAura(f.unit)
-					elseif f and self.cache[f] then
-						self:ResetFrame(f)
-					end
-				end
-			end
 		end
 	end
-	if CompactPartyFrame:IsShown() then
-		for j = 1,5 do
-			local f = _G["CompactPartyFrameMember"..j]
-			if f and f.unit and not self.cache[f] and not strfind(f.unit,"target") then --not strfind(f.unit,"pet") then
-				f.frame = "CompactPartyFrameMember"..j
-				self:ApplyFrame(f)
-				self:UpdateAura(f.unit)
-				self:UpdateBuffAura(f.unit)
-			elseif f and self.cache[f] then
-				self:ResetFrame(f)
-			end
+	for j = 1,5 do
+		local f = _G["CompactPartyFrameMember"..j]
+		if CompactPartyFrame:IsShown() and f and f.unit and not self.cache[f] and not strfind(f.unit,"target") then --not strfind(f.unit,"pet") then
+			f.frame = "CompactPartyFrameMember"..j
+			self:ApplyFrame(f)
+			self:UpdateAura(f.unit)
+			self:UpdateBuffAura(f.unit)
+		elseif f and self.cache[f] then
+			self:ResetFrame(f)
 		end
 	end
 end
@@ -732,7 +728,7 @@ end
 local function isWarning(unit, index, filter)
     local name, icon, count, _, duration, expirationTime, _, _, _, spellId = UnitAura(unit, index, "HARMFUL");
 		local inInstance, instanceType = IsInInstance()
-		if (instanceType =="pvp" or strfind(unit,"pet")) and bgBigspellIds[spellId] then
+		if (instanceType =="pvp" or strfind(unit,"pet")) and bgWarningspellIds[spellId] then
 			return true
 		elseif spellIds[spellId] == "Warning"  and instanceType ~="pvp" then
 			if spellId == 58180 or spellId == 8680  or spellId == 354788 then -- Only Warning if Two Stacks of MS
@@ -1243,7 +1239,7 @@ end
 
 -- Event handling
 local function OnEvent(self,event,...)
-	if event == "GROUP_ROSTER_UPDATE" or event == "UNIT_PET" then self:ApplyStyle()
+	if event == "GROUP_ROSTER_UPDATE" or event == "UNIT_PET" then self:ResetStyle() self:ApplyStyle()
 	elseif event == "PLAYER_ENTERING_WORLD" then  Ctimer(5, function() self:ResetStyle(); self:ApplyStyle() end) self:ResetStyle(); self:ApplyStyle()
 	elseif event == "ZONE_CHANGED_NEW_AREA" then 	Ctimer(5, function() self:ResetStyle(); self:ApplyStyle() end) self:ResetStyle(); self:ApplyStyle()
 	elseif event == "COMBAT_LOG_EVENT_UNFILTERED" then self:CLEU()
@@ -1262,10 +1258,10 @@ BambiUI_ResetDebuffFilter:SetScript('OnClick', function() DebuffFilter:ResetStyl
 
 
 hooksecurefunc(CompactRaidFrameContainer, "SetGroupMode", function() DebuffFilter:ResetStyle() DebuffFilter:ApplyStyle() end) --handles swapping from group to non grouped in raid
-hooksecurefunc(CompactRaidFrameContainer, "SetFlowFilterFunction", function() DebuffFilter:ApplyStyle() end)
-hooksecurefunc(CompactRaidFrameContainer, "SetGroupFilterFunction", function() DebuffFilter:ApplyStyle() end)
-hooksecurefunc(CompactRaidFrameContainer, "SetFlowSortFunction", function() DebuffFilter:ApplyStyle() end)
-hooksecurefunc("CompactPartyFrame_SetFlowSortFunction", function() DebuffFilter:ApplyStyle() end)
+hooksecurefunc(CompactRaidFrameContainer, "SetFlowFilterFunction", function() DebuffFilter:ResetStyle() DebuffFilter:ApplyStyle() end)
+hooksecurefunc(CompactRaidFrameContainer, "SetGroupFilterFunction", function() DebuffFilter:ResetStyle() DebuffFilter:ApplyStyle() end)
+hooksecurefunc(CompactRaidFrameContainer, "SetFlowSortFunction", function() DebuffFilter:ResetStyle() DebuffFilter:ApplyStyle() end)
+hooksecurefunc("CompactPartyFrame_SetFlowSortFunction", function() DebuffFilter:ResetStyle() DebuffFilter:ApplyStyle() end)
 
 --handles swapping to raid and party
 CompactRaidFrameContainer:HookScript("OnHide", function(self) Ctimer(.001, function() DebuffFilter:ResetStyle() DebuffFilter:ApplyStyle() end) end)
