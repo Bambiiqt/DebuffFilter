@@ -987,7 +987,7 @@ function DebuffFilter:UpdateAura(uid)
 					debuffFrame:Hide()
 				end
 			end
-			break
+			break --if this is removed will cycle through all Frames could be good if party and raid frames overlap
 		end
 	end
 end
@@ -1115,7 +1115,7 @@ function DebuffFilter:UpdateBuffAura(uid)
 				end
 			index = nil; buff = nil; backCount= nil
 			end
-			break
+			break --if this is removed will cycle through all Frames could be good if party and raid frames overlap
 		end
 	end
 end
