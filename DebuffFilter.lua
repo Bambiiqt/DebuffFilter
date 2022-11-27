@@ -746,12 +746,10 @@ end
 
 local function SetdebuffFrame(f, debuffFrame, uid, index, filter, scale)
 	local name, icon, count, debuffType, duration, expirationTime, unitCaster, canStealOrPurge, _, spellId = UnitAura(uid, index, filter);
-	debuffFrame.filter = filter;
 	debuffFrame.icon:SetTexture(icon);
 	debuffFrame.icon:SetDesaturated(nil) --Destaurate Icon
 	debuffFrame.icon:SetVertexColor(1, 1, 1);
-	debuffFrame.SpellId = spellId
-	debuffFrame:SetScript("OnEnter", function(self)
+		debuffFrame:SetScript("OnEnter", function(self)
 		GameTooltip:SetOwner (debuffFrame.icon, "ANCHOR_RIGHT")
 		GameTooltip:SetSpellByID(spellId)
 		GameTooltip:Show()
@@ -800,7 +798,7 @@ local function SetdebuffFrame(f, debuffFrame, uid, index, filter, scale)
 			debuffFrame.count:Hide();
 		end
 	end
-	debuffFrame:SetID(index);
+
 	local enabled = expirationTime and expirationTime ~= 0;
 	if enabled then
 		local startTime = expirationTime - duration;
@@ -987,16 +985,16 @@ function DebuffFilter:UpdateBuffs(scf, uid)
 						scf.buffFrames[4]:Hide();scf.buffFrames[5]:Hide();scf.buffFrames[6]:Hide();scf.buffFrames[7]:Hide();
 						j = 4
 						buffFrame = scf.buffFrames[j]; X = j
-					Ctimer(.025, function() --Unitil BOR and BOL is merged could have problems
-						local frame = scf.name.."BuffOverlayRight"
-						if _G[frame] and _G[frame].icon:IsVisible() then
-							scf.buffFrames[j]:ClearAllPoints()
-							scf.buffFrames[j]:SetPoint("RIGHT", f, "RIGHT", -5.5, 10)
-						else
-							scf.buffFrames[j]:ClearAllPoints()
-							scf.buffFrames[j]:SetPoint("TOPRIGHT", f, "TOPRIGHT", -5.5, -6.5)
-						end
-					end)
+						Ctimer(.025, function() --Unitil BOR and BOL is merged could have problems
+							local frame = scf.name.."BuffOverlayRight"
+							if _G[frame] and _G[frame].icon:IsVisible() then
+								scf.buffFrames[j]:ClearAllPoints()
+								scf.buffFrames[j]:SetPoint("RIGHT", f, "RIGHT", -5.5, 10)
+							else
+								scf.buffFrames[j]:ClearAllPoints()
+								scf.buffFrames[j]:SetPoint("TOPRIGHT", f, "TOPRIGHT", -5.5, -6.5)
+							end
+						end)
 
 					else
 				   buffFrame = scf.buffFrames[X+1]
@@ -1289,27 +1287,24 @@ local function RegisterUnit(f)
 end
 
 hooksecurefunc("CompactUnitFrame_UpdateAll", function(f)
-	if f and f.unit and (strmatch(f.unit, "target") or strmatch(f.unit, "nameplate")) then return end
-	if not f or not f.unit then return end
+	if (not f and not f.unit) or (strmatch(f.unit, "target") or strmatch(f.unit, "nameplate")) then return end
 	RegisterUnit(f)
 end)
 
 
 hooksecurefunc("CompactUnitFrame_UpdateUnitEvents", function(f)
-	if f and f.unit and (strmatch(f.unit, "target") or strmatch(f.unit, "nameplate")) then return end
+	if (not f and not f.unit) or (strmatch(f.unit, "target") or strmatch(f.unit, "nameplate")) then return end
 	RegisterUnit(f)
 end)
 
 hooksecurefunc("CompactUnitFrame_UnregisterEvents", function(f)
-	if f and f.unit and (strmatch(f.unit, "target") or strmatch(f.unit, "nameplate")) then return end
-	local scf = DebuffFilter.cache[f]
-  if scf then
-		scf:SetScript("OnEvent", nil)
-    scf:UnregisterAllEvents()
-    DebuffFilter:ResetFrame(f)
-  else
-     return
-  end
+	if DebuffFilter.cache[f] then
+		DebuffFilter.cache[f]:SetScript("OnEvent", nil)
+		DebuffFilter.cache[f]:UnregisterAllEvents()
+		DebuffFilter:ResetFrame(f)
+	else
+		return
+	end
 end)
 
 -- Event handling
