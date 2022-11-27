@@ -584,7 +584,7 @@ function DebuffFilter:CLEU()
 		if (sourceGUID ~= nil) then
 		local duration = 5
 		local expirationTime = GetTime() + duration
-			if (SmokeBombAuras[sourceGUID] == nil) then
+			if not SmokeBombAuras[sourceGUID] then
 				SmokeBombAuras[sourceGUID] = {}
 			end
 			SmokeBombAuras[sourceGUID] = { ["duration"] = duration, ["expirationTime"] = expirationTime }
@@ -602,10 +602,10 @@ function DebuffFilter:CLEU()
 			if (DuelAura[sourceGUID] == nil) then
 				DuelAura[sourceGUID] = {}
 			end
-			if (DuelAura[destGUID] == nil) then
+			if not DuelAura[destGUID] then
 				DuelAura[destGUID] = {}
 			end
-			duration = 5
+			local duration = 5
 			Ctimer(duration + 1, function()
 			DuelAura[sourceGUID] = nil
 			DuelAura[destGUID] = nil
