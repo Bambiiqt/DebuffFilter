@@ -574,46 +574,6 @@ local bgWarningspellIds = {
 
 
 
-function DebuffFilter:ApplyStyle()
-	if CompactRaidFrameManager.container.groupMode == "flush" then
-		for i = 1,80 do
-			local f = _G["CompactRaidFrame"..i]
-			if CompactRaidFrameContainer:IsShown() and f and f.unit and f.inUse and not self.cache[f] and not strfind(f.unit,"target") then --and not strfind(f.unit,"pet") then
-				f.frame = "CompactRaidFrame"..i
-				self:ApplyFrame(f)
-				self:UpdateAura(f.unit)
-				self:UpdateBuffAura(f.unit)
-			elseif f and self.cache[f] then
-				self:ResetFrame(f)
-			end
-		end
-	elseif CompactRaidFrameManager.container.groupMode == "discrete" then
-		for i = 1,8 do
-			for j = 1,5 do
-				local f = _G["CompactRaidGroup"..i.."Member"..j]
-				if CompactRaidFrameContainer:IsShown()  and f  and f.unit and not self.cache[f] and not strfind(f.unit,"target") then --not strfind(f.unit,"pet") then
-					f.frame = "CompactRaidGroup"..i.."Member"..j
-					self:ApplyFrame(f)
-					self:UpdateAura(f.unit)
-					self:UpdateBuffAura(f.unit)
-				elseif f and self.cache[f] then
-					self:ResetFrame(f)
-				end
-			end
-		end
-	end
-	for j = 1,5 do
-		local f = _G["CompactPartyFrameMember"..j]
-		if CompactPartyFrame:IsShown() and f and f.unit and not self.cache[f] and not strfind(f.unit,"target") then --not strfind(f.unit,"pet") then
-			f.frame = "CompactPartyFrameMember"..j
-			self:ApplyFrame(f)
-			self:UpdateAura(f.unit)
-			self:UpdateBuffAura(f.unit)
-		elseif f and self.cache[f] then
-			self:ResetFrame(f)
-		end
-	end
-end
 
 function DebuffFilter:CLEU()
 		local _, event, _, sourceGUID, sourceName, sourceFlags, _, destGUID, _, _, _, spellId, _, _, _, _, spellSchool = CombatLogGetCurrentEventInfo()
@@ -854,282 +814,328 @@ local function SetdebuffFrame(f, debuffFrame, uid, index, filter, scale)
 	debuffFrame:Show();
 end
 -- Update aura for each unit
-function DebuffFilter:UpdateAura(uid)
-	for f,v in pairs(self.cache) do
-			if f.unit == uid then -- away to check that the UID is the correct f.unit
-			local filter = nil
-			local debuffNum = 1
-			local index = 1
-			if ( f.optionTable.displayOnlyDispellableDebuffs ) then
-				filter = "RAID"
+function DebuffFilter:UpdateDebuffs(scf, uid)
+	local f = scf.f
+	if not DebuffFilter.cache[f] then return end
+	local scf = DebuffFilter.cache[f]
+	local filter = nil
+	local debuffNum = 1
+	local index = 1
+	if ( f.optionTable.displayOnlyDispellableDebuffs ) then
+		filter = "RAID"
+	end
+	--Biggest Debuffs
+		while debuffNum <= DEFAULT_DEBUFF do
+			local debuffName = UnitDebuff(uid, index, filter)
+			if ( debuffName ) then
+					if isBiggestDebuff(uid, index, filter) then
+					local debuffFrame = scf.debuffFrames[debuffNum]
+					SetdebuffFrame(f, debuffFrame, uid, index, "HARMFUL", BIGGEST)
+					debuffNum = debuffNum + 1
+				end
+			else
+				break
 			end
-			--Biggest Debuffs
-				while debuffNum <= DEFAULT_DEBUFF do
-					local debuffName = UnitDebuff(uid, index, filter)
-					if ( debuffName ) then
-							if isBiggestDebuff(uid, index, filter) then
-							local debuffFrame = v.debuffFrames[debuffNum]
-							SetdebuffFrame(debuffFrame, uid, index, "HARMFUL", BIGGEST)
-							debuffNum = debuffNum + 1
-						end
-					else
-						break
-					end
-					index = index + 1
+			index = index + 1
+		end
+		index = 1
+		--Bigger Debuff
+		while debuffNum <= DEFAULT_DEBUFF do
+			local debuffName = UnitDebuff(uid, index, filter);
+			if ( debuffName ) then
+					if isBiggerDebuff(uid, index, filter) and not isBiggestDebuff(uid, index, filter) then
+						local debuffFrame = scf.debuffFrames[debuffNum]
+						SetdebuffFrame(f, debuffFrame, uid, index, "HARMFUL", BIGGEST)
+						debuffNum = debuffNum + 1
 				end
-				index = 1
-				--Bigger Debuff
-				while debuffNum <= DEFAULT_DEBUFF do
-					local debuffName = UnitDebuff(uid, index, filter);
-					if ( debuffName ) then
-							if isBiggerDebuff(uid, index, filter) and not isBiggestDebuff(uid, index, filter) then
-								local debuffFrame = v.debuffFrames[debuffNum]
-								SetdebuffFrame(f, debuffFrame, uid, index, "HARMFUL", BIGGEST)
-								debuffNum = debuffNum + 1
-						end
-					else
-						break
-					end
-					index = index + 1
-				end
-				index = 1
-				--Big Debuff
-				while debuffNum <= DEFAULT_DEBUFF do
-					local debuffName = UnitDebuff(uid, index, filter);
-					if ( debuffName ) then
-							if isBigDebuff(uid, index, filter) and not isBiggestDebuff(uid, index, filter) and not isBiggerDebuff(uid, index, filter) then
-								local debuffFrame = v.debuffFrames[debuffNum]
-								SetdebuffFrame(f, debuffFrame, uid, index, "HARMFUL", BIG)
-								debuffNum = debuffNum + 1
-						end
-					else
-						break
-					end
-					index = index + 1
-				end
-				index = 1
-			--isBossDeBuff
-				while debuffNum <= DEFAULT_DEBUFF do
-					local debuffName = UnitDebuff(uid, index, filter);
-					if ( debuffName ) then
-							if CompactUnitFrame_UtilIsBossDebuff(uid, index, filter) and not isBiggestDebuff(uid, index, filter) and not isBiggerDebuff(uid, index, filter) and not isBigDebuff(uid, index, filter) then
-								local debuffFrame = v.debuffFrames[debuffNum]
-								SetdebuffFrame(f, debuffFrame, uid, index, "HARMFUL", BOSSDEBUFF)
-								debuffNum = debuffNum + 1
-						end
-					else
-						break
-					end
-					index = index + 1
-				end
-				index = 1
-				--isBossBuff
-				while debuffNum <= DEFAULT_DEBUFF do
-					local debuffName = UnitBuff(uid, index, filter);
-					if ( debuffName ) then
-						if CompactUnitFrame_UtilIsBossAura(uid, index, filter) and not isBiggestDebuff(uid, index, filter) and not isBiggerDebuff(uid, index, filter) and not isBigDebuff(uid, index, filter) and not CompactUnitFrame_UtilIsBossDebuff(uid, index, filter) then
-							local debuffFrame = v.debuffFrames[debuffNum]
-							SetdebuffFrame(f, debuffFrame, uid, index, "HELPFUL", BOSSBUFF)
-							debuffNum = debuffNum + 1
-						end
-					else
-						break
-					end
-					index = index + 1
-				end
-				index = 1
-				--isWarning
-				while debuffNum <= DEFAULT_DEBUFF do
-					local debuffName = UnitDebuff(uid, index, filter)
-					if ( debuffName ) then
-						if  isWarning(uid, index, filter) and not isBiggestDebuff(uid, index, filter) and not isBiggerDebuff(uid, index, filter) and not isBigDebuff(uid, index, filter) and not CompactUnitFrame_UtilIsBossDebuff(uid, index, filter) and not CompactUnitFrame_UtilIsBossAura(uid, index, filter) then
-							local debuffFrame = v.debuffFrames[debuffNum]
-							SetdebuffFrame(f, debuffFrame, uid, index, "HARMFUL", WARNING)
-							debuffNum = debuffNum + 1
-						end
-					else
-						break
-					end
-					index = index + 1
-				end
-				index = 1
-				--Prio
-				while debuffNum <= DEFAULT_DEBUFF do
-					local debuffName = UnitDebuff(uid, index, filter)
-					if ( debuffName ) then
-						if isPriority(uid, index, filter) and not isBiggestDebuff(uid, index, filter) and not isBiggerDebuff(uid, index, filter) and not isBigDebuff(uid, index, filter) and not CompactUnitFrame_UtilIsBossDebuff(uid, index, filter) and not CompactUnitFrame_UtilIsBossAura(uid, index, filter) and not isWarning(uid, index, filter) then
-							local debuffFrame = v.debuffFrames[debuffNum]
-							SetdebuffFrame(f, debuffFrame, uid, index, "HARMFUL", PRIORITY)
-							debuffNum = debuffNum + 1
-						end
-					else
-						break
-					end
-					index = index + 1
-				end
-				index = 1
-				while debuffNum <= DEFAULT_DEBUFF do
-					local debuffName = UnitDebuff(uid, index, filter)
-					if ( debuffName ) then
-						if ( isDebuff(uid, index, filter) and not isBiggestDebuff(uid, index, filter) and not isBiggerDebuff(uid, index, filter) and not isBigDebuff(uid, index, filter) and not CompactUnitFrame_UtilIsBossDebuff(uid, index, filter) and not CompactUnitFrame_UtilIsBossAura(uid, index, filter) and not isWarning(uid, index, filter) and not isPriority(uid, index, filter)) then
-							local debuffFrame = v.debuffFrames[debuffNum]
-							SetdebuffFrame(f, debuffFrame, uid, index, "HARMFUL", 1)
-							debuffNum = debuffNum + 1
-						end
-					else
-						break
-					end
-					index = index + 1
-				end
-				for i=debuffNum, DEFAULT_DEBUFF do
-				local debuffFrame = v.debuffFrames[i];
-				if debuffFrame then
-					debuffFrame:Hide()
-				end
+			else
+				break
 			end
-			break --if this is removed will cycle through all Frames could be good if party and raid frames overlap
+			index = index + 1
+		end
+		index = 1
+		--Big Debuff
+		while debuffNum <= DEFAULT_DEBUFF do
+			local debuffName = UnitDebuff(uid, index, filter);
+			if ( debuffName ) then
+					if isBigDebuff(uid, index, filter) and not isBiggestDebuff(uid, index, filter) and not isBiggerDebuff(uid, index, filter) then
+						local debuffFrame = scf.debuffFrames[debuffNum]
+						SetdebuffFrame(f, debuffFrame, uid, index, "HARMFUL", BIG)
+						debuffNum = debuffNum + 1
+				end
+			else
+				break
+			end
+			index = index + 1
+		end
+		index = 1
+	--isBossDeBuff
+		while debuffNum <= DEFAULT_DEBUFF do
+			local debuffName = UnitDebuff(uid, index, filter);
+			if ( debuffName ) then
+					if CompactUnitFrame_UtilIsBossDebuff(uid, index, filter) and not isBiggestDebuff(uid, index, filter) and not isBiggerDebuff(uid, index, filter) and not isBigDebuff(uid, index, filter) then
+						local debuffFrame = scf.debuffFrames[debuffNum]
+						SetdebuffFrame(f, debuffFrame, uid, index, "HARMFUL", BOSSDEBUFF)
+						debuffNum = debuffNum + 1
+				end
+			else
+				break
+			end
+			index = index + 1
+		end
+		index = 1
+		--isBossBuff
+		while debuffNum <= DEFAULT_DEBUFF do
+			local debuffName = UnitBuff(uid, index, filter);
+			if ( debuffName ) then
+				if CompactUnitFrame_UtilIsBossAura(uid, index, filter) and not isBiggestDebuff(uid, index, filter) and not isBiggerDebuff(uid, index, filter) and not isBigDebuff(uid, index, filter) and not CompactUnitFrame_UtilIsBossDebuff(uid, index, filter) then
+					local debuffFrame = scf.debuffFrames[debuffNum]
+					SetdebuffFrame(f, debuffFrame, uid, index, "HELPFUL", BOSSBUFF)
+					debuffNum = debuffNum + 1
+				end
+			else
+				break
+			end
+			index = index + 1
+		end
+		index = 1
+		--isWarning
+		while debuffNum <= DEFAULT_DEBUFF do
+			local debuffName = UnitDebuff(uid, index, filter)
+			if ( debuffName ) then
+				if  isWarning(uid, index, filter) and not isBiggestDebuff(uid, index, filter) and not isBiggerDebuff(uid, index, filter) and not isBigDebuff(uid, index, filter) and not CompactUnitFrame_UtilIsBossDebuff(uid, index, filter) and not CompactUnitFrame_UtilIsBossAura(uid, index, filter) then
+					local debuffFrame = scf.debuffFrames[debuffNum]
+					SetdebuffFrame(f, debuffFrame, uid, index, "HARMFUL", WARNING)
+					debuffNum = debuffNum + 1
+				end
+			else
+				break
+			end
+			index = index + 1
+		end
+		index = 1
+		--Prio
+		while debuffNum <= DEFAULT_DEBUFF do
+			local debuffName = UnitDebuff(uid, index, filter)
+			if ( debuffName ) then
+				if isPriority(uid, index, filter) and not isBiggestDebuff(uid, index, filter) and not isBiggerDebuff(uid, index, filter) and not isBigDebuff(uid, index, filter) and not CompactUnitFrame_UtilIsBossDebuff(uid, index, filter) and not CompactUnitFrame_UtilIsBossAura(uid, index, filter) and not isWarning(uid, index, filter) then
+					local debuffFrame = scf.debuffFrames[debuffNum]
+					SetdebuffFrame(f, debuffFrame, uid, index, "HARMFUL", PRIORITY)
+					debuffNum = debuffNum + 1
+				end
+			else
+				break
+			end
+			index = index + 1
+		end
+		index = 1
+		while debuffNum <= DEFAULT_DEBUFF do
+			local debuffName = UnitDebuff(uid, index, filter)
+			if ( debuffName ) then
+				if ( isDebuff(uid, index, filter) and not isBiggestDebuff(uid, index, filter) and not isBiggerDebuff(uid, index, filter) and not isBigDebuff(uid, index, filter) and not CompactUnitFrame_UtilIsBossDebuff(uid, index, filter) and not CompactUnitFrame_UtilIsBossAura(uid, index, filter) and not isWarning(uid, index, filter) and not isPriority(uid, index, filter)) then
+					local debuffFrame = scf.debuffFrames[debuffNum]
+					SetdebuffFrame(f, debuffFrame, uid, index, "HARMFUL", 1)
+					debuffNum = debuffNum + 1
+				end
+			else
+				break
+			end
+			index = index + 1
+		end
+		for i=debuffNum, DEFAULT_DEBUFF do
+		local debuffFrame = scf.debuffFrames[i];
+		if debuffFrame then
+			debuffFrame:Hide()
 		end
 	end
 end
 
-function DebuffFilter:UpdateBuffAura(uid)
-	for f,v in pairs(self.cache) do
-		if f.unit == uid then
-			local filter = nil
-			local buffNum = 1
-			local index, buff, backCount, X
-			for j = 1, DEFAULT_BUFF do
-				for i = 1, 32 do
-					local buffName, _, count, _, _, _, unitCaster, _, _, spellId = UnitBuff(uid, i, filter)
-					if ( buffName ) then
-						if isBuff(uid, i, filter, j) then
-							if (buffName == "Prayer of Mending" or buffName == "Focused Growth") and unitCaster == "player" then backCount = count end 	--Prayer of mending hack
-							if Buff[j][buffName] then
-								 Buff[j][spellId] =  Buff[j][buffName]
-							end
-							if  Buff[j][spellId] then
-								if not buff or  Buff[j][spellId] <  Buff[j][buff] then
-									buff = spellId
-									index = i
-								end
-							end
+function DebuffFilter:UpdateBuffs(scf, uid)
+	local f = scf.f
+	if not DebuffFilter.cache[f] then return end
+  local scf = DebuffFilter.cache[f]
+	local filter = nil
+	local buffNum = 1
+	local index, buff, backCount, X
+	for j = 1, DEFAULT_BUFF do
+		for i = 1, 32 do
+			local buffName, _, count, _, _, _, unitCaster, _, _, spellId = UnitBuff(uid, i, filter)
+			if ( buffName ) then
+				if isBuff(uid, i, filter, j) then
+					if (buffName == "Prayer of Mending" or buffName == "Focused Growth") and unitCaster == "player" then backCount = count end 	--Prayer of mending hack
+					if Buff[j][buffName] then
+						 Buff[j][spellId] =  Buff[j][buffName]
+					end
+					if  Buff[j][spellId] then
+						if not buff or  Buff[j][spellId] <  Buff[j][buff] then
+							buff = spellId
+							index = i
 						end
-					else
-						break
 					end
 				end
-				if index then
-					local name, icon, count, buffType, duration, expirationTime, unitCaster, canStealOrPurge, _, spellId = UnitBuff(uid, index, filter);
-					if j == 4 or j == 5 or j == 6 or j == 7 or j == 8 or j == 9 or unitCaster == "player" then
-						local buffFrame = v.buffFrames[j]
-
-						if j == 4 or j == 5 or j == 6 or j == 7 then
-							if not X then
-								v.buffFrames[4]:Hide();v.buffFrames[5]:Hide();v.buffFrames[6]:Hide();v.buffFrames[7]:Hide();
-								j = 4
-								buffFrame = v.buffFrames[j]; X = j
-							Ctimer(.025, function() --Unitil BOR and BOL is merged could have problems
-								local frame = f.frame.."BuffOverlayRight"
-								if _G[frame] and _G[frame].icon:IsVisible() then
-									v.buffFrames[j]:ClearAllPoints()
-									v.buffFrames[j]:SetPoint("RIGHT", f, "RIGHT", -5.5, 10)
-								else
-									v.buffFrames[j]:ClearAllPoints()
-									v.buffFrames[j]:SetPoint("TOPRIGHT", f, "TOPRIGHT", -5.5, -6.5)
-								end
-							end)
-
-							else
-						   buffFrame = v.buffFrames[X+1]
-							 X = X + 1
-							end
-						end
-
-						buffFrame.icon:SetTexture(icon);
-						buffFrame.icon:SetDesaturated(nil) --Destaurate Icon
-						buffFrame.icon:SetVertexColor(1, 1, 1);
-						buffFrame.SpellId = spellId
-						buffFrame:SetScript("OnEnter", function(self)
-							GameTooltip:SetOwner (buffFrame.icon, "ANCHOR_RIGHT")
-							GameTooltip:SetSpellByID(spellId)
-							GameTooltip:Show()
-						end)
-						buffFrame:SetScript("OnLeave", function(self)
-							GameTooltip:Hide()
-						end)
-						if count or backCount then
-							if backCount then count = backCount end
-							if ( count > 1 ) then
-								local countText = count;
-								if ( count >= 100 ) then
-								 countText = BUFF_STACKS_OVERFLOW;
-								end
-									buffFrame.count:Show();
-									buffFrame.count:SetText(countText);
-							else
-								buffFrame.count:Hide();
-							end
-						end
-						if j == 3 then
-							buffFrame.count:ClearAllPoints()
-							buffFrame.count:SetFont("Fonts\\FRIZQT__.TTF", 12, "OUTLINE") --, MONOCHROME")
-							buffFrame.count:SetPoint("TOPRIGHT", -10, 6.5);
-							buffFrame.count:SetJustifyH("RIGHT");
-							buffFrame.count:SetTextColor(1, 1 ,0, 1)
-						end
-						if j == 4 or j == 5 or j == 6 or j == 7 then
-							SetPortraitToTexture(buffFrame.icon, icon)
-							--buffFrame.icon:SetTexCoord(0.07, 0.93, 0.07, 0.93);
-						end
-						if j == 8 then
-							buffFrame.count:ClearAllPoints()
-							buffFrame.count:SetFont("Fonts\\FRIZQT__.TTF", 11, "OUTLINE") --, MONOCHROME")
-							buffFrame.count:SetPoint("BOTTOMRIGHT", 2, -5);
-							buffFrame.count:SetJustifyH("RIGHT");
-							buffFrame.icon:SetVertexColor(1, 1, 1, 0); --Hide Icon for NOW till You MERGE BOR & BOL
-							--buffFrame.count:SetTextColor(0, 0 ,0, 1)
-						end
-						if j == 9 then
-							buffFrame.count:ClearAllPoints()
-							buffFrame.count:SetFont("Fonts\\FRIZQT__.TTF", 11, "OUTLINE") --, MONOCHROME")
-							buffFrame.count:SetPoint("BOTTOMRIGHT", 2, -5);
-							buffFrame.count:SetJustifyH("RIGHT");
-							buffFrame.icon:SetVertexColor(1, 1, 1, 0); --Hide Icon for NOW till You MERGE BOR & BOL
-							--buffFrame.count:SetTextColor(0, 0 ,0, 1)
-						end
-						buffFrame:SetID(j);
-						local startTime = expirationTime - duration;
-						if duration > 59.5 then
-							CooldownFrame_Clear(buffFrame.cooldown);
-						else
-							CooldownFrame_Set(buffFrame.cooldown, startTime, duration, true);
-						end
-						buffFrame:SetSize(f.buffFrames[3]:GetSize()*1,f.buffFrames[3]:GetSize()*1);
-						buffFrame:Show();
-					end
-				else
-					local buffFrame = v.buffFrames[j];
-					if buffFrame then
-						buffFrame:Hide()
-					end
-				end
-			index = nil; buff = nil; backCount= nil
+			else
+				break
 			end
-			break --if this is removed will cycle through all Frames could be good if party and raid frames overlap
 		end
+		if index then
+			local name, icon, count, buffType, duration, expirationTime, unitCaster, canStealOrPurge, _, spellId = UnitBuff(uid, index, filter);
+			if j == 4 or j == 5 or j == 6 or j == 7 or j == 8 or j == 9 or unitCaster == "player" then
+				local buffFrame = scf.buffFrames[j]
+
+				if j == 4 or j == 5 or j == 6 or j == 7 then
+					if not X then
+						scf.buffFrames[4]:Hide();scf.buffFrames[5]:Hide();scf.buffFrames[6]:Hide();scf.buffFrames[7]:Hide();
+						j = 4
+						buffFrame = scf.buffFrames[j]; X = j
+					Ctimer(.025, function() --Unitil BOR and BOL is merged could have problems
+						local frame = scf.name.."BuffOverlayRight"
+						if _G[frame] and _G[frame].icon:IsVisible() then
+							scf.buffFrames[j]:ClearAllPoints()
+							scf.buffFrames[j]:SetPoint("RIGHT", f, "RIGHT", -5.5, 10)
+						else
+							scf.buffFrames[j]:ClearAllPoints()
+							scf.buffFrames[j]:SetPoint("TOPRIGHT", f, "TOPRIGHT", -5.5, -6.5)
+						end
+					end)
+
+					else
+				   buffFrame = scf.buffFrames[X+1]
+					 X = X + 1
+					end
+				end
+
+				buffFrame.icon:SetTexture(icon);
+				buffFrame.icon:SetDesaturated(nil) --Destaurate Icon
+				buffFrame.icon:SetVertexColor(1, 1, 1);
+				buffFrame.SpellId = spellId
+				buffFrame:SetScript("OnEnter", function(self)
+					GameTooltip:SetOwner (buffFrame.icon, "ANCHOR_RIGHT")
+					GameTooltip:SetSpellByID(spellId)
+					GameTooltip:Show()
+				end)
+				buffFrame:SetScript("OnLeave", function(self)
+					GameTooltip:Hide()
+				end)
+				if count or backCount then
+					if backCount then count = backCount end
+					if ( count > 1 ) then
+						local countText = count;
+						if ( count >= 100 ) then
+						 countText = BUFF_STACKS_OVERFLOW;
+						end
+							buffFrame.count:Show();
+							buffFrame.count:SetText(countText);
+					else
+						buffFrame.count:Hide();
+					end
+				end
+				if j == 3 then
+					buffFrame.count:ClearAllPoints()
+					buffFrame.count:SetFont("Fonts\\FRIZQT__.TTF", 12, "OUTLINE") --, MONOCHROME")
+					buffFrame.count:SetPoint("TOPRIGHT", -10, 6.5);
+					buffFrame.count:SetJustifyH("RIGHT");
+					buffFrame.count:SetTextColor(1, 1 ,0, 1)
+				end
+				if j == 4 or j == 5 or j == 6 or j == 7 then
+					SetPortraitToTexture(buffFrame.icon, icon)
+					--buffFrame.icon:SetTexCoord(0.07, 0.93, 0.07, 0.93);
+				end
+				if j == 8 then
+					buffFrame.count:ClearAllPoints()
+					buffFrame.count:SetFont("Fonts\\FRIZQT__.TTF", 11, "OUTLINE") --, MONOCHROME")
+					buffFrame.count:SetPoint("BOTTOMRIGHT", 2, -5);
+					buffFrame.count:SetJustifyH("RIGHT");
+					buffFrame.icon:SetVertexColor(1, 1, 1, 0); --Hide Icon for NOW till You MERGE BOR & BOL
+					--buffFrame.count:SetTextColor(0, 0 ,0, 1)
+				end
+				if j == 9 then
+					buffFrame.count:ClearAllPoints()
+					buffFrame.count:SetFont("Fonts\\FRIZQT__.TTF", 11, "OUTLINE") --, MONOCHROME")
+					buffFrame.count:SetPoint("BOTTOMRIGHT", 2, -5);
+					buffFrame.count:SetJustifyH("RIGHT");
+					buffFrame.icon:SetVertexColor(1, 1, 1, 0); --Hide Icon for NOW till You MERGE BOR & BOL
+					--buffFrame.count:SetTextColor(0, 0 ,0, 1)
+				end
+				buffFrame:SetID(j);
+				local startTime = expirationTime - duration;
+				if duration > 59.5 then
+					CooldownFrame_Clear(buffFrame.cooldown);
+				else
+					CooldownFrame_Set(buffFrame.cooldown, startTime, duration, true);
+				end
+				buffFrame:SetSize(f.buffFrames[3]:GetSize()*1,f.buffFrames[3]:GetSize()*1);
+				buffFrame:Show();
+			end
+		else
+			local buffFrame = scf.buffFrames[j];
+			if buffFrame then
+				buffFrame:Hide()
+			end
+		end
+	index = nil; buff = nil; backCount= nil
+	end
+end
+
+
+local function DebuffFilter_UpdateAuras(scf, unitAuraUpdateInfo)
+
+	local debuffsChanged = false;
+	local buffsChanged = false;
+
+	if unitAuraUpdateInfo == nil or unitAuraUpdateInfo.isFullUpdate then
+		debuffsChanged = true;
+		buffsChanged = true;
+	else
+		if unitAuraUpdateInfo.addedAuras ~= nil then
+			for _, aura in ipairs(unitAuraUpdateInfo.addedAuras) do
+				local type = AuraUtil.ProcessAura(aura, displayOnlyDispellableDebuffs, ignoreBuffs, ignoreDebuffs, ignoreDispelDebuffs);
+				if type == AuraUtil.AuraUpdateChangedType.Debuff then
+					debuffsChanged = true;
+				elseif type == AuraUtil.AuraUpdateChangedType.Buff then
+					buffsChanged = true;
+				elseif type == AuraUtil.AuraUpdateChangedType.Dispel then
+					debuffsChanged = true;
+				end
+			end
+		end
+
+		if unitAuraUpdateInfo.updatedAuraInstanceIDs ~= nil then
+			for _, auraInstanceID in ipairs(unitAuraUpdateInfo.updatedAuraInstanceIDs) do
+				local	aura = C_UnitAuras.GetAuraDataByAuraInstanceID(scf.displayedUnit, auraInstanceID)
+				local type = AuraUtil.ProcessAura(aura, displayOnlyDispellableDebuffs, ignoreBuffs, ignoreDebuffs, ignoreDispelDebuffs);
+				if type == AuraUtil.AuraUpdateChangedType.Debuff then
+					debuffsChanged = true;
+				elseif type == AuraUtil.AuraUpdateChangedType.Buff then
+					buffsChanged = true;
+				elseif type == AuraUtil.AuraUpdateChangedType.Dispel then
+					debuffsChanged = true;
+				end
+			end
+		end
+
+		if unitAuraUpdateInfo.removedAuraInstanceIDs ~= nil then
+			debuffsChanged = true;
+			buffsChanged = true;
+		end
+	end
+
+	if debuffsChanged then
+		DebuffFilter:UpdateDebuffs(scf, scf.displayedUnit)
+	end
+
+	if buffsChanged then
+		DebuffFilter:UpdateBuffs(scf, scf.displayedUnit)
 	end
 end
 
 -- Apply style for each frame
 function DebuffFilter:ApplyFrame(f)
-	self.cache[f] = {}
-	local scf = self.cache[f]
-	f:SetScript("OnSizeChanged",function() DebuffFilter:ResetFrame(f) DebuffFilter:ApplyFrame(f) end)
+  local scf = DebuffFilter.cache[f]
 	if not scf.buffFrames then scf.buffFrames = {} end
 	if not scf.debuffFrames then scf.debuffFrames = {} end
 	for j = 1, DEFAULT_DEBUFF do
 		if not scf.debuffFrames[j] then
-			scf.debuffFrames[j] = CreateFrame("Button", nil, UIParent,"CompactDebuffTemplate")
+			scf.debuffFrames[j] = CreateFrame("Button", "scfDebuff"..f:GetName()..j, UIParent, "CompactDebuffTemplate")
 		end
 		scf.debuffFrames[j]:ClearAllPoints()
 		scf.debuffFrames[j]:SetParent(f)
@@ -1152,7 +1158,7 @@ function DebuffFilter:ApplyFrame(f)
 
 	for j = 1, DEFAULT_BUFF do
 		if not scf.buffFrames[j] then
-			scf.buffFrames[j] = CreateFrame("Button" ,nil, UIParent, "CompactAuraTemplate")
+			scf.buffFrames[j] = CreateFrame("Button" , "scfBuff"..f:GetName()..j, UIParent, "CompactAuraTemplate")
 			scf.buffFrames[j].cooldown:SetDrawSwipe(false)
 		end
 		scf.buffFrames[j]:ClearAllPoints()
@@ -1206,12 +1212,7 @@ function DebuffFilter:ApplyFrame(f)
 	f.dispelDebuffFrames[2]:SetAlpha(0); --Hides Dispel Icons in Upper Right
 	f.dispelDebuffFrames[3]:SetAlpha(0); --Hides Dispel Icons in Upper Right
 end
--- Reset to the original style
-function DebuffFilter:ResetStyle()
-	for f,_ in pairs(DebuffFilter.cache) do
-		DebuffFilter:ResetFrame(f)
-	end
-end
+
 -- Reset style to each cached frame
 function DebuffFilter:ResetFrame(f)
 	for k,v in pairs(self.cache[f].debuffFrames) do
@@ -1237,36 +1238,87 @@ end
 
 
 
--- Event handling
-local function OnEvent(self,event,...)
-	if event == "GROUP_ROSTER_UPDATE" or event == "UNIT_PET" then self:ResetStyle() self:ApplyStyle()
-	elseif event == "PLAYER_ENTERING_WORLD" then  Ctimer(5, function() self:ResetStyle(); self:ApplyStyle() end) self:ResetStyle(); self:ApplyStyle()
-	elseif event == "ZONE_CHANGED_NEW_AREA" then 	Ctimer(5, function() self:ResetStyle(); self:ApplyStyle() end) self:ResetStyle(); self:ApplyStyle()
-	elseif event == "COMBAT_LOG_EVENT_UNFILTERED" then self:CLEU()
-	elseif event == "UNIT_AURA" then self:UpdateAura(...); self:UpdateBuffAura(...) end
+local function scf_OnEvent(self, event, ...)
+	local arg1, arg2, arg3, arg4 = ...
+	if ( event == 'GROUP_ROSTER_UPDATE' ) then
+	  DebuffFilter_UpdateAuras(self)
+	elseif ( event == 'UNIT_PET' ) then
+		DebuffFilter_UpdateAuras(self)
+	elseif ( event == 'PLAYER_ENTERING_WORLD' ) then
+		DebuffFilter_UpdateAuras(self)
+	elseif ( event == 'ZONE_CHANGED_NEW_AREA' ) then
+		DebuffFilter_UpdateAuras(self)
+	else
+		local unitMatches = arg1 == self.unit or arg1 == self.displayedUnit
+	  if ( unitMatches ) then
+	    if ( event == 'UNIT_AURA' ) then
+	     local unitAuraUpdateInfo = arg2
+	     DebuffFilter_UpdateAuras(self, unitAuraUpdateInfo)
+	    end
+	  end
+	end
+	if ( unitMatches or arg1 == "player" ) then
+		if ( event == "UNIT_ENTERED_VEHICLE" or event == "UNIT_EXITED_VEHICLE" or event == "PLAYER_GAINS_VEHICLE_DATA" or event == "PLAYER_LOSES_VEHICLE_DATA" ) then
+			DebuffFilter_UpdateAuras(self);
+		end
+	end
 end
 
-DebuffFilter:SetScript("OnEvent",OnEvent)
-DebuffFilter:RegisterEvent("GROUP_ROSTER_UPDATE")
-DebuffFilter:RegisterEvent("PLAYER_ENTERING_WORLD")
-DebuffFilter:RegisterEvent("ZONE_CHANGED_NEW_AREA")
-DebuffFilter:RegisterEvent("UNIT_AURA")
+local function RegisterUnit(f)
+	if not DebuffFilter.cache[f] then DebuffFilter.cache[f] = CreateFrame("Frame", "scf"..f:GetName()) end
+	local scf = DebuffFilter.cache[f]
+	scf.f = f
+	scf.name = f:GetName()
+	scf.unit = f.unit
+	scf.displayedUnit = f.displayedUnit
+	DebuffFilter:ApplyFrame(f)
+	scf:SetScript("OnEvent", scf_OnEvent)
+	local unit = scf.unit;
+	local displayedUnit;
+	if ( unit ~= scf.displayedUnit ) then
+		 displayedUnit = scf.displayedUnit;
+	end
+
+	scf:RegisterEvent('GROUP_ROSTER_UPDATE')
+	scf:RegisterEvent('UNIT_PET')
+	scf:RegisterEvent('PLAYER_ENTERING_WORLD')
+	scf:RegisterEvent('ZONE_CHANGED_NEW_AREA')
+	scf:RegisterUnitEvent('UNIT_AURA', unit, displayedUnit)
+
+	DebuffFilter_UpdateAuras(scf)
+end
+
+hooksecurefunc("CompactUnitFrame_UpdateAll", function(f)
+	if f and f.unit and (strmatch(f.unit, "target") or strmatch(f.unit, "nameplate")) then return end
+	if not f or not f.unit then return end
+	RegisterUnit(f)
+end)
+
+
+hooksecurefunc("CompactUnitFrame_UpdateUnitEvents", function(f)
+	if f and f.unit and (strmatch(f.unit, "target") or strmatch(f.unit, "nameplate")) then return end
+	RegisterUnit(f)
+end)
+
+hooksecurefunc("CompactUnitFrame_UnregisterEvents", function(f)
+	if f and f.unit and (strmatch(f.unit, "target") or strmatch(f.unit, "nameplate")) then return end
+	local scf = DebuffFilter.cache[f]
+  if scf then
+		scf:SetScript("OnEvent", nil)
+    scf:UnregisterAllEvents()
+    DebuffFilter:ResetFrame(f)
+  else
+     return
+  end
+end)
+
+-- Event handling
+local function OnEvent(self,event,...)
+	if event == "COMBAT_LOG_EVENT_UNFILTERED" then self:CLEU() end
+end
+
+DebuffFilter:SetScript("OnEvent", OnEvent)
 DebuffFilter:RegisterEvent("COMBAT_LOG_EVENT_UNFILTERED")
 
-BambiUI_ResetDebuffFilter = CreateFrame('CheckButton', 'BambiUI_ResetDebuffFilter', BambiUI_ResetDebuffFilter, 'UICheckButtonTemplate');
-BambiUI_ResetDebuffFilter:SetScript('OnClick', function() DebuffFilter:ResetStyle() DebuffFilter:ApplyStyle() print("Reset DebuffFilter Frames") end); --manual hard reset
-
-
-hooksecurefunc(CompactRaidFrameContainer, "SetGroupMode", function() DebuffFilter:ResetStyle() DebuffFilter:ApplyStyle() end) --handles swapping from group to non grouped in raid
-hooksecurefunc(CompactRaidFrameContainer, "SetFlowFilterFunction", function() DebuffFilter:ResetStyle() DebuffFilter:ApplyStyle() end)
-hooksecurefunc(CompactRaidFrameContainer, "SetGroupFilterFunction", function() DebuffFilter:ResetStyle() DebuffFilter:ApplyStyle() end)
-hooksecurefunc(CompactRaidFrameContainer, "SetFlowSortFunction", function() DebuffFilter:ResetStyle() DebuffFilter:ApplyStyle() end)
-hooksecurefunc("CompactPartyFrame_SetFlowSortFunction", function() DebuffFilter:ResetStyle() DebuffFilter:ApplyStyle() end)
-
---handles swapping to raid and party
-CompactRaidFrameContainer:HookScript("OnHide", function(self) Ctimer(.001, function() DebuffFilter:ResetStyle() DebuffFilter:ApplyStyle() end) end)
-CompactRaidFrameContainer:HookScript("OnShow", function(self) Ctimer(.001, function() DebuffFilter:ResetStyle() DebuffFilter:ApplyStyle() end) end)
-CompactPartyFrame:HookScript("OnHide", function(self) Ctimer(.001, function() DebuffFilter:ResetStyle() DebuffFilter:ApplyStyle() end) end)
-CompactPartyFrame:HookScript("OnShow", function(self) Ctimer(.001, function() DebuffFilter:ResetStyle() DebuffFilter:ApplyStyle() end) end)
-
-EditModeManagerFrame:HookScript("OnHide", function() Ctimer(.001, function() DebuffFilter:ResetStyle() DebuffFilter:ApplyStyle() end) end)
+--BambiUI_ResetDebuffFilter = CreateFrame('CheckButton', 'BambiUI_ResetDebuffFilter', BambiUI_ResetDebuffFilter, 'UICheckButtonTemplate');
+--BambiUI_ResetDebuffFilter:SetScript('OnClick', function() DebuffFilter:ResetStyle() DebuffFilter:ApplyStyle() print("Reset DebuffFilter Frames") end); --manual hard reset
