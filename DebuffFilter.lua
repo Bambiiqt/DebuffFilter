@@ -5,7 +5,7 @@ local DebuffFilter = CreateFrame("Frame")
 DebuffFilter.cache = {}
 
 local DEFAULT_DEBUFF = 3
-local DEFAULT_BUFF = 9 --This Number Needs to Equal the Number of tracked Table Buf
+local DEFAULT_BUFF = 12 --This Number Needs to Equal the Number of tracked Table Buf
 local BIGGEST = 1.6
 local BIGGER = 1.4
 local BIG = 1.4
@@ -72,9 +72,7 @@ PriorityBuff[5] = {
 
 --Upper Circle Right on Icon 3
 PriorityBuff[6] = {
-"inputspellhere",
---264761, --War-Scroll of Battle Shout
---6673, --Battle Shout
+"Mark of the Wild",
 }
 --Upper Circle Right on Icon 4
 PriorityBuff[7] = {
@@ -88,6 +86,19 @@ PriorityBuff[8] = {
 --UPPER LEFT PRIO COUNT
 PriorityBuff[9] = {
 "inputspellhere",
+}
+
+PriorityBuff[10] = {
+"Regrowth",
+}
+
+--UPPER RIGHT PRIO COUNT
+PriorityBuff[11] = {
+"Wild Growth",
+}
+--UPPER LEFT PRIO COUNT
+PriorityBuff[12] = {
+"Adaptive Swarm",
 }
 
 local Buff = {}
@@ -951,14 +962,14 @@ end
 function DebuffFilter:UpdateBuffs(scf, uid)
 	local f = scf.f
 	if not DebuffFilter.cache[f] then return end
-  local scf = DebuffFilter.cache[f]
+	local scf = DebuffFilter.cache[f]
 	local filter = nil
 	local buffNum = 1
-	local index, buff, backCount, X
+	local index, buff, backCount, X, Z
 	for j = 1, DEFAULT_BUFF do
 		for i = 1, 32 do
 			local buffName, _, count, _, _, _, unitCaster, _, _, spellId = UnitBuff(uid, i, filter)
-			if ( buffName ) then
+			if ( buffName ) and ( j == 4 or j == 5 or j == 6 or j == 7 or j == 8 or j == 9 or unitCaster == "player" ) then
 				if isBuff(uid, i, filter, j) then
 					if (buffName == "Prayer of Mending" or buffName == "Focused Growth") and unitCaster == "player" then backCount = count end 	--Prayer of mending hack
 					if Buff[j][buffName] then
@@ -985,7 +996,7 @@ function DebuffFilter:UpdateBuffs(scf, uid)
 						scf.buffFrames[4]:Hide();scf.buffFrames[5]:Hide();scf.buffFrames[6]:Hide();scf.buffFrames[7]:Hide();
 						j = 4
 						buffFrame = scf.buffFrames[j]; X = j
-						Ctimer(.025, function() --Unitil BOR and BOL is merged could have problems
+						Ctimer(.01, function() --Unitil BOR and BOL is merged could have problems
 							local frame = scf.name.."BuffOverlayRight"
 							if _G[frame] and _G[frame].icon:IsVisible() then
 								scf.buffFrames[j]:ClearAllPoints()
@@ -997,8 +1008,18 @@ function DebuffFilter:UpdateBuffs(scf, uid)
 						end)
 
 					else
-				   buffFrame = scf.buffFrames[X+1]
-					 X = X + 1
+				   		buffFrame = scf.buffFrames[X+1]
+					 	X = X + 1
+					end
+				end
+				if j == 10 or j == 11 or j == 12 then
+					if not Z then
+						scf.buffFrames[10]:Hide();scf.buffFrames[11]:Hide();scf.buffFrames[12]:Hide();
+						j = 10
+						buffFrame = scf.buffFrames[j]; Z = j
+					else
+				   		buffFrame = scf.buffFrames[Z+1]
+					 	Z = Z + 1
 					end
 				end
 
@@ -1080,33 +1101,27 @@ local function DebuffFilter_UpdateAuras(scf, unitAuraUpdateInfo)
 	local debuffsChanged = false;
 	local buffsChanged = false;
 
-	if unitAuraUpdateInfo == nil or unitAuraUpdateInfo.isFullUpdate then
+	if unitAuraUpdateInfo == nil or unitAuraUpdateInfo.isFullUpdate or scf.unit ~= scf.displayedUnit then
 		debuffsChanged = true;
 		buffsChanged = true;
 	else
 		if unitAuraUpdateInfo.addedAuras ~= nil then
 			for _, aura in ipairs(unitAuraUpdateInfo.addedAuras) do
-				local type = AuraUtil.ProcessAura(aura, displayOnlyDispellableDebuffs, ignoreBuffs, ignoreDebuffs, ignoreDispelDebuffs);
-				if type == AuraUtil.AuraUpdateChangedType.Debuff then
+				if aura and (aura.isHarmful or aura.isBossAura) then
 					debuffsChanged = true;
-				elseif type == AuraUtil.AuraUpdateChangedType.Buff then
+				elseif aura and aura.isHelpful then
 					buffsChanged = true;
-				elseif type == AuraUtil.AuraUpdateChangedType.Dispel then
-					debuffsChanged = true;
 				end
 			end
 		end
 
 		if unitAuraUpdateInfo.updatedAuraInstanceIDs ~= nil then
 			for _, auraInstanceID in ipairs(unitAuraUpdateInfo.updatedAuraInstanceIDs) do
-				local	aura = C_UnitAuras.GetAuraDataByAuraInstanceID(scf.displayedUnit, auraInstanceID)
-				local type = AuraUtil.ProcessAura(aura, displayOnlyDispellableDebuffs, ignoreBuffs, ignoreDebuffs, ignoreDispelDebuffs);
-				if type == AuraUtil.AuraUpdateChangedType.Debuff then
+				local aura = C_UnitAuras.GetAuraDataByAuraInstanceID(scf.displayedUnit, auraInstanceID)
+				if aura and (aura.isHarmful or aura.isBossAura) then
 					debuffsChanged = true;
-				elseif type == AuraUtil.AuraUpdateChangedType.Buff then
+				elseif aura and aura.isHelpful then
 					buffsChanged = true;
-				elseif type == AuraUtil.AuraUpdateChangedType.Dispel then
-					debuffsChanged = true;
 				end
 			end
 		end
@@ -1116,7 +1131,6 @@ local function DebuffFilter_UpdateAuras(scf, unitAuraUpdateInfo)
 			buffsChanged = true;
 		end
 	end
-
 	if debuffsChanged then
 		DebuffFilter:UpdateDebuffs(scf, scf.displayedUnit)
 	end
@@ -1198,6 +1212,16 @@ function DebuffFilter:ApplyFrame(f)
 			scf.buffFrames[j]:SetScale(1.15)
 			scf.buffFrames[j]:SetFrameLevel(3)
 			scf.buffFrames[j]:SetFrameStrata("HIGH")
+		elseif j == 10 or j == 11 or j == 12 then
+			if j == 10 then
+				if not strfind(f.unit,"pet") then
+					scf.buffFrames[j]:SetPoint("BOTTOM", scf.buffFrames[1], "TOP", 0, 0)
+				end
+			else
+				if not strfind(f.unit,"pet") then
+					scf.buffFrames[j]:SetPoint("RIGHT", scf.buffFrames[j -1], "LEFT", 0, 0)
+				end
+			end
 		end
 		scf.buffFrames[j]:SetSize(f.buffFrames[3]:GetSize()) --ensures position is prelocked before showing , avoids the growing of row
 		scf.buffFrames[j]:Hide()
@@ -1248,12 +1272,12 @@ local function scf_OnEvent(self, event, ...)
 		DebuffFilter_UpdateAuras(self)
 	else
 		local unitMatches = arg1 == self.unit or arg1 == self.displayedUnit
-	  if ( unitMatches ) then
-	    if ( event == 'UNIT_AURA' ) then
-	     local unitAuraUpdateInfo = arg2
-	     DebuffFilter_UpdateAuras(self, unitAuraUpdateInfo)
-	    end
-	  end
+		if ( unitMatches ) then
+			if ( event == 'UNIT_AURA' ) then
+				local unitAuraUpdateInfo = arg2
+				DebuffFilter_UpdateAuras(self, unitAuraUpdateInfo)
+			end
+		end
 	end
 	if ( unitMatches or arg1 == "player" ) then
 		if ( event == "UNIT_ENTERED_VEHICLE" or event == "UNIT_EXITED_VEHICLE" or event == "PLAYER_GAINS_VEHICLE_DATA" or event == "PLAYER_LOSES_VEHICLE_DATA" ) then
@@ -1271,29 +1295,22 @@ local function RegisterUnit(f)
 	scf.displayedUnit = f.displayedUnit
 	DebuffFilter:ApplyFrame(f)
 	scf:SetScript("OnEvent", scf_OnEvent)
-	local unit = scf.unit;
-	local displayedUnit;
-	if ( unit ~= scf.displayedUnit ) then
-		 displayedUnit = scf.displayedUnit;
-	end
-
 	scf:RegisterEvent('GROUP_ROSTER_UPDATE')
 	scf:RegisterEvent('UNIT_PET')
 	scf:RegisterEvent('PLAYER_ENTERING_WORLD')
 	scf:RegisterEvent('ZONE_CHANGED_NEW_AREA')
-	scf:RegisterUnitEvent('UNIT_AURA', unit, displayedUnit)
+	scf:RegisterUnitEvent('UNIT_AURA', f.unit, f.displayedUnit)
 
 	DebuffFilter_UpdateAuras(scf)
 end
 
-hooksecurefunc("CompactUnitFrame_UpdateAll", function(f)
-	if (not f and not f.unit) or (strmatch(f.unit, "target") or strmatch(f.unit, "nameplate")) then return end
+--[[hooksecurefunc("CompactUnitFrame_UpdateUnitEvents", function(f)
+	if (not f) or (not f.unit) or (f and f.unit and (strmatch(f.unit, "target") or strmatch(f.unit, "nameplate"))) then return end
 	RegisterUnit(f)
-end)
+end)]]
 
-
-hooksecurefunc("CompactUnitFrame_UpdateUnitEvents", function(f)
-	if (not f and not f.unit) or (strmatch(f.unit, "target") or strmatch(f.unit, "nameplate")) then return end
+hooksecurefunc("CompactUnitFrame_UpdateAll", function(f)
+	if (not f) or (not f.unit) or (f and f.unit and (strmatch(f.unit, "target") or strmatch(f.unit, "nameplate"))) then return end
 	RegisterUnit(f)
 end)
 
