@@ -176,6 +176,7 @@ local spellIds = {
 	[115080] = "Biggest", -- Touch of Death
 	[122470] = "Bigger", -- Touch of Karma
 	[124280] = "Big", -- Touch of Karma Dot
+	[386276] = "Big", -- Bonedust Brew
 
   --PALLY
 	--[206891] = "Big", -- Focused Assault
@@ -192,7 +193,9 @@ local spellIds = {
 	[79140]  = "Biggest", -- Vendetta
 	[207736] = "Big", -- Shadowy Duel
 	[212183] = "Big", -- Smoke Bomb
+	[385408] = "Big", -- Rogue: Sepsis
 	[8680] = "Warning", --Wound Poison
+	[383414] = "Warning", --Amplyfying Poison
 
 	--LOCK
 	--[80240] = "Bigger", -- Havoc
@@ -650,7 +653,7 @@ local function isBigDebuff(unit, index, filter)
   local name, icon, _, _, duration, expirationTime, source, _, _, spellId = UnitAura(unit, index, "HARMFUL");
 	local inInstance, instanceType = IsInInstance()
 	if instanceType =="arena" then
-		if (spellId == 325216) then --BoneDust Brew
+		if (spellId == 325216 or spellId == 386276) then --BoneDust Brew
 			local id, specID
 			if source then
 				if strfind(source, "nameplate") then
@@ -757,6 +760,29 @@ end
 
 local function SetdebuffFrame(f, debuffFrame, uid, index, filter, scale)
 	local name, icon, count, debuffType, duration, expirationTime, unitCaster, canStealOrPurge, _, spellId = UnitAura(uid, index, filter);
+
+	if spellId == 45524 then --Chains of Ice Dk
+		--icon = 463560
+		--icon = 236922
+		icon = 236925
+	end
+
+	if spellId == 317589 then --Mirros of Toremnt, Tormenting Backlash (Venthyr Mage) to Frost Jaw
+		icon = 538562
+	end
+
+	if spellId == 334693 then --Abosolute Zero Frost Dk Legendary Stun
+		icon = 517161
+	end
+
+	if spellId == 115196 then --Shiv
+		icon = 135428
+	end
+
+	if spellId == 199845 then --Psyflay
+		icon = 537021
+	end
+
 	debuffFrame.icon:SetTexture(icon);
 	debuffFrame.icon:SetDesaturated(nil) --Destaurate Icon
 	debuffFrame.icon:SetVertexColor(1, 1, 1);
