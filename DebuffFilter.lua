@@ -150,8 +150,8 @@ local spellIds = {
 	--[209967] = "Biggest", -- Dire Beast: Basilisk
 	--[203268] = "Big", -- Sticky Tar
 	--[131894] = "Big", -- A Murder of Crows
-		[212431] = "Big", -- Explosive Shot
-		[257284] = "Warning", -- Hunter's Mark
+	[212431] = "Big", -- Explosive Shot
+	[257284] = "Warning", -- Hunter's Mark
 
   --SHAMAN
 	[188389] =  "Warning", --Flame Shock
@@ -206,9 +206,9 @@ local spellIds = {
 	--[48181] = "Big", -- Haunt
 	--[234877] = "Big", -- Curse of Shadows
 	--[196414] = "Big", -- Eradication
-		[603] = "Warning", -- Doom (Demo)
+	[603] = "Warning", -- Doom (Demo)
 	--[233582] = "Warning", --Entrenched Flame
-		[205179] = "Big", --Phantom Singularity
+	[205179] = "Big", --Phantom Singularity
 
   --WARRIOR
   --[198819] = "Bigger", -- Sharpen
