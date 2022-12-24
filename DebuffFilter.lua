@@ -172,6 +172,9 @@ local spellIds = {
 	--[200947] = "Big", -- Encroaching Vines
 	[58180] = "Warning", --Infected Wounds (PvP MS)
 
+	--EVOKER
+	[383005] = "Bigger", -- Chrono Loop
+
 	--MONK
 	[115080] = "Biggest", -- Touch of Death
 	[122470] = "Bigger", -- Touch of Karma
@@ -191,6 +194,7 @@ local spellIds = {
 
 	--ROGUE
 	[79140]  = "Biggest", -- Vendetta
+	[360194] = "Biggest", -- Deathmark
 	[207736] = "Big", -- Shadowy Duel
 	[212183] = "Big", -- Smoke Bomb
 	[385408] = "Big", -- Rogue: Sepsis
@@ -209,6 +213,7 @@ local spellIds = {
 	[603] = "Warning", -- Doom (Demo)
 	--[233582] = "Warning", --Entrenched Flame
 	[205179] = "Big", --Phantom Singularity
+	[386997] = "Big", -- Warlock: Soulrot 
 
   --WARRIOR
   --[198819] = "Bigger", -- Sharpen
