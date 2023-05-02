@@ -1,5 +1,6 @@
 ﻿## Interface: 80000
 ## Title: DebuffFilter
+## IconTexture: Interface\AddOns\BambiUi\Icon
 ## X-Curse-Project-Name: DebuffFilter
 ## X-Curse-Project-ID: DebuffFilter
 

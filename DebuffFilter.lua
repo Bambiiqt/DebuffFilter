@@ -11,14 +11,17 @@ local BIGGER = 1.4
 local BIG = 1.4
 local BOSSDEBUFF = 1.4
 local BOSSBUFF = 1.4
-local WARNING = 1.15
+local WARNING = 1.2
 local PRIORITY = 1
 
 local strfind = string.find
 local strmatch = string.match
 local tblinsert = table.insert
 local tblremove= table.remove
-local mathfloor = math.floor
+local math_floor = math.floor
+local math_min = math.min
+local math_max = math.max
+local math_rand = math.random
 local mathabs = math.abs
 local bit_band = bit.band
 local tblsort = table.sort
@@ -138,6 +141,7 @@ local spellIds = {
 	[45181] = "Warning", --Cheated Death
   --PALLY
 	[25771] = "Warning", --Forbearance
+	[393879] = "Warning", --Gift of the Golden Val'kyr
 	--DH
 	[209261] = "Warning", --Uncontained Fel
 	--GENERAL WARNINGS
@@ -170,10 +174,13 @@ local spellIds = {
 	--[232559] = "Big", -- Thorns
 	--[236021] = "Big", -- Ferocious Wound
 	--[200947] = "Big", -- Encroaching Vines
+	[391889] = "Big", -- Adpative Swarm
 	[58180] = "Warning", --Infected Wounds (PvP MS)
+	[202347] = "Warning", --Stellar Flare
 
 	--EVOKER
 	[383005] = "Bigger", -- Chrono Loop
+	[372048] = "Big", -- Oppressing Roar
 
 	--MONK
 	[115080] = "Biggest", -- Touch of Death
@@ -190,6 +197,7 @@ local spellIds = {
 	--[199845] = "Bigger", --Psyflay
 	--[247777] = "Big", --Mind Trauma
 	--[214621] = "Big", --Schism
+	[375901] = "Big", -- Priest: Mindgames
 	[335467] = "Big", --Devouring Plague
 
 	--ROGUE
@@ -198,6 +206,7 @@ local spellIds = {
 	[207736] = "Big", -- Shadowy Duel
 	[212183] = "Big", -- Smoke Bomb
 	[385408] = "Big", -- Rogue: Sepsis
+	[384631] = "Big", -- Rogue: Flagellation 
 	[8680] = "Warning", --Wound Poison
 	[383414] = "Warning", --Amplyfying Poison
 
@@ -226,18 +235,19 @@ local spellIds = {
 	--[207744] = "Big", -- Fiery Brand
 
 	--COVENANTS
-	[320224] = "Biggest", --Potender (Nightfae)
-	[327140] = "Biggest", --Forgeborne Reveries (Necrolord)
-	[323673] = "Big", -- Priest: Mindgames (Venthyr)
-	[314793] = "Big", -- Mage: Mirrors of Torment (Venthyr)
-	[323654] = "Big", -- Rogue: Flagellation (Venthyer)
-	[328305] = "Big", -- Rogue: Sepsis (NightFae)
-	[325640] = "Big", -- Warlock: Soulrot (Nightfae)
-	[324149] = "Big", -- Hunter: Flayed Shot (Venthyer)
-	[325216] = "Big", -- Bonedust Brew (Necro)
-	[325203] = "Big", --Unholy Transfusion (Necro)
-	[325733] = "Big", -- Adpative Swarm (Necro)
-	[317009] = "Big", -- DH: Sinful Brand(Venthyer)
+	[320224] = "Biggest", --Potender (Nightfae)(Not Re-Talented)
+	[327140] = "Biggest", --Forgeborne Reveries (Necrolord)(Not Re-Talented)
+	[317009] = "Big", -- DH: Sinful Brand(Venthyer)(Not Re-Talented)
+	[324149] = "Big", -- Hunter: Flayed Shot (Venthyer)(Not Re-Talented)
+	[314793] = "Big", -- Mage: Mirrors of Torment (Venthyr)(Not Re-Talented)
+	[325203] = "Big", --Unholy Transfusion (Necro)(Not Re-Talented)
+	[323673] = "Big", -- **Priest: Mindgames (Venthyr)
+	[323654] = "Big", -- **Rogue: Flagellation (Venthyer)
+	[328305] = "Big", -- **Rogue: Sepsis (NightFae)
+	[325640] = "Big", -- **Warlock: Soulrot (Nightfae)
+	[325216] = "Big", -- **Bonedust Brew (Necro)
+	[325733] = "Big", -- **Adpative Swarm (Necro)
+
 
 	--TRINKETS
 
@@ -592,7 +602,10 @@ local bgWarningspellIds = {
 }
 
 
-
+local function round(num, numDecimalPlaces)
+    local mult = 10 ^ (numDecimalPlaces or 0)
+    return math_floor(num * mult + 0.5) / mult
+end
 
 function DebuffFilter:CLEU()
 		local _, event, _, sourceGUID, sourceName, sourceFlags, _, destGUID, _, _, _, spellId, _, _, _, _, spellSchool = CombatLogGetCurrentEventInfo()
@@ -677,6 +690,26 @@ local function isBigDebuff(unit, index, filter)
 			end
 		end
 	end
+	if instanceType =="arena" then
+		if (spellId == 391889) then --Adaptive Swarm
+			local id, specID
+			if source then
+				if strfind(source, "nameplate") then
+					if (UnitGUID(source) == UnitGUID("arena1")) then id = 1 elseif (UnitGUID(source) == UnitGUID("arena2")) then id = 2 elseif (UnitGUID(source) == UnitGUID("arena3")) then id = 3 end
+				else
+					if strfind(source, "arena1") then id = 1 elseif strfind(source, "arena2") then id = 2 elseif strfind(source, "arena3") then id = 3 end
+				end
+				specID = GetArenaOpponentSpec(id)
+				if specID then
+					if (specID == 105) then --Druid: Balance: 102 / Feral: 103 / Guardian: 104 /Restoration: 105
+						spellIds[spellId] = "Warning"
+					else
+						spellIds[spellId] = "Big"
+					end
+				end
+			end
+		end
+	end
 	if (instanceType =="pvp" or strfind(unit,"pet")) and bgBigspellIds[spellId] then
 		return true
 	elseif spellIds[spellId] == "Big"  and instanceType ~="pvp" then
@@ -710,8 +743,8 @@ local function isWarning(unit, index, filter)
 		if (instanceType =="pvp" or strfind(unit,"pet")) and bgWarningspellIds[spellId] then
 			return true
 		elseif spellIds[spellId] == "Warning"  and instanceType ~="pvp" then
-			if spellId == 58180 or spellId == 8680  or spellId == 354788 then -- Only Warning if Two Stacks of MS
-				if count == 2 then
+			if spellId == 58180 or spellId == 8680 then -- Only Warning if Two Stacks of MS
+				if count >= 2 then
 					return true
 				else
 					return false
@@ -764,6 +797,10 @@ local function CooldownFrame_Clear(self)
 end
 
 local function SetdebuffFrame(f, debuffFrame, uid, index, filter, scale)
+	local frameWidth, frameHeight = f:GetSize()
+	local componentScale = min(frameHeight / NATIVE_UNIT_FRAME_HEIGHT, frameWidth / NATIVE_UNIT_FRAME_WIDTH);
+	local overlaySize = 11 * componentScale
+	local buffId = index
 	local name, icon, count, debuffType, duration, expirationTime, unitCaster, canStealOrPurge, _, spellId = UnitAura(uid, index, filter);
 
 	if spellId == 45524 then --Chains of Ice Dk
@@ -793,7 +830,7 @@ local function SetdebuffFrame(f, debuffFrame, uid, index, filter, scale)
 	debuffFrame.icon:SetVertexColor(1, 1, 1);
 		debuffFrame:SetScript("OnEnter", function(self)
 		GameTooltip:SetOwner (debuffFrame.icon, "ANCHOR_RIGHT")
-		GameTooltip:SetSpellByID(spellId)
+		GameTooltip:SetUnitDebuff(uid, buffId, "HARMFUL")
 		GameTooltip:Show()
 	end)
 	debuffFrame:SetScript("OnLeave", function(self)
@@ -850,7 +887,7 @@ local function SetdebuffFrame(f, debuffFrame, uid, index, filter, scale)
 	end
 	local color = DebuffTypeColor[debuffType] or DebuffTypeColor["none"];
 	debuffFrame.border:SetVertexColor(color.r, color.g, color.b);
-	debuffFrame:SetSize(f.buffFrames[3]:GetSize()*scale,f.buffFrames[3]:GetSize()*scale);
+	debuffFrame:SetSize(overlaySize*scale,overlaySize*scale);
 	debuffFrame:Show();
 end
 -- Update aura for each unit
@@ -992,6 +1029,10 @@ end
 
 function DebuffFilter:UpdateBuffs(scf, uid)
 	local f = scf.f
+	local frameWidth, frameHeight = f:GetSize()
+	local componentScale = min(frameHeight / NATIVE_UNIT_FRAME_HEIGHT, frameWidth / NATIVE_UNIT_FRAME_WIDTH);
+	local overlaySize = 11 * componentScale
+
 	if not DebuffFilter.cache[f] then return end
 	local scf = DebuffFilter.cache[f]
 	local filter = nil
@@ -1018,6 +1059,7 @@ function DebuffFilter:UpdateBuffs(scf, uid)
 			end
 		end
 		if index then
+			local buffId = index
 			local name, icon, count, buffType, duration, expirationTime, unitCaster, canStealOrPurge, _, spellId = UnitBuff(uid, index, filter);
 			if j == 4 or j == 5 or j == 6 or j == 7 or j == 8 or j == 9 or unitCaster == "player" then
 				local buffFrame = scf.buffFrames[j]
@@ -1060,7 +1102,7 @@ function DebuffFilter:UpdateBuffs(scf, uid)
 				buffFrame.SpellId = spellId
 				buffFrame:SetScript("OnEnter", function(self)
 					GameTooltip:SetOwner (buffFrame.icon, "ANCHOR_RIGHT")
-					GameTooltip:SetSpellByID(spellId)
+					GameTooltip:SetUnitBuff(uid, buffId, "HELPFUL")
 					GameTooltip:Show()
 				end)
 				buffFrame:SetScript("OnLeave", function(self)
@@ -1113,7 +1155,7 @@ function DebuffFilter:UpdateBuffs(scf, uid)
 				else
 					CooldownFrame_Set(buffFrame.cooldown, startTime, duration, true);
 				end
-				buffFrame:SetSize(f.buffFrames[3]:GetSize()*1,f.buffFrames[3]:GetSize()*1);
+				buffFrame:SetSize(overlaySize*1,overlaySize*1);
 				buffFrame:Show();
 			end
 		else
@@ -1173,6 +1215,11 @@ end
 
 -- Apply style for each frame
 function DebuffFilter:ApplyFrame(f)
+
+local frameWidth, frameHeight = f:GetSize()
+local componentScale = min(frameHeight / NATIVE_UNIT_FRAME_HEIGHT, frameWidth / NATIVE_UNIT_FRAME_WIDTH);
+local overlaySize =  11 * componentScale
+
   local scf = DebuffFilter.cache[f]
 	if not scf.buffFrames then scf.buffFrames = {} end
 	if not scf.debuffFrames then scf.debuffFrames = {} end
@@ -1191,7 +1238,7 @@ function DebuffFilter:ApplyFrame(f)
 		else
 			scf.debuffFrames[j]:SetPoint("BOTTOMLEFT",scf.debuffFrames[j-1],"BOTTOMRIGHT",0,0)
 		end
-		scf.debuffFrames[j]:SetSize(f.buffFrames[3]:GetSize())  --ensures position is prelocked before showing , avoids the growing of row
+		scf.debuffFrames[j]:SetSize(overlaySize, overlaySize)  --ensures position is prelocked before showing , avoids the growing of row
 		scf.debuffFrames[j]:Hide()
 	end
 	for j = 1,#f.debuffFrames do
@@ -1254,7 +1301,7 @@ function DebuffFilter:ApplyFrame(f)
 				end
 			end
 		end
-		scf.buffFrames[j]:SetSize(f.buffFrames[3]:GetSize()) --ensures position is prelocked before showing , avoids the growing of row
+		scf.buffFrames[j]:SetSize(overlaySize, overlaySize) --ensures position is prelocked before showing , avoids the growing of row
 		scf.buffFrames[j]:Hide()
 	end
 	for j = 1,#f.buffFrames do
