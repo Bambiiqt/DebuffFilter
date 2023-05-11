@@ -166,6 +166,7 @@ local spellIds = {
 	--[77606] = "Biggest", -- Dark Simulacrum
 	--[130736] = "Big", -- Soul Reaper
 	--[48743] = "Big", -- Death Pact
+	[204206] = "Big", --Chilled (Chill Streak)
 	[233397] = "Warning", -- Delirium
 	[214975] = "Warning", -- Heartstop Aura
 	[199719] = "Warning", -- Heartstop Aura
