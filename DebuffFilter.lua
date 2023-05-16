@@ -234,6 +234,7 @@ local spellIds = {
 	--DEMON HUNTER
 	--[206491] = "Big", -- Nemesis
 	--[207744] = "Big", -- Fiery Brand
+	[370969] = "Big", -- The Hunt Dot
 
 	--COVENANTS
 	[320224] = "Biggest", --Potender (Nightfae)(Not Re-Talented)
@@ -1244,7 +1245,7 @@ local overlaySize =  11 * componentScale
 	end
 	for j = 1,#f.debuffFrames do
 		f.debuffFrames[j]:Hide()
-		f.debuffFrames[j]:SetScript("OnShow", f.debuffFrames[j].Hide) --Hides Blizzards Frames
+		f.debuffFrames[j]:SetScript("OnShow", function(self) self:Hide() end)
 	end
 
 	for j = 1, DEFAULT_BUFF do
@@ -1307,7 +1308,7 @@ local overlaySize =  11 * componentScale
 	end
 	for j = 1,#f.buffFrames do
 		f.buffFrames[j]:Hide() --Hides Blizzards Frames
-		f.buffFrames[j]:SetScript("OnShow", f.buffFrames[j].Hide)
+		f.buffFrames[j]:SetScript("OnShow", function(self) self:Hide() end)
 	end
 	f.dispelDebuffFrames[1]:SetAlpha(0); --Hides Dispel Icons in Upper Right
 	f.dispelDebuffFrames[2]:SetAlpha(0); --Hides Dispel Icons in Upper Right
