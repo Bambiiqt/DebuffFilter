@@ -37,54 +37,54 @@ for i = 1, DEFAULT_BUFF do
 end
 
 PriorityBuff[1] = {
---"Power Infusion",
-"Renew",
-"Beacon of Light",
-"Beacon of Faith",
-774, --Rejuv
+	--"Power Infusion",
+	"Renew",
+	"Beacon of Light",
+	"Beacon of Faith",
+	774, --Rejuv
 }
 
 PriorityBuff[2] = {
-"Atonement",
-"Echo of Light",
-155777, --Rejuc Germ
-"Spring Blossoms",
-"Glimmer of Light",
+	"Atonement",
+	"Echo of Light",
+	155777, --Rejuc Germ
+	"Spring Blossoms",
+	"Glimmer of Light",
 }
 
 PriorityBuff[3] = {
-"Power Word: Shield",
-"Prayer of Mending",
-"Lifebloom",
-"Bestow Faith",
-216328, --LightGrace
-"Focused Growth", --Focused Growth (Honor Talent)
+	"Power Word: Shield",
+	"Prayer of Mending",
+	"Lifebloom",
+	"Bestow Faith",
+	216328, --LightGrace
+	"Focused Growth", --Focused Growth (Honor Talent)
 }
 
 --Upper Circle Right on Icon 1
 PriorityBuff[4] = {
-"Power Word: Fortitude",
+	"Power Word: Fortitude",
 }
 
 --Upper Circle Right on Icon 2
 PriorityBuff[5] = {
-"Arcane Intellect",
-"Arcane Brilliance",
-"Dalaran Brilliance",
+	"Arcane Intellect",
+	"Arcane Brilliance",
+	"Dalaran Brilliance",
 }
 
 --Upper Circle Right on Icon 3
 PriorityBuff[6] = {
-"Mark of the Wild",
+	"Mark of the Wild",
 }
 --Upper Circle Right on Icon 4
 PriorityBuff[7] = {
-"inputspellhere",
+	"inputspellhere",
 }
 
 --UPPER RIGHT PRIO COUNT
 PriorityBuff[8] = {
-"inputspellhere",
+		"inputspellhere",
 }
 --UPPER LEFT PRIO COUNT
 PriorityBuff[9] = {
@@ -92,16 +92,16 @@ PriorityBuff[9] = {
 }
 
 PriorityBuff[10] = {
-"Regrowth",
+	"Regrowth",
 }
 
 --UPPER RIGHT PRIO COUNT
 PriorityBuff[11] = {
-"Wild Growth",
+	"Wild Growth",
 }
 --UPPER LEFT PRIO COUNT
 PriorityBuff[12] = {
-"Adaptive Swarm",
+	"Adaptive Swarm",
 }
 
 local Buff = {}
@@ -133,7 +133,7 @@ local spellIds = {
 --	[318187] = "Priority", --Gushing Wounds
 ---WARNINGS---
   --DEATH KNIGHT
-  [123981] = "Warning", --Perdition
+  	[123981] = "Warning", --Perdition
   --Mage
 	[87024] = "Warning", --Cauterized
 	[41425] = "Warning", --Hypothermia
