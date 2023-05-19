@@ -614,7 +614,7 @@ function DebuffFilter:CLEU()
 	-----------------------------------------------------------------------------------------------------------------
 	--SmokeBomb Check
 	-----------------------------------------------------------------------------------------------------------------
-		if ((event == "SPELL_CAST_SUCCESS") and (spellId == 212182 or spellId == 359053)) then
+	if ((event == "SPELL_CAST_SUCCESS") and (spellId == 212182 or spellId == 359053)) then
 		if (sourceGUID ~= nil) then
 		local duration = 5
 		local expirationTime = GetTime() + duration
@@ -741,22 +741,22 @@ end
 
 local function isWarning(unit, index, filter)
     local name, icon, count, _, duration, expirationTime, _, _, _, spellId = UnitAura(unit, index, "HARMFUL");
-		local inInstance, instanceType = IsInInstance()
-		if (instanceType =="pvp" or strfind(unit,"pet")) and bgWarningspellIds[spellId] then
-			return true
-		elseif spellIds[spellId] == "Warning"  and instanceType ~="pvp" then
-			if spellId == 58180 or spellId == 8680 then -- Only Warning if Two Stacks of MS
-				if count >= 2 then
-					return true
-				else
-					return false
-				end
+	local inInstance, instanceType = IsInInstance()
+	if (instanceType =="pvp" or strfind(unit,"pet")) and bgWarningspellIds[spellId] then
+		return true
+	elseif spellIds[spellId] == "Warning"  and instanceType ~="pvp" then
+		if spellId == 58180 or spellId == 8680 then -- Only Warning if Two Stacks of MS
+			if count >= 2 then
+				return true
+			else
+				return false
 			end
-			return true
-		else
-			return false
 		end
+		return true
+	else
+		return false
 	end
+end
 
 local function isPriority(unit, index, filter)
     local name, icon, _, _, duration, expirationTime, _, _, _, spellId = UnitAura(unit, index, "HARMFUL");
@@ -772,16 +772,16 @@ local function isDebuff(unit, index, filter)
 		if spellIds[spellId] == "Hide" then
 		return false
 	else
-	  return true
+	  	return true
 	end
 end
 
 local function isBuff(unit, index, filter, j)
-  local name, icon, _, _, duration, expirationTime, _, _, _, spellId = UnitAura(unit, index, "HELPFUL");
+  	local name, icon, _, _, duration, expirationTime, _, _, _, spellId = UnitAura(unit, index, "HELPFUL");
 	if Buff[j][spellId] or Buff[j][name] then
 		return true
 	else
-	  return false
+	 	return false
 	end
 end
 
@@ -811,12 +811,12 @@ local function SetdebuffFrame(f, debuffFrame, uid, index, filter, scale)
 		icon = 236925
 	end
 
-	if spellId == 317589 then --Mirros of Toremnt, Tormenting Backlash (Venthyr Mage) to Frost Jaw
-		icon = 538562
-	end
-
 	if spellId == 334693 then --Abosolute Zero Frost Dk Legendary Stun
 		icon = 517161
+	end
+
+	if spellId == 317589 then --Mirros of Toremnt, Tormenting Backlash (Venthyr Mage) to Frost Jaw
+		icon = 538562
 	end
 
 	if spellId == 115196 then --Shiv
@@ -825,6 +825,10 @@ local function SetdebuffFrame(f, debuffFrame, uid, index, filter, scale)
 
 	if spellId == 199845 then --Psyflay
 		icon = 537021
+	end
+	
+	if spellId == 285515 then --Frost Shock to Frost Nove
+		icon = 135848
 	end
 
 	debuffFrame.icon:SetTexture(icon);
@@ -907,7 +911,7 @@ function DebuffFilter:UpdateDebuffs(scf, uid)
 		while debuffNum <= DEFAULT_DEBUFF do
 			local debuffName = UnitDebuff(uid, index, filter)
 			if ( debuffName ) then
-					if isBiggestDebuff(uid, index, filter) then
+				if isBiggestDebuff(uid, index, filter) then
 					local debuffFrame = scf.debuffFrames[debuffNum]
 					SetdebuffFrame(f, debuffFrame, uid, index, "HARMFUL", BIGGEST)
 					debuffNum = debuffNum + 1
@@ -922,10 +926,10 @@ function DebuffFilter:UpdateDebuffs(scf, uid)
 		while debuffNum <= DEFAULT_DEBUFF do
 			local debuffName = UnitDebuff(uid, index, filter);
 			if ( debuffName ) then
-					if isBiggerDebuff(uid, index, filter) and not isBiggestDebuff(uid, index, filter) then
-						local debuffFrame = scf.debuffFrames[debuffNum]
-						SetdebuffFrame(f, debuffFrame, uid, index, "HARMFUL", BIGGEST)
-						debuffNum = debuffNum + 1
+				if isBiggerDebuff(uid, index, filter) and not isBiggestDebuff(uid, index, filter) then
+					local debuffFrame = scf.debuffFrames[debuffNum]
+					SetdebuffFrame(f, debuffFrame, uid, index, "HARMFUL", BIGGEST)
+					debuffNum = debuffNum + 1
 				end
 			else
 				break
@@ -937,10 +941,10 @@ function DebuffFilter:UpdateDebuffs(scf, uid)
 		while debuffNum <= DEFAULT_DEBUFF do
 			local debuffName = UnitDebuff(uid, index, filter);
 			if ( debuffName ) then
-					if isBigDebuff(uid, index, filter) and not isBiggestDebuff(uid, index, filter) and not isBiggerDebuff(uid, index, filter) then
-						local debuffFrame = scf.debuffFrames[debuffNum]
-						SetdebuffFrame(f, debuffFrame, uid, index, "HARMFUL", BIG)
-						debuffNum = debuffNum + 1
+				if isBigDebuff(uid, index, filter) and not isBiggestDebuff(uid, index, filter) and not isBiggerDebuff(uid, index, filter) then
+					local debuffFrame = scf.debuffFrames[debuffNum]
+					SetdebuffFrame(f, debuffFrame, uid, index, "HARMFUL", BIG)
+					debuffNum = debuffNum + 1
 				end
 			else
 				break
@@ -948,14 +952,14 @@ function DebuffFilter:UpdateDebuffs(scf, uid)
 			index = index + 1
 		end
 		index = 1
-	--isBossDeBuff
+		--isBossDeBuff
 		while debuffNum <= DEFAULT_DEBUFF do
 			local debuffName = UnitDebuff(uid, index, filter);
 			if ( debuffName ) then
-					if CompactUnitFrame_UtilIsBossDebuff(uid, index, filter) and not isBiggestDebuff(uid, index, filter) and not isBiggerDebuff(uid, index, filter) and not isBigDebuff(uid, index, filter) then
-						local debuffFrame = scf.debuffFrames[debuffNum]
-						SetdebuffFrame(f, debuffFrame, uid, index, "HARMFUL", BOSSDEBUFF)
-						debuffNum = debuffNum + 1
+				if CompactUnitFrame_UtilIsBossDebuff(uid, index, filter) and not isBiggestDebuff(uid, index, filter) and not isBiggerDebuff(uid, index, filter) and not isBigDebuff(uid, index, filter) then
+					local debuffFrame = scf.debuffFrames[debuffNum]
+					SetdebuffFrame(f, debuffFrame, uid, index, "HARMFUL", BOSSDEBUFF)
+					debuffNum = debuffNum + 1
 				end
 			else
 				break
@@ -1343,7 +1347,7 @@ end
 local function scf_OnEvent(self, event, ...)
 	local arg1, arg2, arg3, arg4 = ...
 	if ( event == 'GROUP_ROSTER_UPDATE' ) then
-	  DebuffFilter_UpdateAuras(self)
+	  	DebuffFilter_UpdateAuras(self)
 	elseif ( event == 'UNIT_PET' ) then
 		DebuffFilter_UpdateAuras(self)
 	elseif ( event == 'PLAYER_ENTERING_WORLD' ) then
