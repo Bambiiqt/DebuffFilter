@@ -819,12 +819,12 @@ local function SetdebuffFrame(f, debuffFrame, uid, index, filter, scale)
 		icon = 538562
 	end
 
-	if spellId == 115196 then --Shiv
-		icon = 135428
-	end
-
 	if spellId == 199845 then --Psyflay
 		icon = 537021
+	end
+
+	if spellId == 115196 then --Shiv
+		icon = 135428
 	end
 	
 	if spellId == 285515 then --Frost Shock to Frost Nove
@@ -834,7 +834,7 @@ local function SetdebuffFrame(f, debuffFrame, uid, index, filter, scale)
 	debuffFrame.icon:SetTexture(icon);
 	debuffFrame.icon:SetDesaturated(nil) --Destaurate Icon
 	debuffFrame.icon:SetVertexColor(1, 1, 1);
-		debuffFrame:SetScript("OnEnter", function(self)
+	debuffFrame:SetScript("OnEnter", function(self)
 		GameTooltip:SetOwner (debuffFrame.icon, "ANCHOR_RIGHT")
 		GameTooltip:SetUnitDebuff(uid, buffId, "HARMFUL")
 		GameTooltip:Show()
