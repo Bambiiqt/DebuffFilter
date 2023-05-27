@@ -176,6 +176,7 @@ local spellIds = {
 	--[236021] = "Big", -- Ferocious Wound
 	--[200947] = "Big", -- Encroaching Vines
 	[391889] = "Big", -- Adpative Swarm
+	[410063] = "Big", -- Adpative Swarm
 	[58180] = "Warning", --Infected Wounds (PvP MS)
 	[202347] = "Warning", --Stellar Flare
 
