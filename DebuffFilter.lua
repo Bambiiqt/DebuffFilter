@@ -673,42 +673,38 @@ end
 local function isBigDebuff(unit, index, filter)
   local name, icon, _, _, duration, expirationTime, source, _, _, spellId = UnitAura(unit, index, "HARMFUL");
 	local inInstance, instanceType = IsInInstance()
-	if instanceType =="arena" then
-		if (spellId == 325216 or spellId == 386276) then --BoneDust Brew
-			local id, specID
-			if source then
-				if strfind(source, "nameplate") then
-					if (UnitGUID(source) == UnitGUID("arena1")) then id = 1 elseif (UnitGUID(source) == UnitGUID("arena2")) then id = 2 elseif (UnitGUID(source) == UnitGUID("arena3")) then id = 3 end
+	if (spellId == 325216 or spellId == 386276) then --BoneDust Brew
+		local id, specID
+		if source then
+			if strfind(source, "nameplate") then
+				if (UnitGUID(source) == UnitGUID("arena1")) then id = 1 elseif (UnitGUID(source) == UnitGUID("arena2")) then id = 2 elseif (UnitGUID(source) == UnitGUID("arena3")) then id = 3 end
+			else
+				if strfind(source, "arena1") then id = 1 elseif strfind(source, "arena2") then id = 2 elseif strfind(source, "arena3") then id = 3 end
+			end
+			specID = GetArenaOpponentSpec(id)
+			if specID then
+				if (specID == 270) then --Monk: Brewmaster: 268 / Windwalker: 269 / Mistweaver: 270
+					spellIds[spellId] = "Warning"
 				else
-					if strfind(source, "arena1") then id = 1 elseif strfind(source, "arena2") then id = 2 elseif strfind(source, "arena3") then id = 3 end
-				end
-				specID = GetArenaOpponentSpec(id)
-				if specID then
-					if (specID == 270) then --Monk: Brewmaster: 268 / Windwalker: 269 / Mistweaver: 270
-						spellIds[spellId] = "Warning"
-					else
-						spellIds[spellId] = "Big"
-					end
+					spellIds[spellId] = "Big"
 				end
 			end
 		end
 	end
-	if instanceType =="arena" then
-		if (spellId == 391889) then --Adaptive Swarm
-			local id, specID
-			if source then
-				if strfind(source, "nameplate") then
-					if (UnitGUID(source) == UnitGUID("arena1")) then id = 1 elseif (UnitGUID(source) == UnitGUID("arena2")) then id = 2 elseif (UnitGUID(source) == UnitGUID("arena3")) then id = 3 end
+	if (spellId == 391889) then --Adaptive Swarm
+		local id, specID
+		if source then
+			if strfind(source, "nameplate") then
+				if (UnitGUID(source) == UnitGUID("arena1")) then id = 1 elseif (UnitGUID(source) == UnitGUID("arena2")) then id = 2 elseif (UnitGUID(source) == UnitGUID("arena3")) then id = 3 end
+			else
+				if strfind(source, "arena1") then id = 1 elseif strfind(source, "arena2") then id = 2 elseif strfind(source, "arena3") then id = 3 end
+			end
+			specID = GetArenaOpponentSpec(id)
+			if specID then
+				if (specID == 105) then --Druid: Balance: 102 / Feral: 103 / Guardian: 104 /Restoration: 105
+					spellIds[spellId] = "Warning"
 				else
-					if strfind(source, "arena1") then id = 1 elseif strfind(source, "arena2") then id = 2 elseif strfind(source, "arena3") then id = 3 end
-				end
-				specID = GetArenaOpponentSpec(id)
-				if specID then
-					if (specID == 105) then --Druid: Balance: 102 / Feral: 103 / Guardian: 104 /Restoration: 105
-						spellIds[spellId] = "Warning"
-					else
-						spellIds[spellId] = "Big"
-					end
+					spellIds[spellId] = "Big"
 				end
 			end
 		end
@@ -741,8 +737,26 @@ local function CompactUnitFrame_UtilIsBossAura(unit, index, filter)
 end
 
 local function isWarning(unit, index, filter)
-    local name, icon, count, _, duration, expirationTime, _, _, _, spellId = UnitAura(unit, index, "HARMFUL");
+    local name, icon, count, _, duration, expirationTime, source, _, _, spellId = UnitAura(unit, index, "HARMFUL");
 	local inInstance, instanceType = IsInInstance()
+	if (spellId == 18838) then --Flame Shock
+		local id, specID
+		if source then
+			if strfind(source, "nameplate") then
+				if (UnitGUID(source) == UnitGUID("arena1")) then id = 1 elseif (UnitGUID(source) == UnitGUID("arena2")) then id = 2 elseif (UnitGUID(source) == UnitGUID("arena3")) then id = 3 end
+			else
+				if strfind(source, "arena1") then id = 1 elseif strfind(source, "arena2") then id = 2 elseif strfind(source, "arena3") then id = 3 end
+			end
+			specID = GetArenaOpponentSpec(id)
+			if specID then
+				if (specID == 262) then --Shaman: Elemental: 262 / Enhancement: 263 / Resto 264
+					spellIds[spellId] = "Warning"
+				else
+					spellIds[spellId] = "None"
+				end
+			end
+		end
+	end
 	if (instanceType =="pvp" or strfind(unit,"pet")) and bgWarningspellIds[spellId] then
 		return true
 	elseif spellIds[spellId] == "Warning"  and instanceType ~="pvp" then
