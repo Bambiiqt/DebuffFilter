@@ -737,7 +737,7 @@ local function CompactUnitFrame_UtilIsBossAura(unit, index, filter)
 end
 
 local function isWarning(unit, index, filter)
-    local name, icon, count, _, duration, expirationTime, _, _, _, spellId = UnitAura(unit, index, "HARMFUL");
+    local name, icon, count, _, duration, expirationTime, source, _, _, spellId = UnitAura(unit, index, "HARMFUL");
 	local inInstance, instanceType = IsInInstance()
 	if (spellId == 18838) then --Flame Shock
 		local id, specID
