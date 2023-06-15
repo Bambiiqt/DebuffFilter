@@ -176,7 +176,7 @@ local spellIds = {
 	--[236021] = "Big", -- Ferocious Wound
 	--[200947] = "Big", -- Encroaching Vines
 	[391889] = "Big", -- Adpative Swarm
-	[410063] = "Big", -- Adpative Swarm
+	[410063] = "Warning", -- Reactive Resin
 	[58180] = "Warning", --Infected Wounds (PvP MS)
 	[202347] = "Warning", --Stellar Flare
 
@@ -760,7 +760,7 @@ local function isWarning(unit, index, filter)
 	if (instanceType =="pvp" or strfind(unit,"pet")) and bgWarningspellIds[spellId] then
 		return true
 	elseif spellIds[spellId] == "Warning"  and instanceType ~="pvp" then
-		if spellId == 58180 or spellId == 8680 then -- Only Warning if Two Stacks of MS
+		if spellId == 58180 or spellId == 8680 or spellId == 410063 then -- Only Warning if Two Stacks of MS
 			if count >= 2 then
 				return true
 			else
