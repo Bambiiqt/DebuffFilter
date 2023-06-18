@@ -184,6 +184,9 @@ local spellIds = {
 	[383005] = "Bigger", -- Chrono Loop
 	[372048] = "Big", -- Oppressing Roar
 
+	--MAGE
+	[390612] = "Big", -- Frostbomb
+
 	--MONK
 	[115080] = "Biggest", -- Touch of Death
 	[122470] = "Bigger", -- Touch of Karma
@@ -739,7 +742,7 @@ end
 local function isWarning(unit, index, filter)
     local name, icon, count, _, duration, expirationTime, source, _, _, spellId = UnitAura(unit, index, "HARMFUL");
 	local inInstance, instanceType = IsInInstance()
-	if (spellId == 18838) then --Flame Shock
+	if (spellId == 188389) then --Flame Shock
 		local id, specID
 		if source then
 			if strfind(source, "nameplate") then
