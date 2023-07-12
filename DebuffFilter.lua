@@ -419,169 +419,193 @@ local bgBiggerspellIds = {
 
 local bgBigspellIds = {
 --CC--
-	[3355] = "True",		-- Freezing Trap
-	[203337] = "True",		-- Freezing Trap (Diamond Ice - pvp honor talent)
-	[24394] = "True",		-- Intimidation
-	[213691] = "True",		-- Scatter Shot (pvp honor talent)
+[3355] = "True",			-- Freezing Trap
+[203337] = "True",			-- Freezing Trap (Diamond Ice - pvp honor talent)
+[24394] = "True",			-- Intimidation
+[213691] = "True",			-- Scatter Shot (pvp honor talent)
+[1513 ] = "True",        		-- Scare Beast
 
-	[51514] = "True",		-- Hex
-	[210873] = "True",		-- Hex (compy)
-	[211010] = "True",		-- Hex (snake)
-	[211015] = "True",		-- Hex (cockroach)
-	[211004] = "True",		-- Hex (spider)
-	[196942] = "True",		-- Hex (Voodoo Totem)
-	[269352] = "True",		-- Hex (skeletal hatchling)
-	[277778] = "True",		-- Hex (zandalari Tendonripper)
-	[277784] = "True",		-- Hex (wicker mongrel)
-	[77505] = "True",		-- Earthquake
-	[118905] = "True",		-- Static Charge (Capacitor Totem)
-	[305485] = "True",		-- Lightning Lasso
-	[197214] = "True",		-- Sundering
-	[118345] = "True",		-- Pulverize (Shaman Primal Earth Elemental)
+["Hex"] = "True",			-- Hex
+[51514] = "True",			-- Hex
+[210873] = "True",			-- Hex (compy)
+[211010] = "True",			-- Hex (snake)
+[211015] = "True",			-- Hex (cockroach)
+[211004] = "True",			-- Hex (spider)
+[196942] = "True",			-- Hex (Voodoo Totem)
+[269352] = "True",			-- Hex (skeletal hatchling)
+[277778] = "True",			-- Hex (zandalari Tendonripper)
+[277784] = "True",			-- Hex (wicker mongrel)
+[77505] = "True",			-- Earthquake
+[118905] = "True",			-- Static Charge (Capacitor Totem)
+[305485] = "True",			-- Lightning Lasso
+[197214] = "True",			-- Sundering
+[118345] = "True",			-- Pulverize (Shaman Primal Earth Elemental)
 
-	[108194] = "True",		-- Asphyxiate
-	[221562] = "True",		-- Asphyxiate
-	[207167] = "True",		-- Blinding Sleet
-	[287254] = "True",		-- Dead of Winter (pvp talent)
-	[210141] = "True",		-- Zombie Explosion (Reanimation PvP Talent)
-	[91800] = "True",		-- Gnaw
-	[91797] = "True",		-- Monstrous Blow (Dark Transformation)
-	[334693] = "True",    -- Absolute Zero (Shadowlands Legendary Stun)
+[108194] = "True",			-- Asphyxiate
+[221562] = "True",			-- Asphyxiate
+[207167] = "True",			-- Blinding Sleet
+[287254] = "True",			-- Dead of Winter (pvp talent)
+[210141] = "True",			-- Zombie Explosion (Reanimation PvP Talent)
+[91800] = "True",			-- Gnaw
+[91797] = "True",			-- Monstrous Blow (Dark Transformation)
+[334693] = "True",       			-- Absolute Zero (Shadowlands Legendary Stun)
+[377048] = "True",       			-- Absolute Zero
 
-	[33786] = "True",		-- Cyclone
-	[5211] = "True",		-- Mighty Bash
-	[163505] = "True",		-- Rake
-	[203123] = "True",		-- Maim
-	[202244] = "True",		-- Overrun (pvp honor talent)
-	[99] = "True",	-- Incapacitating Roar
-	[2637] = "True",		-- Hibernate
+[33786] = "True",			-- Cyclone
+[5211] = "True",			-- Mighty Bash
+[163505] = "True",			-- Rake
+[203123] = "True",			-- Maim
+[202244] = "True",			-- Overrun (pvp honor talent)
+[99] = "True",			-- Incapacitating Roar
+[2637] = "True",			-- Hibernate
 
-	[118] = "True",		-- Polymorph
-	[61305] = "True",		-- Polymorph: Black Cat
-	[28272] = "True",		-- Polymorph: Pig
-	[61721] = "True",		-- Polymorph: Rabbit
-	[61780] = "True",		-- Polymorph: Turkey
-	[28271] = "True",		-- Polymorph: Turtle
-	[161353] = "True",		-- Polymorph: Polar bear cub
-	[126819] = "True",		-- Polymorph: Porcupine
-	[161354] = "True",		-- Polymorph: Monkey
-	[61025] = "True",		-- Polymorph: Serpent
-	[161355] = "True",		-- Polymorph: Penguin
-	[277787] = "True",		-- Polymorph: Direhorn
-	[277792] = "True",		-- Polymorph: Bumblebee
-	[161372] = "True",		-- Polymorph: Peacock
-	[82691] = "True",		-- Ring of Frost
-	[140376] = "True",		-- Ring of Frost
-	[31661] = "True",		-- Dragon's Breath
+[372245] = "True",			-- Terror of the Skies
+[360806] = "True",			-- Sleep Walk
 
-	[119381] = "True",		-- Leg Sweep
-	[115078] = "True",		-- Paralysis
-	[198909] = "True",		-- Song of Chi-Ji
-	[202274] = "True",		-- Incendiary Brew (honor talent)
-	[202346] = "True",		-- Double Barrel (honor talent)
+["Polymorph"] = "True",		-- Polymorph
+[118] = "True",			-- Polymorph
+[61305] = "True",			-- Polymorph: Black Cat
+[28272] = "True",			-- Polymorph: Pig
+[61721] = "True",			-- Polymorph: Rabbit
+[61780] = "True",			-- Polymorph: Turkey
+[28271] = "True",			-- Polymorph: Turtle
+[161353] = "True",			-- Polymorph: Polar bear cub
+[126819] = "True",			-- Polymorph: Porcupine
+[161354] = "True",			-- Polymorph: Monkey
+[61025] = "True",			-- Polymorph: Serpent
+[161355] = "True",			-- Polymorph: Penguin
+[277787] = "True",			-- Polymorph: Direhorn
+[277792] = "True",			-- Polymorph: Bumblebee
+[161372] = "True",			-- Polymorph: Peacock
+[391622] = "True",			-- Polymorph: Duck
+[389831] = "True",			-- Snowdrift
+[82691] = "True",			-- Ring of Frost
+[140376] = "True",			-- Ring of Frost
+[31661] = "True",			-- Dragon's Breath
 
-	[853] = "True",		-- Hammer of Justice
-	[105421] = "True",		-- Blinding Light
-	[20066] = "True",		-- Repentance
+[119381] = "True",			-- Leg Sweep
+[115078] = "True",			-- Paralysis
+[198909] = "True",			-- Song of Chi-Ji
+[202274] = "True",			-- Incendiary Brew (honor talent)
+[202346] = "True",			-- Double Barrel (honor talent)
 
-	[605] = "True",		-- Dominate Mind
-	[8122] = "True",		-- Psychic Scream
-	[9484] = "True",		-- Shackle Undead
-	[64044] = "True",		-- Psychic Horror
-	[87204] = "True",		-- Sin and Punishment
-	[226943] = "True",		-- Mind Bomb
-	[205369] = "True",		-- Mind Bomb
-	[200196] = "True",		-- Holy Word: Chastise
-	[200200] = "True",		-- Holy Word: Chastise (talent)
-	[358861] = "True",		-- Void Volley: Horrify
+[853] = "True",			-- Hammer of Justice
+[105421] = "True",			-- Blinding Light
+[20066] = "True",			-- Repentance
 
-	[2094] = "True",		-- Blind
-	[1833] = "True",		-- Cheap Shot
-	[1776] = "True",		-- Gouge
-	[408] = "True",		-- Kidney Shot
-	[6770] = "True",		-- Sap
-	[199804] = "True",		-- Between the eyes
+[605] = "True",			-- Dominate Mind
+[8122] = "True",			-- Psychic Scream
+[9484] = "True",			-- Shackle Undead
+[64044] = "True",			-- Psychic Horror
+[87204] = "True",			-- Sin and Punishment
+[226943] = "True",			-- Mind Bomb
+[205369] = "True",			-- Mind Bomb
+[200196] = "True",			-- Holy Word: Chastise
+[200200] = "True",			-- Holy Word: Chastise (talent)
+[358861] = "True",			-- Void Volley: Horrify
 
-	[118699] = "True",		-- Fear
-	[5484] = "True",    -- Howl of Terror
-	[6789] = "True",		-- Mortal Coil
-	[30283] = "True",		-- Shadowfury
-	[710] = "True",		-- Banish
-	[22703] = "True",		-- Infernal Awakening
-	[213688] = "True",  	-- Fel Cleave (Fel Lord - PvP Talent)
-	[89766] = "True",  	-- Axe Toss (Felguard/Wrathguard)
-	[115268] = "True",	  -- Mesmerize (Shivarra)
-	[6358] = "True",  	-- Seduction (Succubus)
-	[261589] = "True",	  -- Seduction (Succubus)
-	[171017] = "True",	  -- Meteor Strike (infernal)
-	[171018] = "True",	  -- Meteor Strike (abisal)
+[2094] = "True",			-- Blind
+[1833] = "True",			-- Cheap Shot
+[1776] = "True",			-- Gouge
+[408] = "True",			-- Kidney Shot
+[6770] = "True",			-- Sap
+--[199804] = "True",			-- Between the eyes
 
-	[5246] = "True",		-- Intimidating Shout (aoe)
-	[132169] = "True",		-- Storm Bolt
-	[132168] = "True",		-- Shockwave
-	[199085] = "True",		-- Warpath
+[118699] = "True",			-- Fear
+[5484] = "True",	    	-- Howl of Terror
+[6789] = "True",			-- Mortal Coil
+[30283] = "True",			-- Shadowfury
+[710] = "True",			-- Banish
+[22703] = "True",			-- Infernal Awakening
+[213688] = "True",	  		-- Fel Cleave (Fel Lord - PvP Talent)
+[89766] = "True",	  		-- Axe Toss (Felguard/Wrathguard)
+--[347008] = "True",	  		-- Axe Toss (Felguard/Wrathguard)
+[115268] = "True",		    -- Mesmerize (Shivarra)
+[6358] = "True",	  		-- Seduction (Succubus)
+[261589] = "True",		 	-- Seduction (Succubus)
+[171017] = "True",		 	-- Meteor Strike (infernal)
+[171018] = "True",		  	-- Meteor Strike (abisal)
 
-	[179057] = "True",		-- Chaos Nova
-	[211881] = "True",		-- Fel Eruption
-	[217832] = "True",		-- Imprison
-	[221527] = "True",		-- Imprison (pvp talent)
-	[200166] = "True",		-- Metamorfosis stun
-	[207685] = "True",		-- Sigil of Misery
-	[205630] = "True",		-- Illidan's Grasp
-	[208618] = "True",		-- Illidan's Grasp (throw stun)
-	[213491] = "True",		-- Demonic Trample Stun
+[5246] = "True",			-- Intimidating Shout (aoe)
+[316593] = "True",			--Intimidating Shout
+[316595] = "True", 				--Intimidating Shout
+[132169] = "True",			-- Storm Bolt
+[325886] = "True",       			-- Ancient Aftershock
+[326062] = "True",       			-- Ancient Aftershock
+[132168] = "True",			-- Shockwave
+[199085] = "True",			-- Warpath
 
-	[331866] = "True",    -- Door of Shadows Fear (Venthyr)
-	[332423] = "True",    -- Sparkling Driftglobe Core 35% Stun (Kyrian)
-	[324263] = "True",    -- Sulfuric Emission (Necro)
-	[20549] = "True",		-- War Stomp (tauren racial)
-	[107079] = "True",		-- Quaking Palm (pandaren racial)
-	[255723] = "True",		-- Bull Rush (highmountain tauren racial)
-	[287712] = "True",		-- Haymaker (kul tiran racial)
+[179057] = "True",			-- Chaos Nova
+[211881] = "True",			-- Fel Eruption
+[217832] = "True",			-- Imprison
+[221527] = "True",			-- Imprison (pvp talent)
+[200166] = "True",			-- Metamorfosis stun
+[207685] = "True",			-- Sigil of Misery
+[205630] = "True",			-- Illidan's Grasp
+[208618] = "True",			-- Illidan's Grasp (throw stun)
+[213491] = "True",			-- Demonic Trample Stun
 
---Silence--
-	[202914] = "True",  -- Spider Sting (pvp honor talent) --no silence}] = "True", this its the previous effect
-	[202933] = "True",  -- Spider Sting	(pvp honor talent) --this its the silence effect
-	[47476] = "True",  -- Strangulate
-	[317589] = "True",  -- Tormenting Backlash (Venthyr Mage)
-	[81261] = "True",  -- Solar Beam
-	[217824] = "True",  -- Shield of Virtue (pvp honor talent)
-	[15487] = "True",  -- Silence
-	[1330] = "True",  -- Garrote - Silence
-	[196364] = "True",  -- Unstable Affliction
-	[204490] = "True",  -- Sigil of Silence
+[331866] = "True",        		-- Door of Shadows Fear (Venthyr)
+[332423] = "True",        		-- Sparkling Driftglobe Core 35% Stun (Kyrian)
+[324263] = "True",        		-- Sulfuric Emission (Necrolord)
+[20549] = "True",			-- War Stomp (tauren racial)
+[107079] = "True",			-- Quaking Palm (pandaren racial)
+[255723] = "True",			-- Bull Rush (highmountain tauren racial)
+[287712] = "True",			-- Haymaker (kul tiran racial)
 
---Roots--
-	[212638] = "True", 	-- Tracker's Net (pvp honor talent) -- Also -80% hit chance melee & range physical (CC and Root category)
-	[307871] = "True", 	-- Spear of Bastion
+[356727] = "True",			-- Spider Venom  (Chimaeral Sting)
+[47476] = "True",			-- Strangulate
+[317589] = "True",			-- Tormenting Backlash (Venthyr Mage)
+[81261] = "True",			-- Solar Beam
+[410065] = "True",			-- Reactive Resin
+[217824] = "True",			-- Shield of Virtue (pvp honor talent)
+[15487] = "True",			-- Silence
+[1330] = "True",			-- Garrote - Silence
+[196364] = "True",			-- Unstable Affliction
+[204490] = "True",			-- Sigil of Silence
 
-	[117526] = "True",  -- Binding Shot
-	[190927] = "True",  -- Harpoon
-	[190925] = "True",  -- Harpoon
-	[162480] = "True",  -- Steel Trap
-	[53148] = "True",  -- Charge (tenacity ability)
-	[64695] = "True",  -- Earthgrab (Earthgrab Totem)
-	[285515] = "True",  -- Surge of Power
-	[233395] = "True",  -- Deathchill (pvp talent)
-	[204085] = "True",  -- Deathchill (pvp talent)
-	[91807] = "True",  -- Shambling Rush (Dark Transformation)
-	[339] = "True",  -- Entangling Roots
-	[170855] = "True",  -- Entangling Roots (Nature's Grasp)
-	[45334 ] = "True",  -- Immobilized (Wild Charge - Bear)
-	[102359] = "True",  -- Mass Entanglement
-	[122] = "True",  -- Frost Nova
-	[198121] = "True",  -- Frostbite (pvp talent)
-	[157997] = "True",  -- Ice Nova
-	[228600] = "True",  -- Glacial Spike
-	[33395] = "True",  -- Freeze
-	[116706] = "True",  -- Disable
-	[105771] = "True",  -- Charge (root)
-	[199042] = "True", -- Thunderstruck
-	[323996] = "True", -- The Hunt
-	[354051] = "True", -- Nimble Steps
+[212638] = "True",				-- Tracker's Net (pvp honor talent) -- Also -80% hit chance melee & range physical (CC and Root category)
+[356723] = "True",				-- Scorpid Venom (Chimaeral Sting)
+[307871] = "True",				-- Spear of Bastion
+[376080] = "True",				-- Spear of Bastion
+[114404] = "True", 				-- Void Tendrils
+
+[117526] = "True",				-- Binding Shot
+[190927] = "True",				-- Harpoon
+[190925] = "True",				-- Harpoon
+[162480] = "True",				-- Steel Trap
+[393456] = "True",				-- Entrapment
+[53148] = "True",				-- Charge (tenacity ability)
+[64695] = "True",				-- Earthgrab (Earthgrab Totem)
+[285515] = "True",	    		-- Surge of Power
+[356738] = "True",	     		-- Earth Unleashed
+[233395] = "True",				-- Deathchill (pvp talent)
+[204085] = "True",				-- Deathchill (pvp talent)
+[91807] = "True",				-- Shambling Rush (Dark Transformation)
+[339] = "True",				-- Entangling Roots
+[170855] = "True",				-- Entangling Roots (Nature's Grasp)
+[45334] = "True",				-- Immobilized (Wild Charge - Bear)
+[102359] = "True",				-- Mass Entanglement
+[355689] = "True",				-- Landslide
+[122] = "True",				-- Frost Nova
+[198121] = "True",				-- Frostbite (pvp talent)
+[386770] = "True",				-- Freezing Cold
+[378760] = "True",				-- Frost Bite
+[157997] = "True",				-- Ice Nova
+[228600] = "True",				-- Glacial Spike
+[33395] = "True",				-- Freeze
+[116706] = "True",				-- Disable
+[324382] = "True",				-- Clash
+[105771] = "True",				-- Charge (root)
+[199042] = "True",				-- Thunderstruck
+[356356] = "True",				-- Warbringer
+[323996] = "True",				-- The Hunt
+[370970] = "True",				-- The Hunt
+[354051] = "True",				-- Nimble Steps
+
 }
 
-local bgWarningspellIds = {
+local bgWarningspellIds = { -- or pet debuffs
 
 	[233490] = "True", -- UA
 	[233497] = "True", -- UA
@@ -604,6 +628,8 @@ local bgWarningspellIds = {
 	[285145] = "True", -- UA
 	[285146] = "True", -- UA
 	[34914] = "True", -- VT
+	[202347] = "True", --Stellar Flare
+	[188389]= "True", --Flame Shock
 
 }
 
@@ -688,8 +714,10 @@ local function isBigDebuff(unit, index, filter)
 			if specID then
 				if (specID == 270) then --Monk: Brewmaster: 268 / Windwalker: 269 / Mistweaver: 270
 					spellIds[spellId] = "Warning"
+					bgWarningspellIds[spellId] = "True"
 				else
 					spellIds[spellId] = "Big"
+					bgWarningspellIds[spellId] = nil
 				end
 			end
 		end
@@ -706,8 +734,10 @@ local function isBigDebuff(unit, index, filter)
 			if specID then
 				if (specID == 105) then --Druid: Balance: 102 / Feral: 103 / Guardian: 104 /Restoration: 105
 					spellIds[spellId] = "Warning"
+					bgWarningspellIds[spellId] = "True"
 				else
 					spellIds[spellId] = "Big"
+					bgWarningspellIds[spellId] = nil
 				end
 			end
 		end
@@ -754,8 +784,10 @@ local function isWarning(unit, index, filter)
 			if specID then
 				if (specID == 262) then --Shaman: Elemental: 262 / Enhancement: 263 / Resto 264
 					spellIds[spellId] = "Warning"
+					bgWarningspellIds[spellId] = "True"
 				else
 					spellIds[spellId] = "None"
+					bgWarningspellIds[spellId] = nil
 				end
 			end
 		end
@@ -837,7 +869,7 @@ local function SetdebuffFrame(f, debuffFrame, uid, index, filter, scale)
 		icon = 538562
 	end
 
-	if spellId == 199845 then --Psyflay
+	if spellId == 199845 then --Psyflay4
 		icon = 537021
 	end
 
@@ -911,7 +943,11 @@ local function SetdebuffFrame(f, debuffFrame, uid, index, filter, scale)
 	end
 	local color = DebuffTypeColor[debuffType] or DebuffTypeColor["none"];
 	debuffFrame.border:SetVertexColor(color.r, color.g, color.b);
-	debuffFrame:SetSize(overlaySize*scale,overlaySize*scale);
+	if strfind(uid,"pet") then
+		debuffFrame:SetSize(overlaySize*scale*1.5,overlaySize*scale*1.5);
+	else
+		debuffFrame:SetSize(overlaySize*scale,overlaySize*scale);
+	end
 	debuffFrame:Show();
 end
 -- Update aura for each unit
