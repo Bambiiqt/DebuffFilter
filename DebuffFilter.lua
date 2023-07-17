@@ -1182,31 +1182,55 @@ function DebuffFilter:UpdateBuffs(scf, uid)
 					end
 				end
 				if j == 3 then
-					buffFrame.count:ClearAllPoints()
-					buffFrame.count:SetFont("Fonts\\FRIZQT__.TTF", 12, "OUTLINE") --, MONOCHROME")
-					buffFrame.count:SetPoint("TOPRIGHT", -10, 6.5);
-					buffFrame.count:SetJustifyH("RIGHT");
-					buffFrame.count:SetTextColor(1, 1 ,0, 1)
+					if strfind(uid,"pet") then
+						buffFrame.count:ClearAllPoints()
+						buffFrame.count:SetFont("Fonts\\FRIZQT__.TTF", 8, "OUTLINE") --, MONOCHROME")
+						buffFrame.count:SetPoint("TOPRIGHT", -3, 4);
+						buffFrame.count:SetJustifyH("RIGHT");
+						buffFrame.count:SetTextColor(1, 1 ,0, 1)
+					else
+						buffFrame.count:ClearAllPoints()
+						buffFrame.count:SetFont("Fonts\\FRIZQT__.TTF", 12, "OUTLINE") --, MONOCHROME")
+						buffFrame.count:SetPoint("TOPRIGHT", -10, 6.5);
+						buffFrame.count:SetJustifyH("RIGHT");
+						buffFrame.count:SetTextColor(1, 1 ,0, 1)
+					end
 				end
 				if j == 4 or j == 5 or j == 6 or j == 7 then
 					SetPortraitToTexture(buffFrame.icon, icon)
-					--buffFrame.icon:SetTexCoord(0.07, 0.93, 0.07, 0.93);
+					buffFrame.icon:SetTexCoord(0.07, 0.93, 0.07, 0.93);
 				end
 				if j == 8 then
-					buffFrame.count:ClearAllPoints()
-					buffFrame.count:SetFont("Fonts\\FRIZQT__.TTF", 11, "OUTLINE") --, MONOCHROME")
-					buffFrame.count:SetPoint("BOTTOMRIGHT", 2, -5);
-					buffFrame.count:SetJustifyH("RIGHT");
-					buffFrame.icon:SetVertexColor(1, 1, 1, 0); --Hide Icon for NOW till You MERGE BOR & BOL
+					if strfind(uid,"pet") then
+						buffFrame.count:ClearAllPoints()
+						buffFrame.count:SetFont("Fonts\\FRIZQT__.TTF", 7, "OUTLINE") --, MONOCHROME")
+						buffFrame.count:SetPoint("BOTTOMRIGHT", 3, -2);
+						buffFrame.count:SetJustifyH("RIGHT");
+						buffFrame.icon:SetVertexColor(1, 1, 1, 0); --Hide Icon for NOW till You MERGE BOR & BOL
+					else
+						buffFrame.count:ClearAllPoints()
+						buffFrame.count:SetFont("Fonts\\FRIZQT__.TTF", 11, "OUTLINE") --, MONOCHROME")
+						buffFrame.count:SetPoint("BOTTOMRIGHT", 2, -4);
+						buffFrame.count:SetJustifyH("RIGHT");
+						buffFrame.icon:SetVertexColor(1, 1, 1, 0); --Hide Icon for NOW till You MERGE BOR & BOL
 					--buffFrame.count:SetTextColor(0, 0 ,0, 1)
+					end
 				end
 				if j == 9 then
-					buffFrame.count:ClearAllPoints()
-					buffFrame.count:SetFont("Fonts\\FRIZQT__.TTF", 11, "OUTLINE") --, MONOCHROME")
-					buffFrame.count:SetPoint("BOTTOMRIGHT", 2, -5);
-					buffFrame.count:SetJustifyH("RIGHT");
-					buffFrame.icon:SetVertexColor(1, 1, 1, 0); --Hide Icon for NOW till You MERGE BOR & BOL
+					if strfind(uid,"pet") then
+						buffFrame.count:ClearAllPoints()
+						buffFrame.count:SetFont("Fonts\\FRIZQT__.TTF", 7, "OUTLINE") --, MONOCHROME")
+						buffFrame.count:SetPoint("BOTTOMRIGHT", 3, -2);
+						buffFrame.count:SetJustifyH("RIGHT");
+						buffFrame.icon:SetVertexColor(1, 1, 1, 0); --Hide Icon for NOW till You MERGE BOR & BOL
+					else
+						buffFrame.count:ClearAllPoints()
+						buffFrame.count:SetFont("Fonts\\FRIZQT__.TTF", 11, "OUTLINE") --, MONOCHROME")
+						buffFrame.count:SetPoint("BOTTOMRIGHT", 2, -4);
+						buffFrame.count:SetJustifyH("RIGHT");
+						buffFrame.icon:SetVertexColor(1, 1, 1, 0); --Hide Icon for NOW till You MERGE BOR & BOL
 					--buffFrame.count:SetTextColor(0, 0 ,0, 1)
+					end
 				end
 				buffFrame:SetID(j);
 				local startTime = expirationTime - duration;
@@ -1335,21 +1359,21 @@ local overlaySize =  11 * componentScale
 			end
 				scf.buffFrames[j]:SetScale(.4)
 				scf.buffFrames[j]:SetFrameLevel(3)
-				scf.buffFrames[j]:SetFrameStrata("HIGH")
+				scf.buffFrames[j]:SetFrameStrata("LOW")
 		elseif j ==8 then --Upper Right Count Only)
 			if not strfind(f.unit,"pet") then
 				scf.buffFrames[j]:SetPoint("TOPRIGHT", f, "TOPRIGHT", -2, -1.5)
 			end
 			scf.buffFrames[j]:SetScale(1.15)
 			scf.buffFrames[j]:SetFrameLevel(3)
-			scf.buffFrames[j]:SetFrameStrata("HIGH")
+			scf.buffFrames[j]:SetFrameStrata("LOW")
 		elseif j ==9 then --Upper Left Count Only
 			if not strfind(f.unit,"pet") then
 				scf.buffFrames[j]:SetPoint("TOPLEFT", f, "TOPLEFT", 2, -1.5)
 			end
 			scf.buffFrames[j]:SetScale(1.15)
 			scf.buffFrames[j]:SetFrameLevel(3)
-			scf.buffFrames[j]:SetFrameStrata("HIGH")
+			scf.buffFrames[j]:SetFrameStrata("LOW")
 		elseif j == 10 or j == 11 or j == 12 then
 			if j == 10 then
 				if not strfind(f.unit,"pet") then
@@ -1416,10 +1440,11 @@ local function scf_OnEvent(self, event, ...)
 				DebuffFilter_UpdateAuras(self, unitAuraUpdateInfo)
 			end
 		end
-	end
-	if ( unitMatches or arg1 == "player" ) then
-		if ( event == "UNIT_ENTERED_VEHICLE" or event == "UNIT_EXITED_VEHICLE" or event == "PLAYER_GAINS_VEHICLE_DATA" or event == "PLAYER_LOSES_VEHICLE_DATA" ) then
-			DebuffFilter_UpdateAuras(self);
+		--if ( unitMatches or arg1 == "player" then
+		if arg1 == "player" then
+			if ( event == "UNIT_ENTERED_VEHICLE" or event == "UNIT_EXITED_VEHICLE" or event == "PLAYER_GAINS_VEHICLE_DATA" or event == "PLAYER_LOSES_VEHICLE_DATA" ) then
+				DebuffFilter_UpdateAuras(self);
+			end
 		end
 	end
 end
@@ -1433,11 +1458,18 @@ local function RegisterUnit(f)
 	scf.displayedUnit = f.displayedUnit
 	DebuffFilter:ApplyFrame(f)
 	scf:SetScript("OnEvent", scf_OnEvent)
-	scf:RegisterEvent('GROUP_ROSTER_UPDATE')
-	scf:RegisterEvent('UNIT_PET')
+	--scf:RegisterEvent('GROUP_ROSTER_UPDATE')
+	scf:RegisterUnitEvent('UNIT_PET', f.unit, f.displayedUnit)
+	scf:RegisterUnitEvent('UNIT_AURA', f.unit, f.displayedUnit)
+	scf:RegisterUnitEvent('PLAYER_GAINS_VEHICLE_DATA', f.unit, f.displayedUnit)
+	scf:RegisterUnitEvent('PLAYER_LOSES_VEHICLE_DATA', f.unit, f.displayedUnit)
 	scf:RegisterEvent('PLAYER_ENTERING_WORLD')
 	scf:RegisterEvent('ZONE_CHANGED_NEW_AREA')
-	scf:RegisterUnitEvent('UNIT_AURA', f.unit, f.displayedUnit)
+
+	if UnitIsUnit(f.unit ,"player") then 
+		scf:RegisterEvent("UNIT_ENTERED_VEHICLE");
+		scf:RegisterEvent("UNIT_EXITED_VEHICLE");
+	end
 
 	DebuffFilter_UpdateAuras(scf)
 end
@@ -1447,9 +1479,15 @@ end
 	RegisterUnit(f)
 end)]]
 
-hooksecurefunc("CompactUnitFrame_UpdateAll", function(f)
+--[[hooksecurefunc("CompactUnitFrame_UpdateAll", function(f)
 	if (not f) or (not f.unit) or (f and f.unit and (strmatch(f.unit, "target") or strmatch(f.unit, "nameplate"))) then return end
+	print("fire")
 	RegisterUnit(f)
+end)]]
+
+hooksecurefunc("CompactUnitFrame_RegisterEvents", function(f)
+	if (not f) or (not f.unit) or (f and f.unit and (strmatch(f.unit, "target") or strmatch(f.unit, "nameplate"))) then return end
+		RegisterUnit(f)
 end)
 
 hooksecurefunc("CompactUnitFrame_UnregisterEvents", function(f)
@@ -1464,11 +1502,25 @@ end)
 
 -- Event handling
 local function OnEvent(self,event,...)
-	if event == "COMBAT_LOG_EVENT_UNFILTERED" then self:CLEU() end
+	if event == "COMBAT_LOG_EVENT_UNFILTERED" then 
+		self:CLEU() 
+	elseif event == "PLAYER_ENTERING_WORLD" or event == "ZONE_CHANGED_NEW_AREA" or event == "GROUP_ROSTER_UPDATE" then
+		local PartyFrame = _G["CompactPartyFrame"]
+		if not IsInGroup() and not IsInRaid() then
+			for i, memberUnitFrame in ipairs(PartyFrame.memberUnitFrames) do
+				if UnitIsUnit(memberUnitFrame.unit, "player") then
+					RegisterUnit(memberUnitFrame)
+				end
+			end
+		end
+	end
 end
 
 DebuffFilter:SetScript("OnEvent", OnEvent)
 DebuffFilter:RegisterEvent("COMBAT_LOG_EVENT_UNFILTERED")
+DebuffFilter:RegisterEvent('PLAYER_ENTERING_WORLD')
+DebuffFilter:RegisterEvent('ZONE_CHANGED_NEW_AREA')
+DebuffFilter:RegisterEvent('GROUP_ROSTER_UPDATE')
 
 --BambiUI_ResetDebuffFilter = CreateFrame('CheckButton', 'BambiUI_ResetDebuffFilter', BambiUI_ResetDebuffFilter, 'UICheckButtonTemplate');
 --BambiUI_ResetDebuffFilter:SetScript('OnClick', function() DebuffFilter:ResetStyle() DebuffFilter:ApplyStyle() print("Reset DebuffFilter Frames") end); --manual hard reset
