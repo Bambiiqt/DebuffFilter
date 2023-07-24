@@ -91,15 +91,16 @@ PriorityBuff[9] = {
 "inputspellhere",
 }
 
+--Second Row 1
 PriorityBuff[10] = {
 	"Regrowth",
 }
 
---UPPER RIGHT PRIO COUNT
+--Second Row 2
 PriorityBuff[11] = {
 	"Wild Growth",
 }
---UPPER LEFT PRIO COUNT
+--Second Row 3
 PriorityBuff[12] = {
 	"Adaptive Swarm",
 }
@@ -1245,6 +1246,7 @@ function DebuffFilter:UpdateBuffs(scf, uid)
 		else
 			local buffFrame = scf.buffFrames[j];
 			if buffFrame then
+				buffFrame:SetSize(overlaySize*1,overlaySize*1);
 				buffFrame:Hide()
 			end
 		end
@@ -1300,17 +1302,17 @@ end
 -- Apply style for each frame
 function DebuffFilter:ApplyFrame(f)
 
-local frameWidth, frameHeight = f:GetSize()
-local componentScale = min(frameHeight / NATIVE_UNIT_FRAME_HEIGHT, frameWidth / NATIVE_UNIT_FRAME_WIDTH);
-local overlaySize =  11 * componentScale
+	local frameWidth, frameHeight = f:GetSize()
+	local componentScale = min(frameHeight / NATIVE_UNIT_FRAME_HEIGHT, frameWidth / NATIVE_UNIT_FRAME_WIDTH);
+	local overlaySize =  11 * componentScale
 
-  local scf = DebuffFilter.cache[f]
+	local scf = self.cache[f]
+
 	if not scf.buffFrames then scf.buffFrames = {} end
 	if not scf.debuffFrames then scf.debuffFrames = {} end
+
 	for j = 1, DEFAULT_DEBUFF do
-		if not scf.debuffFrames[j] then
-			scf.debuffFrames[j] = CreateFrame("Button", "scfDebuff"..f:GetName()..j, UIParent, "CompactDebuffTemplate")
-		end
+		scf.debuffFrames[j] = _G["scfDebuff"..f:GetName()..j] or CreateFrame("Button" , "scfDebuff"..f:GetName()..j, UIParent, "CompactDebuffTemplate")
 		scf.debuffFrames[j]:ClearAllPoints()
 		scf.debuffFrames[j]:SetParent(f)
 		if j == 1 then
@@ -1331,10 +1333,8 @@ local overlaySize =  11 * componentScale
 	end
 
 	for j = 1, DEFAULT_BUFF do
-		if not scf.buffFrames[j] then
-			scf.buffFrames[j] = CreateFrame("Button" , "scfBuff"..f:GetName()..j, UIParent, "CompactAuraTemplate")
-			scf.buffFrames[j].cooldown:SetDrawSwipe(false)
-		end
+		scf.buffFrames[j] = _G["scfBuff"..f:GetName()..j] or CreateFrame("Button" , "scfBuff"..f:GetName()..j, UIParent, "CompactAuraTemplate")
+		scf.buffFrames[j].cooldown:SetDrawSwipe(false)
 		scf.buffFrames[j]:ClearAllPoints()
 		scf.buffFrames[j]:SetParent(f)
 		if j == 1 then --Buff One
@@ -1374,7 +1374,7 @@ local overlaySize =  11 * componentScale
 			scf.buffFrames[j]:SetScale(1.15)
 			scf.buffFrames[j]:SetFrameLevel(3)
 			scf.buffFrames[j]:SetFrameStrata("LOW")
-		elseif j == 10 or j == 11 or j == 12 then
+		elseif j == 10 or j == 11 or j == 12 then --Second Row 123
 			if j == 10 then
 				if not strfind(f.unit,"pet") then
 					scf.buffFrames[j]:SetPoint("BOTTOM", scf.buffFrames[1], "TOP", 0, 0)
@@ -1450,15 +1450,17 @@ local function scf_OnEvent(self, event, ...)
 end
 
 local function RegisterUnit(f)
-	if not DebuffFilter.cache[f] then DebuffFilter.cache[f] = CreateFrame("Frame", "scf"..f:GetName()) end
+	local frame = _G["scf"..f:GetName()]
+	if frame and frame.unit and frame.unit == f.unit then return end 
+	if not DebuffFilter.cache[f] then 
+		DebuffFilter.cache[f] = frame or CreateFrame("Frame", "scf"..f:GetName()) 
+	end
 	local scf = DebuffFilter.cache[f]
 	scf.f = f
 	scf.name = f:GetName()
 	scf.unit = f.unit
 	scf.displayedUnit = f.displayedUnit
-	DebuffFilter:ApplyFrame(f)
 	scf:SetScript("OnEvent", scf_OnEvent)
-	--scf:RegisterEvent('GROUP_ROSTER_UPDATE')
 	scf:RegisterUnitEvent('UNIT_PET', f.unit, f.displayedUnit)
 	scf:RegisterUnitEvent('UNIT_AURA', f.unit, f.displayedUnit)
 	scf:RegisterUnitEvent('PLAYER_GAINS_VEHICLE_DATA', f.unit, f.displayedUnit)
@@ -1471,23 +1473,16 @@ local function RegisterUnit(f)
 		scf:RegisterEvent("UNIT_EXITED_VEHICLE");
 	end
 
+	DebuffFilter:ApplyFrame(f)
 	DebuffFilter_UpdateAuras(scf)
 end
 
---[[hooksecurefunc("CompactUnitFrame_UpdateUnitEvents", function(f)
+hooksecurefunc("CompactUnitFrame_UpdateAll", function(f)
 	if (not f) or (not f.unit) or (f and f.unit and (strmatch(f.unit, "target") or strmatch(f.unit, "nameplate"))) then return end
+	if f:IsForbidden() then return end
+	local name = f:GetName()
+	if not name or not name:match("^Compact") then return end
 	RegisterUnit(f)
-end)]]
-
---[[hooksecurefunc("CompactUnitFrame_UpdateAll", function(f)
-	if (not f) or (not f.unit) or (f and f.unit and (strmatch(f.unit, "target") or strmatch(f.unit, "nameplate"))) then return end
-	print("fire")
-	RegisterUnit(f)
-end)]]
-
-hooksecurefunc("CompactUnitFrame_RegisterEvents", function(f)
-	if (not f) or (not f.unit) or (f and f.unit and (strmatch(f.unit, "target") or strmatch(f.unit, "nameplate"))) then return end
-		RegisterUnit(f)
 end)
 
 hooksecurefunc("CompactUnitFrame_UnregisterEvents", function(f)
@@ -1521,6 +1516,8 @@ DebuffFilter:RegisterEvent("COMBAT_LOG_EVENT_UNFILTERED")
 DebuffFilter:RegisterEvent('PLAYER_ENTERING_WORLD')
 DebuffFilter:RegisterEvent('ZONE_CHANGED_NEW_AREA')
 DebuffFilter:RegisterEvent('GROUP_ROSTER_UPDATE')
+DebuffFilter:RegisterEvent('UNIT_PET')
+
 
 --BambiUI_ResetDebuffFilter = CreateFrame('CheckButton', 'BambiUI_ResetDebuffFilter', BambiUI_ResetDebuffFilter, 'UICheckButtonTemplate');
 --BambiUI_ResetDebuffFilter:SetScript('OnClick', function() DebuffFilter:ResetStyle() DebuffFilter:ApplyStyle() print("Reset DebuffFilter Frames") end); --manual hard reset
