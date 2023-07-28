@@ -79,14 +79,15 @@ PriorityBuff[6] = {
 }
 --Upper Circle Right on Icon 4
 PriorityBuff[7] = {
-	"inputspellhere",
+	"Blessing of the Bronze",
+	"Battle Shout",
 }
 
---UPPER RIGHT PRIO COUNT
+--UPPER RIGHT PRIO COUNT (Buff Overlay Right)
 PriorityBuff[8] = {
-		"inputspellhere",
+	"inputspellhere",
 }
---UPPER LEFT PRIO COUNT
+--UPPER LEFT PRIO COUNT (Buff Overlay Right)
 PriorityBuff[9] = {
 "inputspellhere",
 }
@@ -1447,6 +1448,8 @@ local function scf_OnEvent(self, event, ...)
 				end
 				local f = _G[self.name]
 				self:RegisterUnitEvent('UNIT_AURA', f.unit, f.displayedUnit)
+				self:RegisterUnitEvent('PLAYER_GAINS_VEHICLE_DATA', f.unit, f.displayedUnit)
+				self:RegisterUnitEvent('PLAYER_LOSES_VEHICLE_DATA', f.unit, f.displayedUnit)
 				DebuffFilter_UpdateAuras(self)
 			end
 		end
