@@ -61,6 +61,29 @@ PriorityBuff[3] = {
 	"Focused Growth", --Focused Growth (Honor Talent)
 }
 
+local row1Buffs = {}
+local row1BuffsCount = 1
+for i = 1, 3 do
+	for _, v in ipairs(PriorityBuff[i]) do
+		row1Buffs[v] = row1BuffsCount
+		row1BuffsCount = row1BuffsCount + 1
+	end
+end
+
+	--Second Row 1
+PriorityBuff[10] = {
+	"Regrowth",
+}
+	
+	--Second Row 2
+PriorityBuff[11] = {
+	"Wild Growth",
+}
+	--Second Row 3
+PriorityBuff[12] = {
+	"Adaptive Swarm",
+}
+
 --Upper Circle Right on Icon 1
 PriorityBuff[4] = {
 	"Power Word: Fortitude",
@@ -85,25 +108,200 @@ PriorityBuff[7] = {
 
 --UPPER RIGHT PRIO COUNT (Buff Overlay Right)
 PriorityBuff[8] = {
-	"inputspellhere",
+		--**Stealth Given**
+	198158, --Mass Invisibility
+	"Shroud of Concealment",
+
+	--**Class Stealth**--
+
+	"Stealth",
+	199483, --Camouflage
+	"Camouflage",
+	5215, --Prowl
+	110960, --Greater Invisibility
+	"Invisibility",
+
+
+	--**Secondary’s CD’s Given**--
+
+	53480,  --Roar of Sacrifice
+	212640, --Mending Bandage
+	223658, --Safeguard
+	213871, --Bodyguard
+	207810, --Nether Bond
+	291944, --Regeneration’
+	59543, --Gift of the Naaru
+	332505, --Soulsteel Clamps
+	332506, --Soulsteel Clamps
+
+
+	--324867, --Fleshcraft (Necrolord)
+
+	--**DMG/Heal CDs Given**--
+	--**Threat MIsdirect Given**--
+
+	57934, --Tricks of the Trade 221630 is DMG
+	"Misdirection",
+
+	--** Secondary’ Class Ds**--
+
+	19236, --Desperate Prayer
+	387636, --Soulburn: Healthstone
+	17767, --Shadow Bulwark
+	277187, --Gladiator’s Emblem
+	"Gladiator's Emblem",
+	363522, --Gladiator's Eternal Aegis
+	310143, --Soulshape
+	--"Spirit Mend",
+
+
+	--**Class Perm Passive Buffs & DMG CDs**--
+
+	315443, --Abomination Limb
+	383269, --Abomination Limb
+	152279, --Breath of Sindragosa
+	47568,	--Empower Rune Weapon
+	51271, --Pillars of Frost
+	49206, --Ebon Gargoyle
+	207289, --Unholy Assault
+	288853, --Abomb
+	--356337, --Rune of Spellwarding
+
+	162264, -- Metamorphosis (Havoc)
+	208195, --Demon Soul (Necro)
+	347765, --Demon Soul
+
+
+	319454, --Heart of the Wild
+	108293, --Heart of the Wild (Guardian)
+	50334,  --Berserk (Guardian)
+	102558, --Incarnation: Guardian of Ursoc
+	5487,   --Bear Form
+	108291, --Heart of the Wild (Boomy)
+	108292, --Heart of the Wild (Feral)
+	108294, --Heart of the Wild (Resto)
+	102560, --Incarnation: Chosen of Elune
+	390414, --Incarnation: Chosen of Elune (Orbital)
+	194223, --Celestial Alignment 
+	383410, --Celestial Alignment (Orbital)
+	102543, --Incarnation: Avatar of Ashamane
+	106951, --Berserk
+	117679, --Incarnation Tree of Life
+	124974, --Nature's Vigel
+	410406, --Wild Attunement (Frenzy from Clone)
+	5217,   --Tiger Fury
+	202425, --Warrior of Elune
+	202770, --Fury of Elune
+	202359, --Astral Communion
+	248280, --Trees CLEU
+	197625, --Moonkin Form (Resto)
+	24858, --Moonkin Form
+	768, --Cat Form
+	783, --Travel Form
+
+	375087, --Dragonrage
+	374349, --Renewing Blaze Hot
+
+	266779, --Coordinated Assaults
+	186289, --Aspect of the Eagle
+	260402, -- Double Tap
+	288613, -- True Shot
+	212704, --The Beast within
+	193530, --Aspect of the Wild
+	19574, --Bestial Wraith
+	205691, --Dire Beast Basilisk [summonid]
+
+	383874, --Hyperthermia
+	190319, --Combustion
+	12042, --Arcane Power
+	365362, --Arcane Surge
+	324220, --Deathborne
+	12472, --Icy Veins
+	342242, --Time Warp
+	332928, --Siphon Storm
+	321686, --Mirror Image CLEU,
+	235313, --Blazing Barrier
+	11426, --Ice Barrier
+	235450, --Prismatic Barrier
+
+	310454, --Weapons of Order
+	152173, --Serenity
+	137639, --Storm, Earth, and Fire
+	123904, --WW Xuen Pet Summmon "Xuen" same Id has sourceGUID
+
+	231895, --Crusade
+	247677, --Reckoning
+	152262, --Seraphim
+
+	319952, --Surrender to Madness
+	194249, --Voidform
+	391109, --Dark Ascension
+	325013, --Boon of the Ascended
+	372617, --Empyreal Blaze
+	372760, --Divine Word
+	372761, --Divine Favor DMG
+	372791, --Divine Favor Healing
+	196490, --Divine Favor AOE
+	15286,  --Vampiric Embrace
+	193065, --Masochism
+	327710, --Benevolent Faerie CD Reduction (Night Fae Priest)
+	123040, --Disc Pet Summmon Mindbender
+	34433,  --Disc Pet Summmon Sfiend
+	405963, --Divine Image
+	197862, --ArchAngel
+	322105, --Shadow Covenant
+	232698, --Shadowform
+	355898, --Inner Shadow
+	355897, --Inner Light
+
+
+	121471, --Shadow Blades
+	13750,  --Adrenline Rush
+
+	260881, --Spirit Wolf
+	204262, --Spectral Recovery
+	2645,   --Ghost Wolf
+	335903, --Doomwinds (shadowlands legendary)
+	384352, --Doomwinds 
+	114050, --Ascendance
+	114051, --Ascendance
+	333957, --Feral Spirits (Summon or Buff)
+	191634, --Stormkeeper
+	320137, --Stormkeeper
+	383009, --Stormkeeper (Resto)
+	210714, --Ice Fury 
+	375986, --Primordial Wave
+	157319, --Prima Storm Ele
+	157299, --Storm Ele
+	118291, --Primal Fire Ele
+	188592, --Fire Ele
+	118323, --Primal Earth Ele
+	188616, --Earth Ele
+
+	113860, --Dark Soul: Instability
+	113860, --Dark Soul: Misery
+	111685, --Warlock Infernals,  has sourceGUID (spellId and Summons are different) [spellbookid]
+	265187, --Demonic Tyrant has sourceGUID [summonid]
+	265273, --Demonic Power
+	267218, --Nether Portal
+	353601, --Fel Obelisk
+	394243, --Choas Tear
+	387979, --Unstable Tear
+	394235, --Shadowy Tear
+	205180, --Warlock Darkglare
+	285933, --Demon Armor
+
+	46924,  --Bladestorm
+	107574, --Avatar
+	1719,   --Recklessness
+	197690, --Defensive Stance
+	386208, --Defense Stance
+	199261, --Death Wish
+	329038, --Bloodrage (root break)
 }
+
 --UPPER LEFT PRIO COUNT (Buff Overlay Right)
 PriorityBuff[9] = {
-"inputspellhere",
-}
-
---Second Row 1
-PriorityBuff[10] = {
-	"Regrowth",
-}
-
---Second Row 2
-PriorityBuff[11] = {
-	"Wild Growth",
-}
---Second Row 3
-PriorityBuff[12] = {
-	"Adaptive Swarm",
 }
 
 local Buff = {}
@@ -635,13 +833,20 @@ local bgWarningspellIds = { -- or pet debuffs
 
 }
 
-
-local function round(num, numDecimalPlaces)
-    local mult = 10 ^ (numDecimalPlaces or 0)
-    return math_floor(num * mult + 0.5) / mult
+-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+--CLEU Events
+-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+function DebuffFilter:BOCCLEU()
 end
 
-function DebuffFilter:CLEU()
+function DebuffFilter:BORCLEU()
+end
+
+function DebuffFilter:BOLCLEU()
+end
+
+
+function DebuffFilter:DFCLEU()
 		local _, event, _, sourceGUID, sourceName, sourceFlags, _, destGUID, _, _, _, spellId, _, _, _, _, spellSchool = CombatLogGetCurrentEventInfo()
 	-----------------------------------------------------------------------------------------------------------------
 	--SmokeBomb Check
@@ -680,8 +885,12 @@ function DebuffFilter:CLEU()
 	end
 end
 
+-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+--Debuf Scale Filters
+-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
 local function isBiggestDebuff(unit, index, filter)
-  local name, icon, _, _, duration, expirationTime, _, _, _, spellId = UnitAura(unit, index, "HARMFUL");
+  local  _, _, _, _, _, _, _, _, _, spellId = UnitAura(unit, index, "HARMFUL");
 	if spellIds[spellId] == "Biggest"  then
 		return true
 	else
@@ -690,7 +899,7 @@ local function isBiggestDebuff(unit, index, filter)
 end
 
 local function isBiggerDebuff(unit, index, filter)
-  local name, icon, _, _, duration, expirationTime, _, _, _, spellId = UnitAura(unit, index, "HARMFUL");
+  local  _, _, _, _, _, _, _, _, _, spellId = UnitAura(unit, index, "HARMFUL");
 	local inInstance, instanceType = IsInInstance()
 	if (instanceType =="pvp" or strfind(unit,"pet")) and bgBigspellIds[spellId] then
 		return true
@@ -702,7 +911,7 @@ local function isBiggerDebuff(unit, index, filter)
 end
 
 local function isBigDebuff(unit, index, filter)
-  local name, icon, _, _, duration, expirationTime, source, _, _, spellId = UnitAura(unit, index, "HARMFUL");
+  local _, _, count, _, _, _, source, _, _, spellId = UnitAura(unit, index, "HARMFUL");
 	local inInstance, instanceType = IsInInstance()
 	if (spellId == 325216 or spellId == 386276) then --BoneDust Brew
 		local id, specID
@@ -754,7 +963,7 @@ local function isBigDebuff(unit, index, filter)
 end
 
 local function CompactUnitFrame_UtilIsBossDebuff(unit, index, filter)
-  local name, icon, _, _, duration, expirationTime, _, _, _, spellId, _, isBossDeBuff = UnitAura(unit, index, "HARMFUL");
+  local _, _, _, _, _, _, _, _, _, _, _, isBossDeBuff = UnitAura(unit, index, "HARMFUL");
 	if isBossDeBuff then
 		return true
 	else
@@ -763,7 +972,7 @@ local function CompactUnitFrame_UtilIsBossDebuff(unit, index, filter)
 end
 
 local function CompactUnitFrame_UtilIsBossAura(unit, index, filter)
-  local name, icon, _, _, duration, expirationTime, _, _, _, spellId, _, isBossDeBuff = UnitAura(unit, index, "HELPFUL");
+  local _, _, _, _,_, _, _, _, _, _, _, isBossDeBuff = UnitAura(unit, index, "HELPFUL");
 	if isBossDeBuff then
 		return true
 	else
@@ -772,7 +981,7 @@ local function CompactUnitFrame_UtilIsBossAura(unit, index, filter)
 end
 
 local function isWarning(unit, index, filter)
-    local name, icon, count, _, duration, expirationTime, source, _, _, spellId = UnitAura(unit, index, "HARMFUL");
+    local _, _, count, _, _, _, source, _, _, spellId = UnitAura(unit, index, "HARMFUL");
 	local inInstance, instanceType = IsInInstance()
 	if (spellId == 188389) then --Flame Shock
 		local id, specID
@@ -811,7 +1020,7 @@ local function isWarning(unit, index, filter)
 end
 
 local function isPriority(unit, index, filter)
-    local name, icon, _, _, duration, expirationTime, _, _, _, spellId = UnitAura(unit, index, "HARMFUL");
+    local _, _, _, _, _, _, _, _, _, spellId = UnitAura(unit, index, "HARMFUL");
 		if spellIds[spellId] == "Priority" then
 		return true
 	else
@@ -820,7 +1029,7 @@ local function isPriority(unit, index, filter)
 end
 
 local function isDebuff(unit, index, filter)
-    local name, icon, _, _, duration, expirationTime, _, _, _, spellId = UnitAura(unit, index, "HARMFUL");
+    local _, _, _, _, _, _, _, _, _, spellId = UnitAura(unit, index, "HARMFUL");
 		if spellIds[spellId] == "Hide" then
 		return false
 	else
@@ -829,13 +1038,17 @@ local function isDebuff(unit, index, filter)
 end
 
 local function isBuff(unit, index, filter, j)
-  	local name, icon, _, _, duration, expirationTime, _, _, _, spellId = UnitAura(unit, index, "HELPFUL");
-	if Buff[j][spellId] or Buff[j][name] then
-		return true
-	else
-	 	return false
-	end
+  	local name, _, _, _, _, _, _, _, _, spellId = UnitAura(unit, index, "HELPFUL");
+		if Buff[j] and (Buff[j][spellId] or Buff[j][name]) then
+			return true
+		else
+			return false
+		end
 end
+
+-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+--Setting the Debuff Frame
+-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
 local function CooldownFrame_Set(self, start, duration, enable, forceShowDrawEdge, modRate)
 	if enable and enable ~= 0 and start > 0 and duration > 0 then
@@ -871,7 +1084,7 @@ local function SetdebuffFrame(scf, f, debuffFrame, uid, index, filter, scale)
 		icon = 538562
 	end
 
-	if spellId == 199845 then --Psyflay4
+	if spellId == 199845 then --Psyflay
 		icon = 537021
 	end
 
@@ -948,13 +1161,17 @@ local function SetdebuffFrame(scf, f, debuffFrame, uid, index, filter, scale)
 	if strfind(uid,"pet") and not scf.vehicle then
 		debuffFrame:SetSize(overlaySize*scale*1.5,overlaySize*scale*1.5);
 	elseif scf.vehicle then
-		debuffFrame:SetSize(overlaySize*scale*1.2,overlaySize*scale*1.2);
+		debuffFrame:SetSize(overlaySize*scale*1,overlaySize*scale*1);
 	else
 		debuffFrame:SetSize(overlaySize*scale,overlaySize*scale);
 	end
 	debuffFrame:Show();
 end
--- Update aura for each unit
+
+-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+--Debuff Main Loop
+-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
 function DebuffFilter:UpdateDebuffs(scf, uid)
 	local f = scf.f
 	if not DebuffFilter.cache[f] then return end
@@ -1091,6 +1308,10 @@ function DebuffFilter:UpdateDebuffs(scf, uid)
 	end
 end
 
+-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+--Buff Frame Main Loop, Sets Icon and Count in this Loop
+-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
 function DebuffFilter:UpdateBuffs(scf, uid)
 	local f = scf.f
 	local frameWidth, frameHeight = f:GetSize()
@@ -1133,17 +1354,18 @@ function DebuffFilter:UpdateBuffs(scf, uid)
 						scf.buffFrames[4]:Hide();scf.buffFrames[5]:Hide();scf.buffFrames[6]:Hide();scf.buffFrames[7]:Hide();
 						j = 4
 						buffFrame = scf.buffFrames[j]; X = j
-						Ctimer(.01, function() --Unitil BOR and BOL is merged could have problems
-							local frame = scf.name.."BuffOverlayRight"
-							if _G[frame] and _G[frame].icon:IsVisible() then
-								scf.buffFrames[j]:ClearAllPoints()
-								scf.buffFrames[j]:SetPoint("RIGHT", f, "RIGHT", -5.5, 10)
-							else
-								scf.buffFrames[j]:ClearAllPoints()
-								scf.buffFrames[j]:SetPoint("TOPRIGHT", f, "TOPRIGHT", -5.5, -6.5)
-							end
-						end)
-
+						if BuffOverlayRight then 
+							Ctimer(.01, function() --Unitil BOR and BOL is merged could have problems
+								local frame = scf.name.."BuffOverlayRight"
+								if _G[frame] and _G[frame].icon:IsVisible() then
+									scf.buffFrames[j]:ClearAllPoints()
+									scf.buffFrames[j]:SetPoint("RIGHT", f, "RIGHT", -5.5, 10)
+								else
+									scf.buffFrames[j]:ClearAllPoints()
+									scf.buffFrames[j]:SetPoint("TOPRIGHT", f, "TOPRIGHT", -5.5, -6.5)
+								end
+							end)
+						end
 					else
 				   		buffFrame = scf.buffFrames[X+1]
 					 	X = X + 1
@@ -1210,15 +1432,14 @@ function DebuffFilter:UpdateBuffs(scf, uid)
 						buffFrame.count:SetFont("Fonts\\FRIZQT__.TTF", 7, "OUTLINE") --, MONOCHROME")
 						buffFrame.count:SetPoint("BOTTOMRIGHT", 3, -2);
 						buffFrame.count:SetJustifyH("RIGHT");
-						buffFrame.icon:SetVertexColor(1, 1, 1, 0); --Hide Icon for NOW till You MERGE BOR & BOL
 					else
 						buffFrame.count:ClearAllPoints()
 						buffFrame.count:SetFont("Fonts\\FRIZQT__.TTF", 11, "OUTLINE") --, MONOCHROME")
 						buffFrame.count:SetPoint("BOTTOMRIGHT", 2, -4);
 						buffFrame.count:SetJustifyH("RIGHT");
-						buffFrame.icon:SetVertexColor(1, 1, 1, 0); --Hide Icon for NOW till You MERGE BOR & BOL
-					--buffFrame.count:SetTextColor(0, 0 ,0, 1)
 					end
+					scf.buffFrames[4]:ClearAllPoints() -- Buff Icons
+					scf.buffFrames[4]:SetPoint("RIGHT", f, "RIGHT", -5.5, 10)
 				end
 				if j == 9 then
 					if strfind(uid,"pet") then
@@ -1226,14 +1447,11 @@ function DebuffFilter:UpdateBuffs(scf, uid)
 						buffFrame.count:SetFont("Fonts\\FRIZQT__.TTF", 7, "OUTLINE") --, MONOCHROME")
 						buffFrame.count:SetPoint("BOTTOMRIGHT", 3, -2);
 						buffFrame.count:SetJustifyH("RIGHT");
-						buffFrame.icon:SetVertexColor(1, 1, 1, 0); --Hide Icon for NOW till You MERGE BOR & BOL
 					else
 						buffFrame.count:ClearAllPoints()
 						buffFrame.count:SetFont("Fonts\\FRIZQT__.TTF", 11, "OUTLINE") --, MONOCHROME")
 						buffFrame.count:SetPoint("BOTTOMRIGHT", 2, -4);
 						buffFrame.count:SetJustifyH("RIGHT");
-						buffFrame.icon:SetVertexColor(1, 1, 1, 0); --Hide Icon for NOW till You MERGE BOR & BOL
-					--buffFrame.count:SetTextColor(0, 0 ,0, 1)
 					end
 				end
 				buffFrame:SetID(j);
@@ -1251,28 +1469,145 @@ function DebuffFilter:UpdateBuffs(scf, uid)
 			if buffFrame then
 				buffFrame:SetSize(overlaySize*1,overlaySize*1);
 				buffFrame:Hide()
+				if j == 8 then --BuffOverlay Right 
+					scf.buffFrames[4]:ClearAllPoints() --Cleares SMall Buff Icon Positions
+					scf.buffFrames[4]:SetPoint("TOPRIGHT", f, "TOPRIGHT", -5.5, -6.5)
+				end
 			end
 		end
 	index = nil; buff = nil; backCount= nil
 	end
 end
 
+function DebuffFilter:buffsRow1(scf, uid)
+	local f = scf.f
+	local frameWidth, frameHeight = f:GetSize()
+	local componentScale = min(frameHeight / NATIVE_UNIT_FRAME_HEIGHT, frameWidth / NATIVE_UNIT_FRAME_WIDTH);
+	local overlaySize = 11 * componentScale
+	local filter = nil
+	local index, buff, backCount
+	for j = 1, 3 do --buffRow1 is J == 1, 2, 3
+		for i = 1, 32 do
+			local buffName, _, count, _, _, _, unitCaster, _, _, spellId = UnitBuff(uid, i, filter)
+			if ( buffName ) then
+				if unitCaster == "player" and isBuff(uid, i, filter, j) then
+					if (buffName == "Prayer of Mending" or buffName == "Focused Growth") and unitCaster == "player" then backCount = count end 	--Prayer of mending hack
+					if Buff[j][buffName] then
+						 Buff[j][spellId] =  Buff[j][buffName]
+					end
+					if  Buff[j][spellId] then
+						if not buff or  Buff[j][spellId] <  Buff[j][buff] then
+							buff = spellId
+							index = i
+						end
+					end
+				end
+			else
+				break
+			end
+		end
+		if index then
+			local buffId = index
+			local _, icon, count, _, duration, expirationTime, _, _, _, _ = UnitBuff(uid, index, filter);
+			local buffFrame = scf.buffFrames[j]
+			buffFrame.icon:SetTexture(icon);
+			buffFrame.icon:SetDesaturated(nil) --Destaurate Icon
+			buffFrame.icon:SetVertexColor(1, 1, 1);
+			buffFrame:SetScript("OnEnter", function(self)
+				GameTooltip:SetOwner (buffFrame.icon, "ANCHOR_RIGHT")
+				GameTooltip:SetUnitBuff(uid, buffId, "HELPFUL")
+				GameTooltip:Show()
+			end)
+			buffFrame:SetScript("OnLeave", function(self)
+				GameTooltip:Hide()
+			end)
+			if count or backCount then
+				if backCount then count = backCount end
+				if ( count > 1 ) then
+					local countText = count;
+					if ( count >= 100 ) then
+						countText = BUFF_STACKS_OVERFLOW;
+					end
+						buffFrame.count:Show();
+						buffFrame.count:SetText(countText);
+				else
+					buffFrame.count:Hide();
+				end
+			end
+			if strfind(uid,"pet") then
+				buffFrame.count:ClearAllPoints()
+				buffFrame.count:SetFont("Fonts\\FRIZQT__.TTF", 8, "OUTLINE") --, MONOCHROME")
+				buffFrame.count:SetPoint("TOPRIGHT", -3, 4);
+				buffFrame.count:SetJustifyH("RIGHT");
+				buffFrame.count:SetTextColor(1, 1 ,0, 1)
+			else
+				buffFrame.count:ClearAllPoints()
+				buffFrame.count:SetFont("Fonts\\FRIZQT__.TTF", 12, "OUTLINE") --, MONOCHROME")
+				buffFrame.count:SetPoint("TOPRIGHT", -10, 6.5);
+				buffFrame.count:SetJustifyH("RIGHT");
+				buffFrame.count:SetTextColor(1, 1 ,0, 1)
+			end
+			buffFrame:SetID(j);
+			local startTime = expirationTime - duration;
+			if duration > 59.5 then
+				CooldownFrame_Clear(buffFrame.cooldown);
+			else
+				CooldownFrame_Set(buffFrame.cooldown, startTime, duration, true);
+			end
+			buffFrame:SetSize(overlaySize*1,overlaySize*1);
+			buffFrame:Show();
+		else
+			local buffFrame = scf.buffFrames[j];
+			if buffFrame then
+				buffFrame:SetSize(overlaySize*1,overlaySize*1);
+				buffFrame:Hide()
+			end
+		end
+	index = nil; buff = nil; backCount= nil
+	end
+end
+
+-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+--Filters Buff and Debuffs to Correct Loops
+-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
 local function DebuffFilter_UpdateAuras(scf, unitAuraUpdateInfo)
 
 	local debuffsChanged = false;
-	local buffsChanged = false;
+	local buffsRow1 = false;
+	local buffsRow2 = false;
+	local buffsBOR = false;
+	local buffsBOL = false;
+	local buffsBOC = false;
 
-	if unitAuraUpdateInfo == nil or unitAuraUpdateInfo.isFullUpdate or scf.unit ~= scf.displayedUnit then
+	local function HandleAura(aura)
+		if type == AuraUtil.AuraUpdateChangedType.Debuff then
+			scf.debuffs[aura.auraInstanceID] = aura;
+		elseif type == AuraUtil.AuraUpdateChangedType.Buff then
+			scf.buffs[aura.auraInstanceID] = aura;
+		end
+	end
+
+	if unitAuraUpdateInfo == nil or unitAuraUpdateInfo.isFullUpdate or scf.unit ~= scf.displayedUnit or scf.debuffs == nil then
+		scf.debuffs = {};scf.buffs = {}
+		AuraUtil.ForEachAura("player", "HELPFUL", nil, HandleAura, true)
 		debuffsChanged = true;
-		buffsChanged = true;
+		buffsRow1 = true;
+		buffsRow2 = true;
+		buffsBOR = true;
+		buffsBOL = true;
+		buffsBOC = true;
 	else
 		if unitAuraUpdateInfo.addedAuras ~= nil then
 			for _, aura in ipairs(unitAuraUpdateInfo.addedAuras) do
 				if aura and (aura.isHarmful or aura.isBossAura) then
+					scf.debuffs[aura.auraInstanceID] = aura;
 					debuffsChanged = true;
 				elseif aura and aura.isHelpful then
-					buffsChanged = true;
+					scf.buffs[aura.auraInstanceID] = aura;
+					if (aura.sourceUnit and aura.sourceUnit == "player") and ((aura.spellId and row1Buffs[aura.spellId]) or (aura.name and row1Buffs[aura.name])) then   
+						buffsRow1 = true
+					end
 				end
 			end
 		end
@@ -1280,29 +1615,56 @@ local function DebuffFilter_UpdateAuras(scf, unitAuraUpdateInfo)
 		if unitAuraUpdateInfo.updatedAuraInstanceIDs ~= nil then
 			for _, auraInstanceID in ipairs(unitAuraUpdateInfo.updatedAuraInstanceIDs) do
 				local aura = C_UnitAuras.GetAuraDataByAuraInstanceID(scf.displayedUnit, auraInstanceID)
-				if aura and (aura.isHarmful or aura.isBossAura) then
+				if aura and (aura.isHarmful or aura.isBossAura) then --todo: is aura shown, if not you do not need to fire
+					scf.debuffs[aura.auraInstanceID] = aura;
 					debuffsChanged = true;
-				elseif aura and aura.isHelpful then
-					buffsChanged = true;
+				elseif aura and aura.isHelpful then --todo: is aura, if not you do not need to fire
+					scf.buffs[aura.auraInstanceID] = aura;
+					if (aura.sourceUnit and aura.sourceUnit == "player") and ((aura.spellId and row1Buffs[aura.spellId]) or (aura.name and row1Buffs[aura.name])) then
+						buffsRow1 = true
+					end
 				end
 			end
 		end
 
 		if unitAuraUpdateInfo.removedAuraInstanceIDs ~= nil then
-			debuffsChanged = true;
-			buffsChanged = true;
+			for _, auraInstanceID in ipairs(unitAuraUpdateInfo.removedAuraInstanceIDs) do
+				if scf.debuffs[auraInstanceID] ~= nil then --todo: is aura shown, if not you do not need to fire
+					local aura = scf.buffs[auraInstanceID]
+					scf.debuffs[auraInstanceID] = nil;
+					debuffsChanged = true;
+				elseif scf.buffs[auraInstanceID] ~= nil then --todo: is aura shown, if not you do not need to fire
+					local aura = scf.buffs[auraInstanceID]
+					scf.buffs[auraInstanceID] = nil;
+					if (aura.sourceUnit and aura.sourceUnit == "player") and ((aura.spellId and row1Buffs[aura.spellId]) or (aura.name and row1Buffs[aura.name])) then
+						buffsRow1 = true
+					end
+				end
+			end
 		end
 	end
+
 	if debuffsChanged then
 		DebuffFilter:UpdateDebuffs(scf, scf.displayedUnit)
 	end
 
-	if buffsChanged then
-		DebuffFilter:UpdateBuffs(scf, scf.displayedUnit)
+	if buffsRow1 then
+		DebuffFilter:buffsRow1(scf, scf.displayedUnit)
+	end
+	if buffsRow2 then
+	end
+	if buffsBOR then
+	end
+	if buffsBOL then
+	end
+	if buffsBOC then
 	end
 end
 
--- Apply style for each frame
+-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+--Applys all Buff and Debuff Shell Icons to the Frame
+-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
 function DebuffFilter:ApplyFrame(f)
 
 	local frameWidth, frameHeight = f:GetSize()
@@ -1336,7 +1698,13 @@ function DebuffFilter:ApplyFrame(f)
 	end
 
 	for j = 1, DEFAULT_BUFF do
-		scf.buffFrames[j] = _G["scfBuff"..f:GetName()..j] or CreateFrame("Button" , "scfBuff"..f:GetName()..j, UIParent, "CompactAuraTemplate")
+		if j == 8 then --BUffOverlay Right
+			scf.buffFrames[j] = _G["scfBORBuff"..f:GetName()..j] or CreateFrame("Button" , "scfBORBuff"..f:GetName()..j, UIParent, "CompactAuraTemplate")
+		elseif j == 9 then --BUffOverlay Left
+			scf.buffFrames[j] = _G["scfBOLBuff"..f:GetName()..j] or CreateFrame("Button" , "scfBOLBuff"..f:GetName()..j, UIParent, "CompactAuraTemplate")
+		else
+			scf.buffFrames[j] = _G["scfBuff"..f:GetName()..j] or CreateFrame("Button" , "scfBuff"..f:GetName()..j, UIParent, "CompactAuraTemplate")
+		end
 		scf.buffFrames[j].cooldown:SetDrawSwipe(false)
 		scf.buffFrames[j]:ClearAllPoints()
 		scf.buffFrames[j]:SetParent(f)
@@ -1361,22 +1729,16 @@ function DebuffFilter:ApplyFrame(f)
 				end
 			end
 				scf.buffFrames[j]:SetScale(.4)
-				scf.buffFrames[j]:SetFrameLevel(3)
-				scf.buffFrames[j]:SetFrameStrata("LOW")
 		elseif j ==8 then --Upper Right Count Only)
 			if not strfind(f.unit,"pet") then
 				scf.buffFrames[j]:SetPoint("TOPRIGHT", f, "TOPRIGHT", -2, -1.5)
 			end
 			scf.buffFrames[j]:SetScale(1.15)
-			scf.buffFrames[j]:SetFrameLevel(3)
-			scf.buffFrames[j]:SetFrameStrata("LOW")
 		elseif j ==9 then --Upper Left Count Only
 			if not strfind(f.unit,"pet") then
 				scf.buffFrames[j]:SetPoint("TOPLEFT", f, "TOPLEFT", 2, -1.5)
 			end
 			scf.buffFrames[j]:SetScale(1.15)
-			scf.buffFrames[j]:SetFrameLevel(3)
-			scf.buffFrames[j]:SetFrameStrata("LOW")
 		elseif j == 10 or j == 11 or j == 12 then --Second Row 123
 			if j == 10 then
 				if not strfind(f.unit,"pet") then
@@ -1400,16 +1762,18 @@ function DebuffFilter:ApplyFrame(f)
 	f.dispelDebuffFrames[3]:SetAlpha(0); --Hides Dispel Icons in Upper Right
 end
 
--- Reset style to each cached frame
+-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+--Resets all Icons from the frame and the Events
+-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
 function DebuffFilter:ResetFrame(f)
-	local trues = "false"
-	if f.inUse then trues = "true" end
-	for k,v in pairs(self.cache[f].debuffFrames) do
+	local scf = self.cache[f]
+	for k,v in pairs(scf.debuffFrames) do
 		if v then
 			v:Hide()
 		end
 	end
-	for k,v in pairs(self.cache[f].buffFrames) do
+	for k,v in pairs(scf.buffFrames) do
 		if v then
 			v:Hide()
 		end
@@ -1420,9 +1784,14 @@ function DebuffFilter:ResetFrame(f)
 	for j = 1,#f.buffFrames do
 		f.buffFrames[j]:SetScript("OnShow",nil)
 	end
-
-	self.cache[f] = nil
+	scf.debuff = nil
+	scf.buffs = nil
+	scf = nil
 end
+
+-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+--Frame Handler
+-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
 local function scf_OnEvent(self, event, ...)
 	local arg1, arg2, arg3, arg4, arg5 = ...
@@ -1456,6 +1825,10 @@ local function scf_OnEvent(self, event, ...)
 	end
 end
 
+-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+--Frame Register
+-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
 function DebuffFilter:RegisterUnit(f, forced)
 	local frame = _G["scf"..f:GetName()]
 	if frame and frame.unit and frame.unit == f.unit and frame.displayedUnit == f.displayedUnit  and not forced then return end 
@@ -1480,6 +1853,10 @@ function DebuffFilter:RegisterUnit(f, forced)
 	DebuffFilter:ApplyFrame(f)
 	DebuffFilter_UpdateAuras(scf)
 end
+
+-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+--Finding Used Frames and Unused Fames from API
+-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
 function  DebuffFilter:findFrames()
 	if EditModeManagerFrame:UseRaidStylePartyFrames() then
@@ -1529,6 +1906,9 @@ function  DebuffFilter:findFrames()
 	end
 end
 
+-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+--API Events
+-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
 EditModeManagerFrame:HookScript("OnHide", function() 	 
 	DebuffFilter:findFrames()
@@ -1588,7 +1968,10 @@ end
 local function OnEvent(self,event,...)
 	local arg1, arg2, arg3, arg4 = ...
 	if event == "COMBAT_LOG_EVENT_UNFILTERED" then 
-		self:CLEU() 
+		self:DFCLEU()
+		self:BOLCLEU()
+		self:BORCLEU()
+		self:BOCCLEU()
 	elseif ( event == 'GROUP_ROSTER_UPDATE' ) then
 		self:findFrames()
 	elseif ( event == 'UNIT_PET' ) then
@@ -1612,5 +1995,3 @@ DebuffFilter:RegisterEvent('PLAYER_ENTERING_WORLD')
 DebuffFilter:RegisterEvent('ZONE_CHANGED_NEW_AREA')
 DebuffFilter:RegisterEvent('GROUP_ROSTER_UPDATE')
 DebuffFilter:RegisterEvent('UNIT_PET')
-
-
