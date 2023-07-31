@@ -1605,7 +1605,7 @@ local function DebuffFilter_UpdateAuras(scf, unitAuraUpdateInfo)
 					debuffsChanged = true;
 				elseif aura and aura.isHelpful then
 					scf.buffs[aura.auraInstanceID] = aura;
-					if (aura.sourceUnit and aura.sourceUnit == "player") and ((aura.spellId and row1Buffs[aura.spellId]) or (aura.name and row1Buffs[aura.name])) then   
+					if (aura.sourceUnit and aura.sourceUnit == "player") and ((aura.spellId and row1Buffs[aura.spellId]) or (aura.name and row1Buffs[aura.name])) then
 						buffsRow1 = true
 					end
 				end
