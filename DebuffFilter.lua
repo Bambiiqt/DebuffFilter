@@ -84,6 +84,15 @@ PriorityBuff[12] = {
 	"Adaptive Swarm",
 }
 
+local row2Buffs = {}
+local row2BuffsCount = 1
+for i = 10, 12 do
+	for _, v in ipairs(PriorityBuff[i]) do
+		row2Buffs[v] = row2BuffsCount
+		row2BuffsCount = row2BuffsCount + 1
+	end
+end
+
 --Upper Circle Right on Icon 1
 PriorityBuff[4] = {
 	"Power Word: Fortitude",
@@ -300,9 +309,28 @@ PriorityBuff[8] = {
 	329038, --Bloodrage (root break)
 }
 
+local BORBuffs = {}
+local BORBuffsCount = 1
+for i = 4, 8 do
+	for _, v in ipairs(PriorityBuff[i]) do
+		BORBuffs[v] = BORBuffsCount 
+		BORBuffsCount = BORBuffsCount  + 1
+	end
+end
+
 --UPPER LEFT PRIO COUNT (Buff Overlay Right)
 PriorityBuff[9] = {
+	"Guardian Spirit"
 }
+
+local BOLBuffs = {}
+local BOLBuffsCount = 1
+for i = 9, 9 do
+	for _, v in ipairs(PriorityBuff[i]) do
+		BOLBuffs[v] = BOLBuffsCount 
+		BOLBuffsCount = BOLBuffsCount  + 1
+	end
+end
 
 local Buff = {}
 for i = 1, DEFAULT_BUFF do
@@ -833,16 +861,230 @@ local bgWarningspellIds = { -- or pet debuffs
 
 }
 
+local function Split(s, delimiter)
+    local result = {};
+    for match in (s..delimiter):gmatch("(.-)"..delimiter) do
+        table.insert(result, match);
+    end
+    return result;
+end
+
+local tip = CreateFrame('GameTooltip', 'ObjectExistsTooltip', nil, 'GameTooltipTemplate')
+local function ObjectExists(guid, ticker, name, sourceName) --Used for Infrnals and Ele
+  tip:SetOwner(WorldFrame, 'ANCHOR_NONE')
+  tip:SetHyperlink('unit:' .. guid or '')
+	local text1 = ObjectExistsTooltipTextLeft1
+	local text2 = ObjectExistsTooltipTextLeft2
+	local text3 = ObjectExistsTooltipTextLeft3
+	if strfind(tostring(sourceName), "-") then
+		local sourceNameTable = Split(sourceName, "-")
+		sourceName = sourceNameTable[1]
+	end
+	if (text1 and (type(text1:GetText()) == "string")) then
+		if strmatch(text1:GetText(), "Corpse") then
+			--print(text1:GetText().." text1")
+			return "Corpse"
+		end
+	end
+	if (text2 and (type(text2:GetText()) == "string")) then
+		if strmatch(text2:GetText(), "Corpse") then
+			--print(text2:GetText().." text 2")
+			return "Corpse"
+		end
+	end
+	if (text3 and (type(text3:GetText()) == "string")) then
+		if strmatch(text3:GetText(), "Corpse") then
+			--print(text3:GetText().." text3")
+			return "Corpse"
+		end
+	end
+	if (text1 and (type(text1:GetText()) == "string")) then
+		if strfind(text1:GetText(), tostring(sourceName)) then
+			--print(text1:GetText().." text1")
+			return false
+		end
+	end
+	if (text2 and (type(text2:GetText()) == "string")) then
+		if strfind(text2:GetText(), tostring(sourceName)) then
+			--print(text2:GetText().." text 2")
+			return false
+		end
+	end
+	if (text3 and (type(text3:GetText()) == "string")) then
+		if strfind(text3:GetText(), tostring(sourceName)) then
+			--print(text3:GetText().." text3")
+			return false
+		end
+	end
+	return "Despawned"
+end
+
+local function compare(a,b)
+  return a[6] < b[6]
+end
+
 -----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 --CLEU Events
 -----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 function DebuffFilter:BOCCLEU()
 end
 
-function DebuffFilter:BORCLEU()
-end
 
 function DebuffFilter:BOLCLEU()
+end
+
+local CLEUBOR = {}
+local WarBanner = {}
+
+local castedAuraIdsBOR = {
+	[288853] = 25, --Dk Raise Abomination "Abomination" same Id has sourceGUID
+	[49206]  = 25, --Ebon Gargoyle
+
+	[248280] = 10, --Trees
+
+	[205691] = 30, --Dire Beast Basilisk
+
+	[321686] = 40, --Mirror Image
+
+	[123904] = 24,--WW Xuen Pet Summmon "Xuen" same Id has sourceGUID
+
+	[123040] = 12, --Mindbender
+	[34433]  = 15, --Disc Pet Summmon Sfiend "Shadowfiend" same Id has sourceGUID
+
+	[188616] = 60, --Shaman Earth Ele "Greater Earth Elemental", has sourceGUID [summonid]
+	[118323] = 60, --Shaman Primal Earth Ele "Primal Earth Elemental", has sourceGUID [summonid]
+	[188592] = 30, --Shaman Fire Ele "Fire Elemental", has sourceGUID [summonid]
+	[118291] = 30, --Shaman Primal Fire Ele "Primal Fire Earth Elemental", has sourceGUID [summonid]
+	[157299] = 30, --Storm Ele , has sourceGUID [summonid]
+	[157319] = 30, --Primal Storm Ele , has sourceGUID [summonid]
+
+	[111685] = 30, --Warlock Infernals,  has sourceGUID (spellId and Summons are different) [spellbookid]
+	[205180] = 20, --Warlock Darkglare
+	[265187] = 15, --Warlock Demonic Tyrant
+	[353601] = 15, --Fel Obelisk
+	[394243] = 2,  --Choas Tear
+	[387979]  = 6,  --Unstable Tear
+	[394235] = 14, --Shadowy Tear
+
+--Casted Spells
+	[202770] = 8, --Fury of Elune
+	[202359] = 6, --Astral Communion
+
+}
+
+function DebuffFilter:BORCLEU()
+	local _, event, _, sourceGUID, sourceName, sourceFlags, _, destGUID, destName, destFlags, _, spellId, _, _, _, _, spellSchool = CombatLogGetCurrentEventInfo()
+
+	-----------------------------------------------------------------------------------------------------------------
+	--WarBanner Check (Totems Need a Spawn Time Check)
+	-----------------------------------------------------------------------------------------------------------------
+	if ((event == "SPELL_SUMMON") or (event == "SPELL_CREATE")) and (spellId == 236320) then
+		if sourceGUID and not (bit_band(sourceFlags, COMBATLOG_OBJECT_REACTION_HOSTILE) == COMBATLOG_OBJECT_REACTION_HOSTILE) then
+			local duration = 15
+			local expirationTime = GetTime() + duration
+			if (WarBanner[sourceGUID] == nil) then --source is friendly unit party12345 raid1...
+				WarBanner[sourceGUID] = {}
+			end
+			WarBanner[sourceGUID] = { ["duration"] = duration, ["expirationTime"] = expirationTime }
+			C_Timer.After(duration + 1, function()	-- execute in some close next frame to accurate use of UnitAura function
+			WarBanner[sourceGUID] = nil
+			end)
+		end
+	end
+
+	-----------------------------------------------------------------------------------------------------------------
+	--Summoned
+	-----------------------------------------------------------------------------------------------------------------
+
+	if (event == "SPELL_SUMMON") or (event == "SPELL_CREATE") then --Summoned CDs
+		--print(spellId.." "..GetSpellInfo(spellId).." "..destName)
+		if castedAuraIdsBOR[spellId] and sourceGUID and not (bit_band(sourceFlags, COMBATLOG_OBJECT_REACTION_HOSTILE) == COMBATLOG_OBJECT_REACTION_HOSTILE) then
+			local guid = destGUID
+			local duration = castedAuraIdsBOR[spellId]
+			local namePrint, _, icon = GetSpellInfo(spellId)
+			local expirationTime = GetTime() + duration
+
+			if spellId == 321686 then -- Mirror Image
+				icon = 135994
+			end
+
+			if spellId == 157299 or spellId == 157319 then -- Strom Elemental
+				icon = 2065626
+			end
+			--print(sourceName.." Summoned "..namePrint.." "..substring(destGUID, -7).." for "..duration.." BOR")
+			if not CLEUBOR[sourceGUID] then
+				CLEUBOR[sourceGUID] = {}
+			end
+			tblinsert(CLEUBOR[sourceGUID], {icon, duration, expirationTime, spellId, destGUID, Buff[8][spellId], sourceName, namePrint})
+			tblsort(CLEUBOR[sourceGUID], compare)
+			local ticker = 1
+			Ctimer(duration, function()
+				if CLEUBOR[sourceGUID] then
+					for k, v in pairs(CLEUBOR[sourceGUID]) do
+						if v[4] == spellId then
+							--print(v[7].." ".."Timed Out".." "..v[8].." "..substring(v[5], -7).." left w/ "..string.format("%.2f", v[3]-GetTime()).." BOR C_Timer")
+							tremove(CLEUBOR[sourceGUID], k)
+							tblsort(CLEUBOR[sourceGUID], compare)
+							if #CLEUBOR[sourceGUID] == 0 then
+							CLEUBOR[sourceGUID] = nil
+							end
+						end
+					end
+				end
+			end)
+			self.ticker = C_Timer.NewTicker(.25, function()
+				if CLEUBOR[sourceGUID] then
+					for k, v in pairs(CLEUBOR[sourceGUID]) do
+						if (v[5] and (v[4] ~= 394243 and v[4] ~= 387979 and v[4] ~= 394235)) then --Dimmensional Rift Hack to Not Deswpan
+							if substring(v[5], -5) == substring(guid, -5) then --string.sub is to help witj Mirror Images bug
+								if ObjectExists(v[5], ticker, v[8], v[7]) then
+								--print(v[7].." "..ObjectExists(v[5], ticker, v[8], v[7]).." "..v[8].." "..substring(v[5], -7).." left w/ "..string.format("%.2f", v[3]-GetTime()).." BOR C_Ticker")
+								tremove(CLEUBOR[sourceGUID], k)
+								tblsort(CLEUBOR[sourceGUID], compare)
+								if #CLEUBOR[sourceGUID] == 0 then
+									CLEUBOR[sourceGUID] = nil
+									end
+									break
+								end
+							end
+						end
+					end
+				end
+				ticker = ticker + 1
+			end, duration * 4 + 5)
+		end
+	end
+
+	-----------------------------------------------------------------------------------------------------------------
+	--Casted  CDs w/o Aura
+	-----------------------------------------------------------------------------------------------------------------
+	if (event == "SPELL_CAST_SUCCESS") and (spellId == 202770 or spellId == 202359) then --Casted  CDs w/o Aura
+		if castedAuraIdsBOR[spellId] and sourceGUID and not (bit_band(sourceFlags, COMBATLOG_OBJECT_REACTION_HOSTILE) == COMBATLOG_OBJECT_REACTION_HOSTILE) then
+			local duration = castedAuraIdsBOR[spellId]
+			local namePrint, _, icon = GetSpellInfo(spellId)
+			local expirationTime = GetTime() + duration
+			print(sourceName.." Casted "..namePrint.." "..substring(destGUID, -7).." for "..duration.." BOR")
+			if not CLEUBOR[sourceGUID] then
+				CLEUBOR[sourceGUID] = {}
+			end
+			tblinsert(CLEUBOR[sourceGUID], {icon, duration, expirationTime, spellId, destGUID, Buff[8][spellId], sourceName, namePrint})
+			tblsort(CLEUBOR[sourceGUID], compare)
+			Ctimer(duration, function()
+				if CLEUBOR[sourceGUID] then
+					for k, v in pairs(CLEUBOR[sourceGUID]) do
+						if v[4] == spellId then
+							print(v[7].." ".."Timed Out".." "..v[8].." "..substring(v[5], -7).." left w/ "..string.format("%.2f", v[3]-GetTime()).." BOR C_Timer")
+							tremove(CLEUBOR[sourceGUID], k)
+							tblsort(CLEUBOR[sourceGUID], compare)
+							if #CLEUBOR[sourceGUID] == 0 then
+							CLEUBOR[sourceGUID] = nil
+							end
+						end
+					end
+				end
+			end)
+		end
+	end
 end
 
 
@@ -1037,15 +1279,6 @@ local function isDebuff(unit, index, filter)
 	end
 end
 
-local function isBuff(unit, index, filter, j)
-  	local name, _, _, _, _, _, _, _, _, spellId = UnitAura(unit, index, "HELPFUL");
-		if Buff[j] and (Buff[j][spellId] or Buff[j][name]) then
-			return true
-		else
-			return false
-		end
-end
-
 -----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 --Setting the Debuff Frame
 -----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -1174,8 +1407,6 @@ end
 
 function DebuffFilter:UpdateDebuffs(scf, uid)
 	local f = scf.f
-	if not DebuffFilter.cache[f] then return end
-	local scf = DebuffFilter.cache[f]
 	local filter = nil
 	local debuffNum = 1
 	local index = 1
@@ -1309,21 +1540,30 @@ function DebuffFilter:UpdateDebuffs(scf, uid)
 end
 
 -----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+--Buff Filtering & Scale
+-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+local function isBuff(unit, index, filter, j)
+	local name, _, _, _, _, _, _, _, _, spellId = UnitAura(unit, index, "HELPFUL");
+  if Buff[j] and (Buff[j][spellId] or Buff[j][name]) then
+	  return true
+  else
+	  return false
+  end
+end
+
+-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 --Buff Frame Main Loop, Sets Icon and Count in this Loop
 -----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
-function DebuffFilter:UpdateBuffs(scf, uid)
+function DebuffFilter:buffsBOL(scf, uid)
 	local f = scf.f
 	local frameWidth, frameHeight = f:GetSize()
 	local componentScale = min(frameHeight / NATIVE_UNIT_FRAME_HEIGHT, frameWidth / NATIVE_UNIT_FRAME_WIDTH);
 	local overlaySize = 11 * componentScale
-
-	if not DebuffFilter.cache[f] then return end
-	local scf = DebuffFilter.cache[f]
 	local filter = nil
-	local buffNum = 1
 	local index, buff, backCount, X, Z
-	for j = 1, DEFAULT_BUFF do
+	for j = 9, 9 do
 		for i = 1, 32 do
 			local buffName, _, count, _, _, _, unitCaster, _, _, spellId = UnitBuff(uid, i, filter)
 			if ( buffName ) and ( j == 4 or j == 5 or j == 6 or j == 7 or j == 8 or j == 9 or unitCaster == "player" ) then
@@ -1346,124 +1586,234 @@ function DebuffFilter:UpdateBuffs(scf, uid)
 		if index then
 			local buffId = index
 			local name, icon, count, buffType, duration, expirationTime, unitCaster, canStealOrPurge, _, spellId = UnitBuff(uid, index, filter);
-			if j == 4 or j == 5 or j == 6 or j == 7 or j == 8 or j == 9 or unitCaster == "player" then
-				local buffFrame = scf.buffFrames[j]
+			local buffFrame = scf.buffFrames[j]
 
-				if j == 4 or j == 5 or j == 6 or j == 7 then
-					if not X then
-						scf.buffFrames[4]:Hide();scf.buffFrames[5]:Hide();scf.buffFrames[6]:Hide();scf.buffFrames[7]:Hide();
-						j = 4
-						buffFrame = scf.buffFrames[j]; X = j
-						if BuffOverlayRight then 
-							Ctimer(.01, function() --Unitil BOR and BOL is merged could have problems
-								local frame = scf.name.."BuffOverlayRight"
-								if _G[frame] and _G[frame].icon:IsVisible() then
-									scf.buffFrames[j]:ClearAllPoints()
-									scf.buffFrames[j]:SetPoint("RIGHT", f, "RIGHT", -5.5, 10)
-								else
-									scf.buffFrames[j]:ClearAllPoints()
-									scf.buffFrames[j]:SetPoint("TOPRIGHT", f, "TOPRIGHT", -5.5, -6.5)
-								end
-							end)
-						end
-					else
-				   		buffFrame = scf.buffFrames[X+1]
-					 	X = X + 1
+			------------------------------------------------------------------------------------------------------------------------------------------------------------------
+			----CLEU DeBuff Timer
+			------------------------------------------------------------------------------------------------------------------------------------------------------------------
+			-----------------------------------------------------------------------------------------------------------------
+			--Warbanner
+			-----------------------------------------------------------------------------------------------------------------
+			if spellId == 236321 then -- Warbanner (Totems Need a Spawn Time Check)
+				if unitCaster and not UnitIsEnemy("player", unitCaster) then
+					if WarBanner[UnitGUID(unitCaster)] then
+						duration = WarBanner[UnitGUID(unitCaster)].duration
+						expirationTime = WarBanner[UnitGUID(unitCaster)].expirationTime
 					end
 				end
-				if j == 10 or j == 11 or j == 12 then
-					if not Z then
-						scf.buffFrames[10]:Hide();scf.buffFrames[11]:Hide();scf.buffFrames[12]:Hide();
-						j = 10
-						buffFrame = scf.buffFrames[j]; Z = j
-					else
-				   		buffFrame = scf.buffFrames[Z+1]
-					 	Z = Z + 1
-					end
-				end
-
-				buffFrame.icon:SetTexture(icon);
-				buffFrame.icon:SetDesaturated(nil) --Destaurate Icon
-				buffFrame.icon:SetVertexColor(1, 1, 1);
-				buffFrame.SpellId = spellId
-				buffFrame:SetScript("OnEnter", function(self)
-					GameTooltip:SetOwner (buffFrame.icon, "ANCHOR_RIGHT")
-					GameTooltip:SetUnitBuff(uid, buffId, "HELPFUL")
-					GameTooltip:Show()
-				end)
-				buffFrame:SetScript("OnLeave", function(self)
-					GameTooltip:Hide()
-				end)
-				if count or backCount then
-					if backCount then count = backCount end
-					if ( count > 1 ) then
-						local countText = count;
-						if ( count >= 100 ) then
-						 countText = BUFF_STACKS_OVERFLOW;
-						end
-							buffFrame.count:Show();
-							buffFrame.count:SetText(countText);
-					else
-						buffFrame.count:Hide();
-					end
-				end
-				if j == 3 then
-					if strfind(uid,"pet") then
-						buffFrame.count:ClearAllPoints()
-						buffFrame.count:SetFont("Fonts\\FRIZQT__.TTF", 8, "OUTLINE") --, MONOCHROME")
-						buffFrame.count:SetPoint("TOPRIGHT", -3, 4);
-						buffFrame.count:SetJustifyH("RIGHT");
-						buffFrame.count:SetTextColor(1, 1 ,0, 1)
-					else
-						buffFrame.count:ClearAllPoints()
-						buffFrame.count:SetFont("Fonts\\FRIZQT__.TTF", 12, "OUTLINE") --, MONOCHROME")
-						buffFrame.count:SetPoint("TOPRIGHT", -10, 6.5);
-						buffFrame.count:SetJustifyH("RIGHT");
-						buffFrame.count:SetTextColor(1, 1 ,0, 1)
-					end
-				end
-				if j == 4 or j == 5 or j == 6 or j == 7 then
-					SetPortraitToTexture(buffFrame.icon, icon)
-					buffFrame.icon:SetTexCoord(0.07, 0.93, 0.07, 0.93);
-				end
-				if j == 8 then
-					if strfind(uid,"pet") then
-						buffFrame.count:ClearAllPoints()
-						buffFrame.count:SetFont("Fonts\\FRIZQT__.TTF", 7, "OUTLINE") --, MONOCHROME")
-						buffFrame.count:SetPoint("BOTTOMRIGHT", 3, -2);
-						buffFrame.count:SetJustifyH("RIGHT");
-					else
-						buffFrame.count:ClearAllPoints()
-						buffFrame.count:SetFont("Fonts\\FRIZQT__.TTF", 11, "OUTLINE") --, MONOCHROME")
-						buffFrame.count:SetPoint("BOTTOMRIGHT", 2, -4);
-						buffFrame.count:SetJustifyH("RIGHT");
-					end
-					scf.buffFrames[4]:ClearAllPoints() -- Buff Icons
-					scf.buffFrames[4]:SetPoint("RIGHT", f, "RIGHT", -5.5, 10)
-				end
-				if j == 9 then
-					if strfind(uid,"pet") then
-						buffFrame.count:ClearAllPoints()
-						buffFrame.count:SetFont("Fonts\\FRIZQT__.TTF", 7, "OUTLINE") --, MONOCHROME")
-						buffFrame.count:SetPoint("BOTTOMRIGHT", 3, -2);
-						buffFrame.count:SetJustifyH("RIGHT");
-					else
-						buffFrame.count:ClearAllPoints()
-						buffFrame.count:SetFont("Fonts\\FRIZQT__.TTF", 11, "OUTLINE") --, MONOCHROME")
-						buffFrame.count:SetPoint("BOTTOMRIGHT", 2, -4);
-						buffFrame.count:SetJustifyH("RIGHT");
-					end
-				end
-				buffFrame:SetID(j);
-				local startTime = expirationTime - duration;
-				if duration > 59.5 then
-					CooldownFrame_Clear(buffFrame.cooldown);
-				else
-					CooldownFrame_Set(buffFrame.cooldown, startTime, duration, true);
-				end
-				buffFrame:SetSize(overlaySize*1,overlaySize*1);
-				buffFrame:Show();
 			end
+
+			------------------------------------------------------------------------------------------------------------------------------------------------------------------
+			----Two Debuff Conditions
+			------------------------------------------------------------------------------------------------------------------------------------------------------------------
+			-----------------------------------------------------------------------------------------------------------------
+			--Icy Veins Stacks for Slick Ice
+			-----------------------------------------------------------------------------------------------------------------
+			if spellId == 12472 then
+				for i = 1, 40 do
+					local _, _, c, _, d, e, _, _, _, s = UnitAura(uid, i, "HELPFUL")
+					if not s then break end
+					if s == 382148 then
+						count = c
+					end
+				end
+			end
+
+			-----------------------------------------------------------------------------------------------------------------------------------------------------------------
+			--Icon Change
+			-----------------------------------------------------------------------------------------------------------------------------------------------------------------
+			if spellId == 387636 then
+				icon = 538745
+			end
+
+
+			buffFrame.icon:SetTexture(icon);
+			buffFrame.icon:SetDesaturated(nil) --Destaurate Icon
+			buffFrame.icon:SetVertexColor(1, 1, 1);
+			buffFrame.SpellId = spellId
+			buffFrame:SetScript("OnEnter", function(self)
+				GameTooltip:SetOwner (buffFrame.icon, "ANCHOR_RIGHT")
+				GameTooltip:SetUnitBuff(uid, buffId, "HELPFUL")
+				GameTooltip:Show()
+			end)
+			buffFrame:SetScript("OnLeave", function(self)
+				GameTooltip:Hide()
+			end)
+			if count or backCount then
+				if backCount then count = backCount end
+				if ( count > 1 ) then
+					local countText = count;
+					if ( count >= 100 ) then
+						countText = BUFF_STACKS_OVERFLOW;
+					end
+						buffFrame.count:Show();
+						buffFrame.count:SetText(countText);
+				else
+					buffFrame.count:Hide();
+				end
+			end
+			if strfind(uid,"pet") then
+				buffFrame.count:ClearAllPoints()
+				buffFrame.count:SetFont("Fonts\\FRIZQT__.TTF", 7, "OUTLINE") --, MONOCHROME")
+				buffFrame.count:SetPoint("BOTTOMRIGHT", 3, -2);
+				buffFrame.count:SetJustifyH("RIGHT");
+			else
+				buffFrame.count:ClearAllPoints()
+				buffFrame.count:SetFont("Fonts\\FRIZQT__.TTF", 11, "OUTLINE") --, MONOCHROME")
+				buffFrame.count:SetPoint("BOTTOMRIGHT", 2, -4);
+				buffFrame.count:SetJustifyH("RIGHT");
+			end
+			buffFrame:SetID(j);
+			local startTime = expirationTime - duration;
+			if duration > 59.5 then
+				CooldownFrame_Clear(buffFrame.cooldown);
+			else
+				CooldownFrame_Set(buffFrame.cooldown, startTime, duration, true);
+			end
+			buffFrame:SetSize(overlaySize*1,overlaySize*1);
+			buffFrame:Show();
+		else
+			local buffFrame = scf.buffFrames[j];
+			if buffFrame then
+				buffFrame:SetSize(overlaySize*1,overlaySize*1);
+				buffFrame:Hide()
+			end
+		end
+	index = nil; buff = nil; backCount= nil
+	end
+end
+
+function DebuffFilter:buffsBOR(scf, uid)
+	local f = scf.f
+	local frameWidth, frameHeight = f:GetSize()
+	local componentScale = min(frameHeight / NATIVE_UNIT_FRAME_HEIGHT, frameWidth / NATIVE_UNIT_FRAME_WIDTH);
+	local overlaySize = 11 * componentScale
+	local filter = nil
+	local index, buff, backCount, X
+	for j = 4, 8 do
+		for i = 1, 32 do
+			local buffName, _, count, _, _, _, unitCaster, _, _, spellId = UnitBuff(uid, i, filter)
+			if ( buffName ) then
+				if isBuff(uid, i, filter, j) then
+					--if (buffName == "Prayer of Mending" or buffName == "Focused Growth") and unitCaster == "player" then backCount = count end 	--Prayer of mending hack
+					if Buff[j][buffName] then
+						 Buff[j][spellId] =  Buff[j][buffName]
+					end
+					if  Buff[j][spellId] then
+						if not buff or  Buff[j][spellId] <  Buff[j][buff] then
+							buff = spellId
+							index = i
+						end
+					end
+				end
+			else
+				break
+			end
+		end
+		local sourceGUID = UnitGUID(uid)
+		local cleuSpell
+		local cleu = false
+		if index or (CLEUBOR[sourceGUID] and j == 8) then
+			local buffId = index
+			local name, icon, count, debuffType, duration, expirationTime, unitCaster, canStealOrPurge, _, spellId, canApplyAura
+			if CLEUBOR[sourceGUID] and j == 8 then
+				if Buff[j][buff] == nil or (Buff[j][buff] > Buff[j][CLEUBOR[sourceGUID][1][4]]) then
+					icon = CLEUBOR[sourceGUID][1][1]
+					duration = CLEUBOR[sourceGUID][1][2]
+					expirationTime = CLEUBOR[sourceGUID][1][3]
+					spellId = CLEUBOR[sourceGUID][1][4]
+					cleu = true
+					cleuSpell = spellId
+					if spellId == 321686 or spellId == 248280 then -- Trees and Mirror Image Count
+						if not count then count = 0 end
+						for i = 1, #CLEUBOR[sourceGUID] do
+							if CLEUBOR[sourceGUID][i][4] == 321686 or CLEUBOR[sourceGUID][i][4] == 248280 then
+								count = count + 1
+							end
+						end
+					else
+						count = 0
+					end
+				else
+					name, icon, count, debuffType, duration, expirationTime, unitCaster, canStealOrPurge, _, spellId, canApplyAura = UnitBuff(uid, index)
+				end
+			else
+				name, icon, count, debuffType, duration, expirationTime, unitCaster, canStealOrPurge, _, spellId, canApplyAura = UnitBuff(uid, index)
+			end
+
+			local buffFrame = scf.buffFrames[j]
+			if j == 4 or j == 5 or j == 6 or j == 7 then
+				if not X then
+					scf.buffFrames[4]:Hide();scf.buffFrames[5]:Hide();scf.buffFrames[6]:Hide();scf.buffFrames[7]:Hide();
+					j = 4
+					buffFrame = scf.buffFrames[j]; X = j
+				else
+					buffFrame = scf.buffFrames[X+1]
+					X = X + 1
+				end
+			end
+			buffFrame.icon:SetTexture(icon);
+			buffFrame.icon:SetDesaturated(nil) --Destaurate Icon
+			buffFrame.icon:SetVertexColor(1, 1, 1);
+			buffFrame.SpellId = spellId
+
+			buffFrame:SetScript("OnEnter", function(self)
+				GameTooltip:SetOwner (buffFrame.icon, "ANCHOR_RIGHT")
+				if cleu then
+					GameTooltip:SetSpellByID(cleuSpell)
+				else
+					GameTooltip:SetUnitBuff(uid, buffId, "HELPFUL")
+				end
+				GameTooltip:Show()
+			end)
+			buffFrame:SetScript("OnLeave", function(self)
+				GameTooltip:Hide()
+			end)
+			if count or backCount then
+				if backCount then count = backCount end
+				if ( count > 1 ) then
+					local countText = count;
+					if ( count >= 100 ) then
+						countText = BUFF_STACKS_OVERFLOW;
+					end
+						buffFrame.count:Show();
+						buffFrame.count:SetText(countText);
+				else
+					buffFrame.count:Hide();
+				end
+			end
+			if j == 4 or j == 5 or j == 6 or j == 7 then
+				SetPortraitToTexture(buffFrame.icon, icon)
+				buffFrame.icon:SetTexCoord(0.07, 0.93, 0.07, 0.93);
+			end
+			if j == 8 then
+				if strfind(uid,"pet") then
+					buffFrame.count:ClearAllPoints()
+					buffFrame.count:SetFont("Fonts\\FRIZQT__.TTF", 7, "OUTLINE") --, MONOCHROME")
+					buffFrame.count:SetPoint("BOTTOMRIGHT", 3, -2);
+					buffFrame.count:SetJustifyH("RIGHT");
+				else
+					buffFrame.count:ClearAllPoints()
+					buffFrame.count:SetFont("Fonts\\FRIZQT__.TTF", 11, "OUTLINE") --, MONOCHROME")
+					buffFrame.count:SetPoint("BOTTOMRIGHT", 2, -4);
+					buffFrame.count:SetJustifyH("RIGHT");
+				end
+				scf.buffFrames[4]:ClearAllPoints() -- Buff Icons
+				scf.buffFrames[4]:SetPoint("RIGHT", f, "RIGHT", -5.5, 10)
+			end
+			if cleu then
+				duration = CLEUBOR[sourceGUID][1][3] - GetTime();
+			end
+			buffFrame:SetID(j);
+			local startTime = expirationTime - duration;
+			if duration > 59.5 then
+				CooldownFrame_Clear(buffFrame.cooldown);
+			else
+				CooldownFrame_Set(buffFrame.cooldown, startTime, duration, true);
+			end
+			buffFrame:SetSize(overlaySize*1,overlaySize*1);
+			buffFrame:Show();
+			
 		else
 			local buffFrame = scf.buffFrames[j];
 			if buffFrame then
@@ -1473,6 +1823,104 @@ function DebuffFilter:UpdateBuffs(scf, uid)
 					scf.buffFrames[4]:ClearAllPoints() --Cleares SMall Buff Icon Positions
 					scf.buffFrames[4]:SetPoint("TOPRIGHT", f, "TOPRIGHT", -5.5, -6.5)
 				end
+			end
+		end
+	index = nil; buff = nil; backCount= nil
+	end
+end
+
+function DebuffFilter:buffsRow2(scf, uid)
+	local f = scf.f
+	local frameWidth, frameHeight = f:GetSize()
+	local componentScale = min(frameHeight / NATIVE_UNIT_FRAME_HEIGHT, frameWidth / NATIVE_UNIT_FRAME_WIDTH);
+	local overlaySize = 11 * componentScale
+	local filter = nil
+	local index, buff, backCount, Z
+	for j = 10, 12 do --buffRow1 is J == 1, 2, 3
+		for i = 1, 32 do
+			local buffName, _, count, _, _, _, unitCaster, _, _, spellId = UnitBuff(uid, i, filter)
+			if ( buffName ) then
+				if unitCaster == "player" and isBuff(uid, i, filter, j) then
+					--if (buffName == "Prayer of Mending" or buffName == "Focused Growth") and unitCaster == "player" then backCount = count end 	--Prayer of mending hack
+					if Buff[j][buffName] then
+						 Buff[j][spellId] =  Buff[j][buffName]
+					end
+					if  Buff[j][spellId] then
+						if not buff or  Buff[j][spellId] <  Buff[j][buff] then
+							buff = spellId
+							index = i
+						end
+					end
+				end
+			else
+				break
+			end
+		end
+		if index then
+			local buffId = index
+			local _, icon, count, _, duration, expirationTime, _, _, _, _ = UnitBuff(uid, index, filter);
+			local buffFrame = scf.buffFrames[j]
+			if j == 10 or j == 11 or j == 12 then
+				if not Z then
+					scf.buffFrames[10]:Hide();scf.buffFrames[11]:Hide();scf.buffFrames[12]:Hide();
+					j = 10
+					buffFrame = scf.buffFrames[j]; Z = j
+				else
+					   buffFrame = scf.buffFrames[Z+1]
+					 Z = Z + 1
+				end
+			end
+			buffFrame.icon:SetTexture(icon);
+			buffFrame.icon:SetDesaturated(nil) --Destaurate Icon
+			buffFrame.icon:SetVertexColor(1, 1, 1);
+			buffFrame:SetScript("OnEnter", function(self)
+				GameTooltip:SetOwner (buffFrame.icon, "ANCHOR_RIGHT")
+				GameTooltip:SetUnitBuff(uid, buffId, "HELPFUL")
+				GameTooltip:Show()
+			end)
+			buffFrame:SetScript("OnLeave", function(self)
+				GameTooltip:Hide()
+			end)
+			if count or backCount then
+				if backCount then count = backCount end
+				if ( count > 1 ) then
+					local countText = count;
+					if ( count >= 100 ) then
+						countText = BUFF_STACKS_OVERFLOW;
+					end
+						buffFrame.count:Show();
+						buffFrame.count:SetText(countText);
+				else
+					buffFrame.count:Hide();
+				end
+			end
+			if strfind(uid,"pet") then
+				buffFrame.count:ClearAllPoints()
+				buffFrame.count:SetFont("Fonts\\FRIZQT__.TTF", 8, "OUTLINE") --, MONOCHROME")
+				buffFrame.count:SetPoint("TOPRIGHT", -3, 4);
+				buffFrame.count:SetJustifyH("RIGHT");
+				buffFrame.count:SetTextColor(1, 1 ,0, 1)
+			else
+				buffFrame.count:ClearAllPoints()
+				buffFrame.count:SetFont("Fonts\\FRIZQT__.TTF", 12, "OUTLINE") --, MONOCHROME")
+				buffFrame.count:SetPoint("TOPRIGHT", -10, 6.5);
+				buffFrame.count:SetJustifyH("RIGHT");
+				buffFrame.count:SetTextColor(1, 1 ,0, 1)
+			end
+			buffFrame:SetID(j);
+			local startTime = expirationTime - duration;
+			if duration > 59.5 then
+				CooldownFrame_Clear(buffFrame.cooldown);
+			else
+				CooldownFrame_Set(buffFrame.cooldown, startTime, duration, true);
+			end
+			buffFrame:SetSize(overlaySize*1,overlaySize*1);
+			buffFrame:Show();
+		else
+			local buffFrame = scf.buffFrames[j];
+			if buffFrame then
+				buffFrame:SetSize(overlaySize*1,overlaySize*1);
+				buffFrame:Hide()
 			end
 		end
 	index = nil; buff = nil; backCount= nil
@@ -1608,6 +2056,15 @@ local function DebuffFilter_UpdateAuras(scf, unitAuraUpdateInfo)
 					if (aura.sourceUnit and aura.sourceUnit == "player") and ((aura.spellId and row1Buffs[aura.spellId]) or (aura.name and row1Buffs[aura.name])) then
 						buffsRow1 = true
 					end
+					if (aura.sourceUnit and aura.sourceUnit == "player") and ((aura.spellId and row2Buffs[aura.spellId]) or (aura.name and row2Buffs[aura.name])) then
+						buffsRow2 = true
+					end
+					if (aura.sourceUnit and aura.sourceUnit == "player") and ((aura.spellId and BORBuffs[aura.spellId]) or (aura.name and BORBuffs[aura.name])) then
+						buffsBOR = true
+					end
+					if (aura.sourceUnit and aura.sourceUnit == "player") and ((aura.spellId and BOLBuffs[aura.spellId]) or (aura.name and BOLBuffs[aura.name])) then
+						buffsBOL = true
+					end
 				end
 			end
 		end
@@ -1622,6 +2079,15 @@ local function DebuffFilter_UpdateAuras(scf, unitAuraUpdateInfo)
 					scf.buffs[aura.auraInstanceID] = aura;
 					if (aura.sourceUnit and aura.sourceUnit == "player") and ((aura.spellId and row1Buffs[aura.spellId]) or (aura.name and row1Buffs[aura.name])) then
 						buffsRow1 = true
+					end
+					if (aura.sourceUnit and aura.sourceUnit == "player") and ((aura.spellId and row2Buffs[aura.spellId]) or (aura.name and row2Buffs[aura.name])) then
+						buffsRow2 = true
+					end
+					if (aura.sourceUnit and aura.sourceUnit == "player") and ((aura.spellId and BORBuffs[aura.spellId]) or (aura.name and BORBuffs[aura.name])) then
+						buffsBOR = true
+					end
+					if (aura.sourceUnit and aura.sourceUnit == "player") and ((aura.spellId and BOLBuffs[aura.spellId]) or (aura.name and BOLBuffs[aura.name])) then
+						buffsBOL = true
 					end
 				end
 			end
@@ -1639,6 +2105,15 @@ local function DebuffFilter_UpdateAuras(scf, unitAuraUpdateInfo)
 					if (aura.sourceUnit and aura.sourceUnit == "player") and ((aura.spellId and row1Buffs[aura.spellId]) or (aura.name and row1Buffs[aura.name])) then
 						buffsRow1 = true
 					end
+					if (aura.sourceUnit and aura.sourceUnit == "player") and ((aura.spellId and row2Buffs[aura.spellId]) or (aura.name and row2Buffs[aura.name])) then
+						buffsRow2 = true
+					end
+					if (aura.sourceUnit and aura.sourceUnit == "player") and ((aura.spellId and BORBuffs[aura.spellId]) or (aura.name and BORBuffs[aura.name])) then
+						buffsBOR = true
+					end
+					if (aura.sourceUnit and aura.sourceUnit == "player") and ((aura.spellId and BOLBuffs[aura.spellId]) or (aura.name and BOLBuffs[aura.name])) then
+						buffsBOL = true
+					end
 				end
 			end
 		end
@@ -1652,10 +2127,13 @@ local function DebuffFilter_UpdateAuras(scf, unitAuraUpdateInfo)
 		DebuffFilter:buffsRow1(scf, scf.displayedUnit)
 	end
 	if buffsRow2 then
+		DebuffFilter:buffsRow2(scf, scf.displayedUnit)
 	end
 	if buffsBOR then
+		DebuffFilter:buffsBOR(scf, scf.displayedUnit)
 	end
 	if buffsBOL then
+		DebuffFilter:buffsBOL(scf, scf.displayedUnit)
 	end
 	if buffsBOC then
 	end
@@ -1784,6 +2262,8 @@ function DebuffFilter:ResetFrame(f)
 	for j = 1,#f.buffFrames do
 		f.buffFrames[j]:SetScript("OnShow",nil)
 	end
+	scf:UnregisterAllEvents()
+	scf:SetScript("OnEvent", nil)
 	scf.debuff = nil
 	scf.buffs = nil
 	scf = nil
@@ -1867,7 +2347,6 @@ function  DebuffFilter:findFrames()
 				if f and f.unit then
 					self:RegisterUnit(f)
 				elseif self.cache[f] then 
-					self.cache[f]:SetScript("OnEvent", nil)
 					self:ResetFrame(f)
 				end
 			end
@@ -1878,7 +2357,6 @@ function  DebuffFilter:findFrames()
 					if f and f.unit then
 						self:RegisterUnit(f)
 					elseif self.cache[f] then 
-						self.cache[f]:SetScript("OnEvent", nil)
 						self:ResetFrame(f)
 					end
 				end
@@ -1889,7 +2367,6 @@ function  DebuffFilter:findFrames()
 			if f and f.unit then
 				self:RegisterUnit(f)
 			elseif self.cache[f] then 
-				self.cache[f]:SetScript("OnEvent", nil)
 				self:ResetFrame(f)
 			end
 		end
@@ -1899,7 +2376,6 @@ function  DebuffFilter:findFrames()
 			if f and f.unit then
 				self:RegisterUnit(f)
 			elseif self.cache[f] then 
-				self.cache[f]:SetScript("OnEvent", nil)
 				self:ResetFrame(f)
 			end
 		end
@@ -1928,8 +2404,6 @@ EditModeManagerFrame:HookScript("OnShow", function()
 	hooksecurefunc("CompactUnitFrame_UnregisterEvents", function(f)
 		if EditModeManagerFrame:IsVisible() then
 			if DebuffFilter.cache[f] then
-				DebuffFilter.cache[f]:SetScript("OnEvent", nil)
-				DebuffFilter.cache[f]:UnregisterAllEvents()
 				DebuffFilter:ResetFrame(f)
 			else
 				return
