@@ -226,6 +226,7 @@ PriorityBuff[8] = {
 	19574, --Bestial Wraith
 	205691, --Dire Beast Basilisk [summonid]
 
+	382440, --Shifting Power
 	383874, --Hyperthermia
 	190319, --Combustion
 	12042, --Arcane Power
@@ -329,7 +330,6 @@ end
 
 --UPPER LEFT PRIO COUNT (Buff Overlay Right)
 PriorityBuff[9] = {
-	"Renew",
 	185710, --Sugar-Crusted Fish Feast
 	"Food",
 	"Drink",
@@ -491,6 +491,7 @@ local spellIds = {
 
   --SHAMAN
 	[188389] =  "Warning", --Flame Shock
+	[382089] = "Big", -- Electrified Shocks
 	--[208997] = "Big", -- Counterstrike Totem
 	--[206647] = "Big", -- Electrocute
 
@@ -499,6 +500,8 @@ local spellIds = {
 	--[130736] = "Big", -- Soul Reaper
 	--[48743] = "Big", -- Death Pact
 	[204206] = "Big", --Chilled (Chill Streak)
+	[343294] = "Big", --Soul Reaper
+	[214975] = "Warning", -- Shourd of Winter
 	[233397] = "Warning", -- Delirium
 	[214975] = "Warning", -- Heartstop Aura
 	[199719] = "Warning", -- Heartstop Aura
@@ -509,6 +512,7 @@ local spellIds = {
 	--[200947] = "Big", -- Encroaching Vines
 	[391889] = "Big", -- Adpative Swarm
 	[410063] = "Warning", -- Reactive Resin
+	[236021] = "Warning", --Ferocious Wound (5% & 10%)
 	[58180] = "Warning", --Infected Wounds (PvP MS)
 	[202347] = "Warning", --Stellar Flare
 
@@ -518,6 +522,7 @@ local spellIds = {
 
 	--MAGE
 	[390612] = "Big", -- Frostbomb
+	[376103] = "Big",--Radiant Spark Vulnerability
 
 	--MONK
 	[115080] = "Biggest", -- Touch of Death
@@ -546,6 +551,8 @@ local spellIds = {
 	[384631] = "Big", -- Rogue: Flagellation 
 	[8680] = "Warning", --Wound Poison
 	[383414] = "Warning", --Amplyfying Poison
+	[5760] =  "Warning", --Numbing Posion
+
 
 	--LOCK
 	--[80240] = "Bigger", -- Havoc
@@ -556,6 +563,7 @@ local spellIds = {
 	--[48181] = "Big", -- Haunt
 	--[234877] = "Big", -- Curse of Shadows
 	--[196414] = "Big", -- Eradication
+	[199954] = "Warning", --Curse of Fragility
 	[603] = "Warning", -- Doom (Demo)
 	--[233582] = "Warning", --Entrenched Flame
 	[205179] = "Big", --Phantom Singularity
@@ -966,7 +974,7 @@ local bgWarningspellIds = { -- or pet debuffs
 }
 
 
-local function DF_ActionButton_SetupOverlayGlow(button)
+local function ActionButton_SetupOverlayGlow(button)
 	-- If we already have a SpellActivationAlert then just early return. We should already be setup
 	if button.SpellActivationAlert then
 		return;
@@ -981,15 +989,15 @@ local function DF_ActionButton_SetupOverlayGlow(button)
 	button.SpellActivationAlert:Hide();
 end
 
-local function DF_ActionButton_ShowOverlayGlow(button)
-	DF_ActionButton_SetupOverlayGlow(button);
+local function ActionButton_ShowOverlayGlow(button)
+	ActionButton_SetupOverlayGlow(button);
 
 	button.SpellActivationAlert:Show();
 	button.SpellActivationAlert.ProcLoop:Play();
 	button.SpellActivationAlert.ProcStartFlipbook:Hide()
 end
 
-local function DF_ActionButton_HideOverlayGlow(button)
+local function ActionButton_HideOverlayGlow(button)
 	if not button.SpellActivationAlert then
 		return;
 	end
@@ -1931,11 +1939,10 @@ function DebuffFilter:buffsBOL(scf, uid)
 			buffCount(buffFrame, count, backCount)
 			buffFrame:SetID(j);
 			
-			if spellId == 139 then --Ultimate Sac Glow
-				print(spellId)
-				DF_ActionButton_ShowOverlayGlow(buffFrame)
+			if spellId == 199448 then --Ultimate Sac Glow
+				ActionButton_ShowOverlayGlow(buffFrame)
 			else
-				DF_ActionButton_HideOverlayGlow(buffFrame)
+				ActionButton_HideOverlayGlow(buffFrame)
 			end
 			local startTime = expirationTime - duration;
 			if expirationTime  - startTime > 61 then
@@ -2340,7 +2347,13 @@ function DebuffFilter:ApplyFrame(f)
 			scf.buffFrames[j] = _G["scfBuff"..f:GetName()..j] or CreateFrame("Button" , "scfBuff"..f:GetName()..j, UIParent, "CompactAuraTemplate")
 		end
 		local buffFrame = scf.buffFrames[j]
-		buffFrame.cooldown:SetDrawSwipe(false)
+		if strfind(f.unit,"pet") then
+			buffFrame.cooldown:SetDrawSwipe(false)
+		else
+			buffFrame.cooldown:SetDrawSwipe(true)
+			buffFrame.cooldown:SetSwipeColor(0, 0, 0, 0.75)
+			buffFrame.cooldown:SetReverse(true)
+		end
 		buffFrame:ClearAllPoints()
 		buffFrame:SetParent(f)
 		if j == 1 then --Buff One
