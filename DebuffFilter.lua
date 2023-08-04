@@ -1023,7 +1023,7 @@ local function ObjectDNE(guid) --Used for Infrnals and Ele
 	for i = 1, #tooltipData.lines do 
  		local text = tooltipData.lines[i].leftText
 		 if text and (type(text == "string")) then
-			print(i.." "..text)
+			--print(i.." "..text)
 			if strfind(text, "Level ??") or strfind(text, "Corpse") then 
 				return "Despawned"
 			end
@@ -2181,6 +2181,8 @@ end
 --Filters Buff and Debuffs to Correct Loops
 -----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
+
+
 local function DebuffFilter_UpdateAuras(scf, unitAuraUpdateInfo)
 
 	local debuffsChanged = false;
@@ -2198,9 +2200,10 @@ local function DebuffFilter_UpdateAuras(scf, unitAuraUpdateInfo)
 		end
 	end
 
-	if unitAuraUpdateInfo == nil or unitAuraUpdateInfo.isFullUpdate or scf.unit ~= scf.displayedUnit or scf.debuffs == nil then
+	if unitAuraUpdateInfo == nil or unitAuraUpdateInfo.isFullUpdate or (scf.unit and scf.displayedUnit and scf.unit ~= scf.displayedUnit) or scf.debuffs == nil then
 		scf.debuffs = {};scf.buffs = {}
-		AuraUtil.ForEachAura("player", "HELPFUL", nil, HandleAura, true)
+		AuraUtil.ForEachAura(scf.displayedUnit, "HELPFUL", nil, HandleAura, true)
+		AuraUtil.ForEachAura(scf.displayedUnit, "HARMFUL", nil, HandleAura, true)
 		debuffsChanged = true;
 		buffsRow1 = true;
 		buffsRow2 = true;
@@ -2339,21 +2342,27 @@ function DebuffFilter:ApplyFrame(f)
 	end
 
 	for j = 1, DEFAULT_BUFF do
-		if j == 8 then --BUffOverlay Right
-			scf.buffFrames[j] = _G["scfBORBuff"..f:GetName()..j] or CreateFrame("Button" , "scfBORBuff"..f:GetName()..j, UIParent, "CompactAuraTemplate")
-		elseif j == 9 then --BUffOverlay Left
-			scf.buffFrames[j] = _G["scfBOLBuff"..f:GetName()..j] or CreateFrame("Button" , "scfBOLBuff"..f:GetName()..j, UIParent, "CompactAuraTemplate")
+		if strfind(f.unit,"pet") then
+			if j == 8 then --BUffOverlay Right
+				scf.buffFrames[j] = _G["scfPetBORBuff"..f:GetName()..j] or CreateFrame("Button" , "scfPetBORBuff"..f:GetName()..j, UIParent, "CompactAuraTemplate")
+			elseif j == 9 then --BUffOverlay Left
+				scf.buffFrames[j] = _G["scfPetBOLBuff"..f:GetName()..j] or CreateFrame("Button" , "scfPetBOLBuff"..f:GetName()..j, UIParent, "CompactAuraTemplate")
+			else
+				scf.buffFrames[j] = _G["scfPetBuff"..f:GetName()..j] or CreateFrame("Button" , "scfPetBuff"..f:GetName()..j, UIParent, "CompactAuraTemplate")
+			end
 		else
-			scf.buffFrames[j] = _G["scfBuff"..f:GetName()..j] or CreateFrame("Button" , "scfBuff"..f:GetName()..j, UIParent, "CompactAuraTemplate")
+			if j == 8 then --BUffOverlay Right
+				scf.buffFrames[j] = _G["scfBORBuff"..f:GetName()..j] or CreateFrame("Button" , "scfBORBuff"..f:GetName()..j, UIParent, "CompactAuraTemplate")
+			elseif j == 9 then --BUffOverlay Left
+				scf.buffFrames[j] = _G["scfBOLBuff"..f:GetName()..j] or CreateFrame("Button" , "scfBOLBuff"..f:GetName()..j, UIParent, "CompactAuraTemplate")
+			else
+				scf.buffFrames[j] = _G["scfBuff"..f:GetName()..j] or CreateFrame("Button" , "scfBuff"..f:GetName()..j, UIParent, "CompactAuraTemplate")
+			end
 		end
 		local buffFrame = scf.buffFrames[j]
-		if strfind(f.unit,"pet") then
-			buffFrame.cooldown:SetDrawSwipe(false)
-		else
-			buffFrame.cooldown:SetDrawSwipe(true)
-			buffFrame.cooldown:SetSwipeColor(0, 0, 0, 0.75)
-			buffFrame.cooldown:SetReverse(true)
-		end
+		buffFrame.cooldown:SetDrawSwipe(true)
+		buffFrame.cooldown:SetSwipeColor(0, 0, 0, 0.7)
+		buffFrame.cooldown:SetReverse(true)
 		buffFrame:ClearAllPoints()
 		buffFrame:SetParent(f)
 		if j == 1 then --Buff One
@@ -2530,7 +2539,8 @@ function DebuffFilter:RegisterUnit(f, forced)
 	local displayedguid = UnitGUID(f.displayedUnit) or UnitGUID(f.unit)
 
 	if not guid or not displayedguid then return end
-	if frame and frame.unit and frame.unit == f.unit and frame.displayedUnit == f.displayedUnit and frame.guid == guid and frame.displayedguid == displayedguid and not forced then return end 
+	if not forced and ( frame and frame.unit and frame.unit == f.unit and frame.displayedUnit == f.displayedUnit and frame.guid == guid and frame.displayedguid == displayedguid ) then return end 
+	if forced and ( not f.unit or not f.displayedUnit ) then return end
 
 	if not DebuffFilter.cache[f] then 
 		DebuffFilter.cache[f] = frame or CreateFrame("Frame", "scf"..f:GetName()) 
