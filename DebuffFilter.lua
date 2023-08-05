@@ -1795,7 +1795,7 @@ end
 local function buffFilter(uid, j, filter, player)
 	local index, buff, backCount
 	for i = 1, 40 do
-		local buffName, _, count, _, _, _, unitCaster, _, _, spellId = UnitBuff(uid, i, filter)
+		local buffName, _, count, _, _, _, unitCaster, _, _, spellId = UnitAura(uid, i, filter)
 		if ( buffName ) then
 			if isBuff(uid, i, filter, j) then
 				if anybackCount[buffName] or anybackCount[spellId] then backCount = count end 	--Prayer of mending hack
@@ -1819,7 +1819,7 @@ end
 local function buffFilterplayer(uid, j, filter)
 	local index, buff, backCount
 	for i = 1, 40 do
-		local buffName, _, count, _, _, _, unitCaster, _, _, spellId = UnitBuff(uid, i, filter)
+		local buffName, _, count, _, _, _, unitCaster, _, _, spellId = UnitAura(uid, i, filter)
 		if ( buffName ) then
 			if unitCaster == "player" and isBuff(uid, i, filter, j) then
 				if (playerbackCount[buffName] or playerbackCount[spellId]) and unitCaster == "player" then backCount = count end 	--Prayer of mending hack
@@ -1849,7 +1849,7 @@ function DebuffFilter:buffsBOL(scf, uid)
 	local frameWidth, frameHeight = f:GetSize()
 	local componentScale = min(frameHeight / NATIVE_UNIT_FRAME_HEIGHT, frameWidth / NATIVE_UNIT_FRAME_WIDTH);
 	local overlaySize = 11 * componentScale
-	local filter = "player"
+	local filter = "HELPFUL"
 	for j = 9, 9 do
 		local index, buff, backCount = buffFilter(uid, j, filter)
 		local sourceGUID = UnitGUID(uid)
@@ -1969,7 +1969,7 @@ function DebuffFilter:buffsBOR(scf, uid)
 	local frameWidth, frameHeight = f:GetSize()
 	local componentScale = min(frameHeight / NATIVE_UNIT_FRAME_HEIGHT, frameWidth / NATIVE_UNIT_FRAME_WIDTH);
 	local overlaySize = 11 * componentScale
-	local filter = "player"
+	local filter = "HELPFUL"
 	local Z
 	for j = 4, 8 do
 		local index, buff, backCount = buffFilter(uid, j, filter)
@@ -2092,7 +2092,7 @@ function DebuffFilter:buffsRow2(scf, uid)
 	local frameWidth, frameHeight = f:GetSize()
 	local componentScale = min(frameHeight / NATIVE_UNIT_FRAME_HEIGHT, frameWidth / NATIVE_UNIT_FRAME_WIDTH);
 	local overlaySize = 11 * componentScale
-	local filter = nil
+	local filter = "HELPFUL"
 	local Z
 	for j = 10, 12 do --buffRow1 is J == 1, 2, 3
 		local index, buff, backCount = buffFilterplayer(uid, j, filter)
@@ -2144,7 +2144,7 @@ function DebuffFilter:buffsRow1(scf, uid)
 	local frameWidth, frameHeight = f:GetSize()
 	local componentScale = min(frameHeight / NATIVE_UNIT_FRAME_HEIGHT, frameWidth / NATIVE_UNIT_FRAME_WIDTH);
 	local overlaySize = 11 * componentScale
-	local filter = nil
+	local filter = "HELPFUL"
 	for j = 1, 3 do --buffRow1 is J == 1, 2, 3
 		local index, buff, backCount = buffFilterplayer(uid, j, filter)
 		if index then
@@ -2193,10 +2193,12 @@ local function DebuffFilter_UpdateAuras(scf, unitAuraUpdateInfo)
 	local buffsBOC = false;
 
 	local function HandleAura(aura)
-		if aura.isHarmful or aura.isBossAura then
-			scf.debuffs[aura.auraInstanceID] = aura;
-		elseif aura.isHelpful then
-			scf.buffs[aura.auraInstanceID] = aura;
+		if aura then 
+			if aura.isHarmful or aura.isBossAura then
+				scf.debuffs[aura.auraInstanceID] = aura;
+			elseif aura.isHelpful then
+				scf.buffs[aura.auraInstanceID] = aura;
+			end
 		end
 	end
 
