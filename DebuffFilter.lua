@@ -126,6 +126,7 @@ PriorityBuff[7] = {
 PriorityBuff[8] = {
 		--**Stealth Given**
 	198158, --Mass Invisibility
+	414664, --Mass Invisibility
 	"Shroud of Concealment",
 
 	--**Class Stealth**--
