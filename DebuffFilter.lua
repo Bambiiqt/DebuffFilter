@@ -250,8 +250,7 @@ PriorityBuff[8] = {
 
 	231895, --Crusade
 	247677, --Reckoning
-	152262, --Seraphim
-
+	
 	319952, --Surrender to Madness
 	194249, --Voidform
 	391109, --Dark Ascension
