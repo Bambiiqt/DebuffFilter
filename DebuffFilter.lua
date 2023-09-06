@@ -209,6 +209,7 @@ PriorityBuff[8] = {
 	202425, --Warrior of Elune
 	202770, --Fury of Elune
 	202359, --Astral Communion
+	102693, --Grove Guardians
 	248280, --Trees CLEU
 	197625, --Moonkin Form (Resto)
 	24858, --Moonkin Form
@@ -217,6 +218,9 @@ PriorityBuff[8] = {
 
 	375087, --Dragonrage
 	374349, --Renewing Blaze Hot
+	370537, --Stasis
+	404977, --Timeskip
+
 
 	266779, --Coordinated Assaults
 	186289, --Aspect of the Eagle
@@ -416,6 +420,7 @@ PriorityBuff[9] = {
 	--391891, --Adaptive Swarm
 	102351, --Cenarion Ward
 	102352, --Cenarion Ward
+	360827, --Blistering Scales
 	--974, --Earth Shield (Has Stacks)
 	
 	
@@ -518,7 +523,9 @@ local spellIds = {
 
 	--EVOKER
 	[383005] = "Bigger", -- Chrono Loop
+	[409560] = "Bigger", -- Temporal Wound
 	[372048] = "Big", -- Oppressing Roar
+	[404369] = "Warning", --Defy Fate
 
 	--MAGE
 	[390612] = "Big", -- Frostbomb
@@ -1031,8 +1038,15 @@ local function ObjectDNE(guid) --Used for Infrnals and Ele
 	end
 end
 
-local function compare(a,b)
+local function compare_1(a,b)
   return a[6] < b[6]
+end
+
+
+local function compare_2(a, b)
+	if a[6] < b[6] then return true end
+	if a[6] > b[6] then return false end
+	return a[3] > b[3]
 end
 
 -----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -1144,6 +1158,8 @@ local summonedAura = {
 	[49206]  = 25, --Ebon Gargoyle
 
 	[248280] = 10, --Trees
+	[102693] = 15, --Grove Guardians
+
 
 	[205691] = 30, --Dire Beast Basilisk
 
@@ -1209,8 +1225,9 @@ function DebuffFilter:BORCLEU()
 			if not CLEUBOR[sourceGUID] then
 				CLEUBOR[sourceGUID] = {}
 			end
-			tblinsert(CLEUBOR[sourceGUID], {icon, duration, expirationTime, spellId, destGUID, Buff[8][spellId], sourceName, namePrint})
-			tblsort(CLEUBOR[sourceGUID], compare)
+			tblinsert(CLEUBOR[sourceGUID], {icon, duration, expirationTime, spellId, destGUID, BORBuffs[spellId], sourceName, namePrint})
+			tblsort(CLEUBOR[sourceGUID], compare_1)
+			tblsort(CLEUBOR[sourceGUID], compare_2)
 			local ticker = 1
 			Ctimer(duration, function()
 				if CLEUBOR[sourceGUID] then
@@ -1218,7 +1235,9 @@ function DebuffFilter:BORCLEU()
 						if v[4] == spellId then
 							--print(v[7].." ".."Timed Out".." "..v[8].." "..substring(v[5], -7).." left w/ "..string.format("%.2f", v[3]-GetTime()).." BOR C_Timer")
 							tremove(CLEUBOR[sourceGUID], k)
-							tblsort(CLEUBOR[sourceGUID], compare)
+							tblsort(CLEUBOR[sourceGUID], compare_1)
+							tblsort(CLEUBOR[sourceGUID], compare_2)
+							if #CLEUBOR[sourceGUID] ~= 0 then DebuffFilter:buffsBOR(scf, uid) end
 							if #CLEUBOR[sourceGUID] == 0 then
 								CLEUBOR[sourceGUID] = nil
 								DebuffFilter:buffsBOR(scf, uid)
@@ -1235,7 +1254,8 @@ function DebuffFilter:BORCLEU()
 								if ObjectDNE(v[5]) then
 								--print(v[7].." "..ObjectDNE(v[5], ticker, v[8], v[7]).." "..v[8].." "..substring(v[5], -7).." left w/ "..string.format("%.2f", v[3]-GetTime()).." BOR C_Ticker")
 								tremove(CLEUBOR[sourceGUID], k)
-								tblsort(CLEUBOR[sourceGUID], compare)
+								tblsort(CLEUBOR[sourceGUID], compare_1)
+								tblsort(CLEUBOR[sourceGUID], compare_2)
 								if #CLEUBOR[sourceGUID] ~= 0 then DebuffFilter:buffsBOR(scf, uid) end
 								if #CLEUBOR[sourceGUID] == 0 then
 									CLEUBOR[sourceGUID] = nil
@@ -1267,19 +1287,21 @@ function DebuffFilter:BORCLEU()
 			if not CLEUBOR[sourceGUID] then
 				CLEUBOR[sourceGUID] = {}
 			end
-			tblinsert(CLEUBOR[sourceGUID], {icon, duration, expirationTime, spellId, destGUID, Buff[8][spellId], sourceName, namePrint})
-			tblsort(CLEUBOR[sourceGUID], compare)
+			tblinsert(CLEUBOR[sourceGUID], {icon, duration, expirationTime, spellId, destGUID, BORBuffs[spellId], sourceName, namePrint})
+			tblsort(CLEUBOR[sourceGUID], compare_1)
+			tblsort(CLEUBOR[sourceGUID], compare_2)
 			Ctimer(duration, function()
 				if CLEUBOR[sourceGUID] then
 					for k, v in pairs(CLEUBOR[sourceGUID]) do
 						if v[4] == spellId then
 							--print(v[7].." ".."Timed Out".." "..v[8].." "..substring(v[5], -7).." left w/ "..string.format("%.2f", v[3]-GetTime()).." BOR C_Timer")
 							tremove(CLEUBOR[sourceGUID], k)
-							tblsort(CLEUBOR[sourceGUID], compare)
+							tblsort(CLEUBOR[sourceGUID], compare_1)
+							tblsort(CLEUBOR[sourceGUID], compare_2)
 							if #CLEUBOR[sourceGUID] ~= 0 then DebuffFilter:buffsBOR(scf, uid) end
 							if #CLEUBOR[sourceGUID] == 0 then
-							CLEUBOR[sourceGUID] = nil
-							DebuffFilter:buffsBOR(scf, uid)
+								CLEUBOR[sourceGUID] = nil
+								DebuffFilter:buffsBOR(scf, uid)
 							end
 						end
 					end
@@ -1985,10 +2007,10 @@ function DebuffFilter:buffsBOR(scf, uid)
 					expirationTime = CLEUBOR[sourceGUID][1][3]
 					spellId = CLEUBOR[sourceGUID][1][4]
 					cleuSpell = spellId
-					if spellId == 321686 or spellId == 248280 then -- Trees and Mirror Image Count
+					if spellId == 321686 or spellId == 248280 or spellId == 102693 then -- Trees and Mirror Image Count
 						if not count then count = 0 end
 						for i = 1, #CLEUBOR[sourceGUID] do
-							if CLEUBOR[sourceGUID][i][4] == 321686 or CLEUBOR[sourceGUID][i][4] == 248280 then
+							if CLEUBOR[sourceGUID][i][4] == 321686 or CLEUBOR[sourceGUID][i][4] == 248280 or CLEUBOR[sourceGUID][i][4] == 102693 then
 								count = count + 1
 							end
 						end
