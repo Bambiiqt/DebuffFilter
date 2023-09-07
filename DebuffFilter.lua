@@ -420,6 +420,7 @@ PriorityBuff[9] = {
 	--391891, --Adaptive Swarm
 	102351, --Cenarion Ward
 	102352, --Cenarion Ward
+	415649, --Dreamwalker's Embrace
 	360827, --Blistering Scales
 	--974, --Earth Shield (Has Stacks)
 	
