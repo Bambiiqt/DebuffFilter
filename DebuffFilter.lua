@@ -170,6 +170,7 @@ PriorityBuff[8] = {
 	363522, --Gladiator's Eternal Aegis
 	310143, --Soulshape
 	--"Spirit Mend",
+	388035, --Fortitude of the Bear
 
 
 	--**Class Perm Passive Buffs & DMG CDs**--
@@ -409,6 +410,9 @@ PriorityBuff[9] = {
 	204361, --Bloodlust
 	204362, --Heroism
 	29166, --Innervate
+
+	393774, --Sentinal Perception (From Hunter)
+	388045, --Sentinal Owl (Hunter Only)
 	
 	324143, --Conqueror's Banner (Necrolord)
 	--201940, --Protector of the Pack **MAJOR DEFENSIVE**
@@ -493,6 +497,7 @@ local spellIds = {
 	--[203268] = "Big", -- Sticky Tar
 	--[131894] = "Big", -- A Murder of Crows
 	[212431] = "Big", -- Explosive Shot
+	[361049] = "Big", -- Bleeding Gash (Kill Shot w/CA)
 	[257284] = "Warning", -- Hunter's Mark
 
   --SHAMAN
