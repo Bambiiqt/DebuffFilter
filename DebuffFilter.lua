@@ -5,6 +5,7 @@ local DebuffFilter = CreateFrame("Frame")
 DebuffFilter.cache = {}
 
 local DEFAULT_DEBUFF = 3
+local DEFAULT_BIGDEBUFF = 5
 local DEFAULT_BUFF = 12 --This Number Needs to Equal the Number of tracked Table Buf
 local BIGGEST = 1.6
 local BIGGER = 1.4
@@ -133,6 +134,7 @@ PriorityBuff[8] = {
 
 	"Stealth",
 	199483, --Camouflage
+	5384, --Feign Death
 	"Camouflage",
 	5215, --Prowl
 	110960, --Greater Invisibility
@@ -148,11 +150,7 @@ PriorityBuff[8] = {
 	207810, --Nether Bond
 	291944, --Regeneration’
 	59543, --Gift of the Naaru
-	332505, --Soulsteel Clamps
-	332506, --Soulsteel Clamps
 
-
-	--324867, --Fleshcraft (Necrolord)
 
 	--**DMG/Heal CDs Given**--
 	--**Threat MIsdirect Given**--
@@ -162,6 +160,9 @@ PriorityBuff[8] = {
 
 	--** Secondary’ Class Ds**--
 
+	414661, --Frost Mass Barrier
+	414662, --Fire Mass Barrier
+	414663, --Arcane Mass Barrier
 	19236, --Desperate Prayer
 	387636, --Soulburn: Healthstone
 	17767, --Shadow Bulwark
@@ -222,8 +223,8 @@ PriorityBuff[8] = {
 	370537, --Stasis
 	404977, --Timeskip
 
-
 	266779, --Coordinated Assaults
+	360966, --Spearhead
 	186289, --Aspect of the Eagle
 	260402, -- Double Tap
 	288613, -- True Shot
@@ -470,43 +471,32 @@ local spellIds = {
 	[313471] = "Hide", --Faceless Masks
 	[110310] = "Hide", --Dampening
 	[338906] = "Hide", -- The Jailer's Chains
+
 ---Priority--
 --	[317265] = "Priority", --Infinite Stars
 --	[318187] = "Priority", --Gushing Wounds
+
 ---WARNINGS---
-  --DEATH KNIGHT
+--DEATH KNIGHT
   	[123981] = "Warning", --Perdition
-  --Mage
+--DH
+	[209261] = "Warning", --Uncontained Fel
+--Mage
 	[87024] = "Warning", --Cauterized
 	[41425] = "Warning", --Hypothermia
-  --ROGUE
-	[45181] = "Warning", --Cheated Death
-  --PALLY
+--PALLY
 	[25771] = "Warning", --Forbearance
 	[393879] = "Warning", --Gift of the Golden Val'kyr
-	--DH
-	[209261] = "Warning", --Uncontained Fel
-	--GENERAL WARNINGS
+--ROGUE
+	[45181] = "Warning", --Cheated Death
+
+--GENERAL WARNINGS
 	[46392] = "Warning", --Focused Assault (flag carrier, increasing damage taken by 10%)
 	[195901]= "Warning", --Adapted
 	[288756]= "Warning", --Gladiator's Safeguard
 
 ---GENERAL DANGER---
-  --HUNTER
-	--[209967] = "Biggest", -- Dire Beast: Basilisk
-	--[203268] = "Big", -- Sticky Tar
-	--[131894] = "Big", -- A Murder of Crows
-	[212431] = "Big", -- Explosive Shot
-	[361049] = "Big", -- Bleeding Gash (Kill Shot w/CA)
-	[257284] = "Warning", -- Hunter's Mark
-
-  --SHAMAN
-	[188389] =  "Warning", --Flame Shock
-	[382089] = "Big", -- Electrified Shocks
-	--[208997] = "Big", -- Counterstrike Totem
-	--[206647] = "Big", -- Electrocute
-
-	--DEATH KNIGHT
+--DEATH KNIGHT
 	--[77606] = "Biggest", -- Dark Simulacrum
 	--[130736] = "Big", -- Soul Reaper
 	--[48743] = "Big", -- Death Pact
@@ -517,36 +507,55 @@ local spellIds = {
 	[214975] = "Warning", -- Heartstop Aura
 	[199719] = "Warning", -- Heartstop Aura
 
-	--DRUID
+--DEMON HUNTER
+	--[206491] = "Big", -- Nemesis
+	--[207744] = "Big", -- Fiery Brand
+	[320338] = "Big", --Essence Break
+	[370969] = "Big", -- The Hunt Dot
+
+--DRUID
 	--[232559] = "Big", -- Thorns
 	--[236021] = "Big", -- Ferocious Wound
 	--[200947] = "Big", -- Encroaching Vines
+	[274838] = "Big",  --Feral Frenzy
 	[391889] = "Big", -- Adpative Swarm
 	[410063] = "Warning", -- Reactive Resin
 	[236021] = "Warning", --Ferocious Wound (5% & 10%)
 	[58180] = "Warning", --Infected Wounds (PvP MS)
 	[202347] = "Warning", --Stellar Flare
 
-	--EVOKER
+--EVOKER
 	[383005] = "Bigger", -- Chrono Loop
 	[409560] = "Bigger", -- Temporal Wound
 	[372048] = "Big", -- Oppressing Roar
 	[404369] = "Warning", --Defy Fate
 
-	--MAGE
+--HUNTER
+	--[209967] = "Biggest", -- Dire Beast: Basilisk
+	--[203268] = "Big", -- Sticky Tar
+	[131894] = "Big", -- A Murder of Crows (BM)
+	[321538] = "Big", --Bloodshed (BM)
+	[212431] = "Big", -- Explosive Shot (MM)
+	[361049] = "Big", -- Bleeding Gash (Kill Shot w/CA) (SV)
+	[257284] = "Warning", -- Hunter's Mark
+
+--MAGE
 	[390612] = "Big", -- Frostbomb
 	[376103] = "Big",--Radiant Spark Vulnerability
 
-	--MONK
-	[115080] = "Biggest", -- Touch of Death
+--MONK
+	--[115080] = "Biggest", -- Touch of Death
 	[122470] = "Bigger", -- Touch of Karma
 	[124280] = "Big", -- Touch of Karma Dot
+	[393047] = "Big", --Skyreach
 	[386276] = "Big", -- Bonedust Brew
 
-  --PALLY
+--PALLY
 	--[206891] = "Big", -- Focused Assault
+	[343721] = "Big", --  --Final Reckoning
+	[343527] = "Big", --  --Execution Sentence
 
-  --PRIEST
+--PRIEST
 	--[322461] = "Big" --Thoughtstolen
 	--[205369] = "Bigger", -- Mind Bomb
 	--[199845] = "Bigger", --Psyflay
@@ -555,19 +564,25 @@ local spellIds = {
 	[375901] = "Big", -- Priest: Mindgames
 	[335467] = "Big", --Devouring Plague
 
-	--ROGUE
+--ROGUE
 	[79140]  = "Biggest", -- Vendetta
 	[360194] = "Biggest", -- Deathmark
-	[207736] = "Big", -- Shadowy Duel
-	[212183] = "Big", -- Smoke Bomb
+	[207736] = "Bigger", -- Shadowy Duel
+	[212183] = "Bigger", -- Smoke Bomb
 	[385408] = "Big", -- Rogue: Sepsis
 	[384631] = "Big", -- Rogue: Flagellation 
 	[8680] = "Warning", --Wound Poison
 	[383414] = "Warning", --Amplyfying Poison
 	[5760] =  "Warning", --Numbing Posion
 
+--SHAMAN
+	[197209] = "Bigger", --Lightning Rod
+	[382089] = "Big", -- Electrified Shocks
+	[188389] =  "Warning", --Flame Shock
+	--[208997] = "Big", -- Counterstrike Totem
+	--[206647] = "Big", -- Electrocute
 
-	--LOCK
+--WARLOCK
 	--[80240] = "Bigger", -- Havoc
 	--[200587] = "Bigger", -- Fel Fissure
 	--[199954] = "Big", -- Curse of Fragility
@@ -576,39 +591,22 @@ local spellIds = {
 	--[48181] = "Big", -- Haunt
 	--[234877] = "Big", -- Curse of Shadows
 	--[196414] = "Big", -- Eradication
+	--[233582] = "Warning", --Entrenched Flame
+	[386997] = "Bigger", -- Warlock: Soulrot 
+	[205179] = "Big", --Phantom Singularity
+	--[212580] = "Big", --Call Observer
 	[199954] = "Warning", --Curse of Fragility
 	[603] = "Warning", -- Doom (Demo)
-	--[233582] = "Warning", --Entrenched Flame
-	[205179] = "Big", --Phantom Singularity
-	[386997] = "Big", -- Warlock: Soulrot 
 
-  --WARRIOR
+--WARRIOR
   --[198819] = "Bigger", -- Sharpen
   --[236273] = "Big", -- Duel
   --[208086] = "Big", -- Colossus Smash
---[354788] = "Warning", --Slaughterhouse (Stacking MS)
+	--[354788] = "Warning", --Slaughterhouse (Stacking MS)
+	[208086] = "Big", --Colossus Smash
+	[397364] = "Big", --Thunderous Roar
 
-	--DEMON HUNTER
-	--[206491] = "Big", -- Nemesis
-	--[207744] = "Big", -- Fiery Brand
-	[370969] = "Big", -- The Hunt Dot
-
-	--COVENANTS
-	[320224] = "Biggest", --Potender (Nightfae)(Not Re-Talented)
-	[327140] = "Biggest", --Forgeborne Reveries (Necrolord)(Not Re-Talented)
-	[317009] = "Big", -- DH: Sinful Brand(Venthyer)(Not Re-Talented)
-	[324149] = "Big", -- Hunter: Flayed Shot (Venthyer)(Not Re-Talented)
-	[314793] = "Big", -- Mage: Mirrors of Torment (Venthyr)(Not Re-Talented)
-	[325203] = "Big", --Unholy Transfusion (Necro)(Not Re-Talented)
-	[323673] = "Big", -- **Priest: Mindgames (Venthyr)
-	[323654] = "Big", -- **Rogue: Flagellation (Venthyer)
-	[328305] = "Big", -- **Rogue: Sepsis (NightFae)
-	[325640] = "Big", -- **Warlock: Soulrot (Nightfae)
-	[325216] = "Big", -- **Bonedust Brew (Necro)
-	[325733] = "Big", -- **Adpative Swarm (Necro)
-
-
-	--TRINKETS
+--TRINKETS
 
 
 
@@ -1423,10 +1421,10 @@ local function isBigDebuff(unit, index, filter)
 			specID = GetArenaOpponentSpec(id)
 			if specID then
 				if (specID == 105) then --Druid: Balance: 102 / Feral: 103 / Guardian: 104 /Restoration: 105
-					spellIds[spellId] = "Warning"
+					spellIds[spellId] = "Priority"
 					bgWarningspellIds[spellId] = "True"
 				else
-					spellIds[spellId] = "Big"
+					spellIds[spellId] = "Warning"
 					bgWarningspellIds[spellId] = nil
 				end
 			end
@@ -1476,7 +1474,7 @@ local function isWarning(unit, index, filter)
 					spellIds[spellId] = "Warning"
 					bgWarningspellIds[spellId] = "True"
 				else
-					spellIds[spellId] = "None"
+					spellIds[spellId] = "Priority"
 					bgWarningspellIds[spellId] = nil
 				end
 			end
@@ -1651,7 +1649,7 @@ function DebuffFilter:UpdateDebuffs(scf, uid)
 		filter = "RAID"
 	end
 	--Biggest Debuffs
-		while debuffNum <= DEFAULT_DEBUFF do
+		while debuffNum <= DEFAULT_BIGDEBUFF do
 			local debuffName = UnitDebuff(uid, index, filter)
 			if ( debuffName ) then
 				if isBiggestDebuff(uid, index, filter) then
@@ -1666,7 +1664,7 @@ function DebuffFilter:UpdateDebuffs(scf, uid)
 		end
 		index = 1
 		--Bigger Debuff
-		while debuffNum <= DEFAULT_DEBUFF do
+		while debuffNum <= DEFAULT_BIGDEBUFF do
 			local debuffName = UnitDebuff(uid, index, filter);
 			if ( debuffName ) then
 				if isBiggerDebuff(uid, index, filter) and not isBiggestDebuff(uid, index, filter) then
@@ -1681,7 +1679,7 @@ function DebuffFilter:UpdateDebuffs(scf, uid)
 		end
 		index = 1
 		--Big Debuff
-		while debuffNum <= DEFAULT_DEBUFF do
+		while debuffNum <= DEFAULT_BIGDEBUFF do
 			local debuffName = UnitDebuff(uid, index, filter);
 			if ( debuffName ) then
 				if isBigDebuff(uid, index, filter) and not isBiggestDebuff(uid, index, filter) and not isBiggerDebuff(uid, index, filter) then
