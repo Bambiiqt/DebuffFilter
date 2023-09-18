@@ -8,12 +8,13 @@ local DEFAULT_DEBUFF = 3
 local DEFAULT_BIGDEBUFF = 5
 local DEFAULT_BUFF = 12 --This Number Needs to Equal the Number of tracked Table Buf
 local BIGGEST = 1.6
-local BIGGER = 1.4
-local BIG = 1.4
-local BOSSDEBUFF = 1.4
-local BOSSBUFF = 1.4
+local BIGGER = 1.45
+local BIG = 1.45
+local BOSSDEBUFF = 1.45
+local BOSSBUFF = 1.45
 local WARNING = 1.2
 local PRIORITY = 1
+local DEBUFF = .9
 
 local strfind = string.find
 local strmatch = string.match
@@ -238,8 +239,8 @@ PriorityBuff[8] = {
 	190319, --Combustion
 	12042, --Arcane Power
 	365362, --Arcane Surge
-	324220, --Deathborne
-	198144, --Ice Form
+	389794, --Snowdrift
+	--198144, --Ice Form
 	12472, --Icy Veins
 	382148, --Slick Ice
 	342242, --Time Warp
@@ -1758,7 +1759,7 @@ function DebuffFilter:UpdateDebuffs(scf, uid)
 			if ( debuffName ) then
 				if ( isDebuff(uid, index, filter) and not isBiggestDebuff(uid, index, filter) and not isBiggerDebuff(uid, index, filter) and not isBigDebuff(uid, index, filter) and not CompactUnitFrame_UtilIsBossDebuff(uid, index, filter) and not CompactUnitFrame_UtilIsBossAura(uid, index, filter) and not isWarning(uid, index, filter) and not isPriority(uid, index, filter)) then
 					local debuffFrame = scf.debuffFrames[debuffNum]
-					SetdebuffFrame(scf, f, debuffFrame, uid, index, "HARMFUL", 1)
+					SetdebuffFrame(scf, f, debuffFrame, uid, index, "HARMFUL", DEBUFF)
 					debuffNum = debuffNum + 1
 				end
 			else
