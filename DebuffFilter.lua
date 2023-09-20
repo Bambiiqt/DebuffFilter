@@ -555,6 +555,7 @@ local spellIds = {
 	--[206891] = "Big", -- Focused Assault
 	[343721] = "Big", --  --Final Reckoning
 	[343527] = "Big", --  --Execution Sentence
+	[2812] = "Warning", -- Denouce
 
 --PRIEST
 	--[322461] = "Big" --Thoughtstolen
