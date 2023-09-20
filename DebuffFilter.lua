@@ -14,7 +14,7 @@ local BOSSDEBUFF = 1.45
 local BOSSBUFF = 1.45
 local WARNING = 1.2
 local PRIORITY = 1
-local DEBUFF = .9
+local DEBUFF = .925
 
 local strfind = string.find
 local strmatch = string.match
