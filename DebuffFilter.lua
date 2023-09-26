@@ -124,7 +124,9 @@ PriorityBuff[7] = {
 	"Battle Shout",
 }
 
+--------------------------------------------------------------------------------------------------------------------------------------------------
 --UPPER RIGHT PRIO COUNT (Buff Overlay Right)
+--------------------------------------------------------------------------------------------------------------------------------------------------
 PriorityBuff[8] = {
 		--**Stealth Given**
 	198158, --Mass Invisibility
@@ -335,7 +337,9 @@ for i = 4, 8 do
 	end
 end
 
+--------------------------------------------------------------------------------------------------------------------------------------------------
 --UPPER LEFT PRIO COUNT (Buff Overlay Right)
+--------------------------------------------------------------------------------------------------------------------------------------------------
 PriorityBuff[9] = {
 	185710, --Sugar-Crusted Fish Feast
 	"Food",
@@ -343,12 +347,9 @@ PriorityBuff[9] = {
 	"Food & Drink",
 	"Refreshment",
 	
-	--**Immunity Raid**--
+	--**Immunity Raid**-----------------------------------------------------------------------
 	
-	
-	
-	--**Healer CDs Given**--
-	
+	--**Healer CDs Given**--------------------------------------------------------------------
 	199448, --Blessing of Sacrifice (100%)
 	1022, --Blessing of Protection
 	204018, --Blessing of Spellwarding
@@ -373,15 +374,13 @@ PriorityBuff[9] = {
 	370666, --Rescue
 	116849, --Life Cocoon
 	
-	--**Class Healing CDs**--
+	--**Class Healing CDs**---------------------------------------------------------------------
 	207498, --Ancestral Protection
 	209426, --Darkness
 	145629, --Anti-Magic Zone
 	97463, --Rallying Cry
 	
-	
-	--**CC Help**--
-	
+	--**CC Help**-------------------------------------------------------------------------------
 	213610, --Holy Ward
 	359816, --Dream Flight
 	378464, --Nullifying Shourd
@@ -391,9 +390,7 @@ PriorityBuff[9] = {
 	383020, -- Tranquil Totem
 	234084, -- Moon & Stars
 	
-	
 	--**Class Healing & DMG CDs Given**---------------------------------------------------------
-	
 	375226, -- Time Spiral (Death Knight)
 	375229, -- Time Spiral (Demon Hunter)
 	375230, -- Time Spiral (Druid)
@@ -421,7 +418,7 @@ PriorityBuff[9] = {
 	305497, --Thorns(Friendly and Enemy spellId)
 	
 	
-	--** Healer CDs Given w/ Short CD**--
+	--** Healer CDs Given w/ Short CD**---------------------------------------------------------
 	--325748, --Adaptive Swarm
 	--391891, --Adaptive Swarm
 	102351, --Cenarion Ward
@@ -431,8 +428,7 @@ PriorityBuff[9] = {
 	--974, --Earth Shield (Has Stacks)
 	
 	
-	--**Passive Buffs Given**--
-	
+	--**Passive Buffs Given**------------------------------------------------------------------
 	289318, --Mark of the Wild
 	--317920, --Concentration Aura
 	--465, --Devotion Aura
@@ -456,7 +452,9 @@ for i = 1, DEFAULT_BUFF do
 	end
 end
 
--- data from LoseControl
+ --------------------------------------------------------------------------------------------------------------------------------------------------
+ --Debuffs
+ --------------------------------------------------------------------------------------------------------------------------------------------------
 local spellIds = {
 
 --DONT SHOW
@@ -498,7 +496,6 @@ local spellIds = {
 
 ---GENERAL DANGER---
 --DEATH KNIGHT
-	--[77606] = "Biggest", -- Dark Simulacrum
 	--[130736] = "Big", -- Soul Reaper
 	--[48743] = "Big", -- Death Pact
 	[204206] = "Big", --Chilled (Chill Streak)
@@ -509,15 +506,10 @@ local spellIds = {
 	[199719] = "Warning", -- Heartstop Aura
 
 --DEMON HUNTER
-	--[206491] = "Big", -- Nemesis
-	--[207744] = "Big", -- Fiery Brand
 	[320338] = "Big", --Essence Break
 	[370969] = "Big", -- The Hunt Dot
 
 --DRUID
-	--[232559] = "Big", -- Thorns
-	--[236021] = "Big", -- Ferocious Wound
-	--[200947] = "Big", -- Encroaching Vines
 	[274838] = "Big",  --Feral Frenzy
 	[391889] = "Big", -- Adpative Swarm
 	[410063] = "Warning", -- Reactive Resin
@@ -532,8 +524,6 @@ local spellIds = {
 	[404369] = "Warning", --Defy Fate
 
 --HUNTER
-	--[209967] = "Biggest", -- Dire Beast: Basilisk
-	--[203268] = "Big", -- Sticky Tar
 	[131894] = "Big", -- A Murder of Crows (BM)
 	[321538] = "Big", --Bloodshed (BM)
 	[212431] = "Big", -- Explosive Shot (MM)
@@ -545,7 +535,6 @@ local spellIds = {
 	[376103] = "Big",--Radiant Spark Vulnerability
 
 --MONK
-	--[115080] = "Biggest", -- Touch of Death
 	[122470] = "Bigger", -- Touch of Karma
 	[124280] = "Big", -- Touch of Karma Dot
 	[393047] = "Big", --Skyreach
@@ -559,7 +548,6 @@ local spellIds = {
 
 --PRIEST
 	--[322461] = "Big" --Thoughtstolen
-	--[205369] = "Bigger", -- Mind Bomb
 	--[199845] = "Bigger", --Psyflay
 	--[247777] = "Big", --Mind Trauma
 	--[214621] = "Big", --Schism
@@ -611,166 +599,18 @@ local spellIds = {
 --TRINKETS
 
 
-
-
----PVE---
---RAID
---  [240559] = "Bigger", -- Incubation Fluid
-
---MYTHICS AFFIX'S
-	[240559] = "Bigger", -- Grievous Wound
-	[209858] = "Bigger", -- Necrotic Wound
-	--Voidweaver Mal'thir
-	[314411] = "Bigger", --Lingering Doubt
-	[314406] = "Bigger", -- Crippling Pestilence
-	--Samh'rek, Beckoner of Chaos
-	[314478] = "Bigger", --Cascading Terror
-	[314531] = "Bigger", --Tear Flesh
-	--Urg'roth, Breaker of Heroes
-	[314308] = "Bigger", --Spirit Breaker
-
---TORGHAST
-	[296839] = "Bigger", -- Sledgehammer
-	[294526] = "Bigger", -- Curse of Frailty
-
---VISIONS OF ORG
-	[297315] = "Bigger", -- Void Buffet
-	[298510] = "Bigger", -- Aqiri Mind Toxin
-
---FREEHOLD
-	[257436] = "Bigger", -- Poisoning Strike
-	[257437] = "Bigger", -- Poisoning Strike
-	[258323] = "Bigger", -- Infected Wound
-	[257775] = "Bigger", -- Plague Step
-	[274555] = "Bigger", -- Scabrous Bite
-	[278467] = "Bigger", -- Caustic Freehold Brew
-	[257739] = "Bigger", -- Blind Rage
-	[256363] = "Bigger", -- Ripper Punch
-	[257908] = "Bigger", -- Oiled Blade
-
---KING'S REST
-	[265773] = "Bigger", -- Spit Gold (265773)
-	[265914] = "Bigger", -- Molten Gold (265914)
-	[270084] = "Bigger", -- Axe Barrage (270084)
-	[270865] = "Bigger", -- Hidden Blade (270865)
-	[271564] = "Bigger", -- Embalming Fluid (271564)
-	[267763] = "Bigger", -- Wretched Discharge
-	[267618] = "Bigger", -- Drain Fluids (267618)
-	[267626] = "Bigger", -- Dessication (267626)
-	[270487] = "Bigger", -- Severing Blade (270487)
-	[270507] = "Bigger", -- Poison Barrage (270507) (WA for Fixated)
-	[266238] = "Bigger", -- Shattered Defenses (266238)
-	[266231] = "Bigger", -- Severing Axe (266231)
-	[267273] = "Bigger", -- Pioson Nova ???
-	[272388] = "Bigger", -- Shadow Barrage (272388)
-	--[] = "Bigger", -- Pool of Darkness ???
-	[271640] = "Bigger", -- Dark Revelation (271640)
-
---WAYCREST MANOR
-	[260703] = "Bigger", -- Unstable Runic Mark (260703)
-	[268088] = "Bigger", --Aura of Dread (268088)[Doesnt Work!]
-	[260741] = "Bigger", --Jagged Nettles (260741)
-	------- Right Room 1
-	[263943] = "Biggest", --Etch
-	[263905] = "Bigger", --Marking Cleave
-	[264520] = "Big", --Serving Serpent
-	--------Right Hall Way 1
-	[271178] = "Bigger", --Ravaging Leap
-	--------Court Yard
-	[265761] = "Biggest", --Thorned Barrage
-	[264556] = "Bigger", --Tearing Strike
-	[264050] = "Big", --Infected Thorn
-	--------Left Room (sisters)
-	[266036] = "Biggest", --Drain Essence
-	[266035] = "Bigger", --Bone Splinter
-	--------Downstairs Hall
-	[265881] = "Biggest", --Decaying Touch
-	[265880] = "Bigger", --Dread Mark
-	[265882] = "Warning", --Lingering Dread
-	--------Downstairs
-	[264378] = "Biggest", --Fragment Souls
-	[264105] = "Bigger", --Runic Mark
-
---UNDERROT
-	[265019] = "Bigger", -- Savage Cleave
-	[265568] = "Bigger", -- Dark Omen
-	[266107] = "Bigger", -- Thirst For Blood
-	[273226] = "Bigger", -- Decaying Spores
-	[269301] = "Bigger", -- Putrid Blood
-
---TOL DAGOR
-	[258079] = "Bigger", -- Massive Chomp
-	[258128] = "Biggest", -- Debilitating Shout
-	[257028] = "Bigger", -- Fuselighter
-	[256038] = "Bigger", -- Deadeye
-	[256105] = "Bigger", -- Explosive Burst
-	[265889] = "Bigger", -- Torch Strike
-
---TEMPLE OF SETHRALISS
-	[266923] = "Bigger", -- Galvanize
-	[263371] = "Bigger", -- Conduction
-	[267027] = "Bigger", -- Cytotoxin
-	[272699] = "Bigger", -- Venomous Spit
-	[268007] = "Biggest", -- Heart Attack
-
---ATAL'DAZAR
-	[255558] = "Bigger", -- Tainted Blood
-	[255582] = "Bigger", -- Molten Gold
-	[252687] = "Bigger", -- Venomfang Strike
-	[250096] = "Bigger", -- Wracking Pain (Yazma)
-	[257407] = "Biggest", -- Pursuit (Rezan)
-	[250372] = "Big", -- Lingering Nausea [Vol'kaal]
-	[258723] = "Biggest", -- Grotesque Pool [Add Pool]
-	[250585] = "Biggest", -- Toxic Pool [Vol'kaal]
-	[260668] = "Biggest", -- Transfusion (Add)
-	[255835] = "Biggest", -- Transfusion (Boss Priestess)
-	[256577] = "Biggest", -- Soulfest (Yazma)
---SIEGE OF BORULAS
-	[279893] = "Bigger", -- Blood in the Water
-	[273470] = "Bigger", -- Gut Shot
-	[257168] = "Bigger", -- Cursed Slash
-	[257036] = "Bigger", -- Feral Charge
-	[260954] = "Bigger", -- Iron Gaze
-	[257459] = "Bigger", -- On the Hook
-	[272588] = "Bigger", -- Rotting Wounds
-	[275836] = "Bigger", -- Stinging Venom
-	[272421] = "Warning", -- Sighted Artiller
-
---SHRINE OF THE STORM
-	[264166] = "Bigger", -- Undertow
-	[279893] = "Bigger", -- Blood in the Water
-	[268322] = "Bigger", -- Touch of the Drowned
-	[268214] = "Bigger", -- Carve Flash
-	[267818] = "Bigger", -- Slicing Blast
-	[267034] = "Bigger", -- Whispers of Power
-	[274633] = "Bigger", -- Sundering Blow
-	[268317] = "Bigger", -- Rip Mind
-	[268315] = "Bigger", -- Rip Mind
-	[140038] = "Bigger", -- Abyssal Strike
-
---MOTHERLODE
-	[270882] = "Bigger", -- Blazing Azerite (Boss 1)
-	[257544] = "Bigger", -- Jagged Cut (Boss 2)
-	[257582] = "Priority", -- Raging Gaze (Boss 2)
-	[259853] = "Bigger", -- Chemical Burn (Boss 3)
-	[269298] = "Bigger", -- Widowmaker
-	[263202] = "Bigger", -- Rocklance
-
---Operation - Junkyard
-	[299438] = "Bigger", -- Sledgehammer
-
---Operation - Workshop
-	[294929] = "Biggest", -- Death Blast
-	[303678] = "Biggest", -- Shrapnel 20% Stacking Increased Dmg Taken
-	[329326] = "Biggest", -- Dark Binding
-
-
+--------------------------------------------------------------------------------------------------------------------------------------------------
+--BGs & Pets
+--------------------------------------------------------------------------------------------------------------------------------------------------
 }
 
-local bgBiggerspellIds = {
+-- data from LoseControl
+local bgBiggerspellIds = { --Always Shows for Pets
+	
 }
 
-local bgBigspellIds = {
+-- data from LoseControl
+local bgBigspellIds = { --Always Shows for Pets
 --CC--
 [3355] = "True",			-- Freezing Trap
 [203337] = "True",			-- Freezing Trap (Diamond Ice - pvp honor talent)
@@ -958,7 +798,8 @@ local bgBigspellIds = {
 
 }
 
-local bgWarningspellIds = { -- or pet debuffs
+-- data from LoseControl Warning 
+local bgWarningspellIds = { --Always Shows for Pets
 
 	[233490] = "True", -- UA
 	[233497] = "True", -- UA
@@ -1380,7 +1221,7 @@ end
 local function isBiggerDebuff(unit, index, filter)
   local  _, _, _, _, _, _, _, _, _, spellId = UnitAura(unit, index, "HARMFUL");
 	local inInstance, instanceType = IsInInstance()
-	if (instanceType =="pvp" or strfind(unit,"pet")) and bgBigspellIds[spellId] then
+	if (instanceType =="pvp" or strfind(unit,"pet")) and bgBiggerspellIds[spellId] then
 		return true
 	elseif spellIds[spellId] == "Bigger"  and instanceType ~="pvp" then
 		return true
@@ -1534,6 +1375,8 @@ local function CooldownFrame_Clear(self)
 end
 
 local function SetdebuffFrame(scf, f, debuffFrame, uid, index, filter, scale)
+	if not debuffFrame then return end 
+	
 	local frameWidth, frameHeight = f:GetSize()
 	local componentScale = min(frameHeight / NATIVE_UNIT_FRAME_HEIGHT, frameWidth / NATIVE_UNIT_FRAME_WIDTH);
 	local overlaySize = 11 * componentScale
