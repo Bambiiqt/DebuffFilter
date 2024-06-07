@@ -47,22 +47,22 @@ local playerbackCount = {
 
 PriorityBuff[1] = {
 	--"Power Infusion",
-	"Renew",
+	"Power Word: Shield",
 	"Beacon of Light",
 	"Beacon of Faith",
 	774, --Rejuv
 }
 
 PriorityBuff[2] = {
-	"Atonement",
-	"Echo of Light",
+	"Renew",
 	155777, --Rejuc Germ
 	"Spring Blossoms",
 	"Glimmer of Light",
 }
 
 PriorityBuff[3] = {
-	"Power Word: Shield",
+	"Atonement",
+	"Echo of Light",
 	"Prayer of Mending",
 	"Lifebloom",
 	"Bestow Faith",
@@ -231,8 +231,8 @@ PriorityBuff[8] = {
 	186289, --Aspect of the Eagle
 	260402, -- Double Tap
 	288613, -- True Shot
+	359844, --Call of the Wild
 	212704, --The Beast within
-	193530, --Aspect of the Wild
 	19574, --Bestial Wraith
 	205691, --Dire Beast Basilisk [summonid]
 
@@ -2182,7 +2182,6 @@ end
 -----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
 function DebuffFilter:ApplyFrame(f)
-
 	local frameWidth, frameHeight = f:GetSize()
 	local componentScale = min(frameHeight / NATIVE_UNIT_FRAME_HEIGHT, frameWidth / NATIVE_UNIT_FRAME_WIDTH);
 	local overlaySize =  11 * componentScale
