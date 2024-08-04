@@ -233,8 +233,6 @@ BOR = {
 	--356337, --Rune of Spellwarding
 
 	162264, -- Metamorphosis (Havoc)
-	208195, --Demon Soul (Necro)
-	347765, --Demon Soul
 
 
 	319454, --Heart of the Wild
@@ -319,6 +317,7 @@ BOR = {
 	123040, --Disc Pet Summmon Mindbender
 	34433,  --Disc Pet Summmon Sfiend
 	405963, --Divine Image
+	47536, 	--Rapture
 	197862, --ArchAngel
 	322105, --Shadow Covenant
 	232698, --Shadowform
@@ -1921,27 +1920,6 @@ end
 
 function DebuffFilter:frameBuffs(scf, uid, tbl1, tbl2, tbl3)
 
-	----------------------------------------------------------------------------------------------------------------------------------------------------------
-	-- Used for Raid Buffs
-	----------------------------------------------------------------------------------------------------------------------------------------------------------
-	if tbl2 then
-		if tbl2[1] then 
-			local j = 4
-			for i = 1, 4 do  
-				if tbl2[i] then
-					local name, icon, count, debuffType, duration, expirationTime, unitCaster, canStealOrPurge, _, spellId, canApplyAura, destGUID, position, index, filter = unpack(tbl2[i])
-					DebuffFilter:SetBuffIcon(scf, uid, j, name, icon, count, debuffType, duration, expirationTime, unitCaster, canStealOrPurge, _, spellId, canApplyAura, destGUID, position, index, filter, tbl2.BUFFSIZE)
-				else
-					DebuffFilter:SetBuffIcon(scf, uid, j, nil, nil, nil, nil, nil, nil, nil, nil, nil, nil,nil, nil, nil, nil,nil, tbl2.BUFFSIZE)
-				end
-				j = j + 1
-			end
-		else
-			for j = 4, 7 do  
-				DebuffFilter:SetBuffIcon(scf, uid, j, nil, nil, nil, nil, nil, nil, nil, nil, nil, nil,nil, nil, nil, nil,nil, tbl2.BUFFSIZE)
-			end
-		end
-	end
 
 	----------------------------------------------------------------------------------------------------------------------------------------------------------
 	-- Main Row Used for Buff 123 and BOL, BOR
@@ -2038,6 +2016,28 @@ function DebuffFilter:frameBuffs(scf, uid, tbl1, tbl2, tbl3)
 			DebuffFilter:SetBuffIcon(scf, uid, tbl1.j, name, icon, count, debuffType, duration, expirationTime, unitCaster, canStealOrPurge, _, spellId, canApplyAura, destGUID, position, index, filter, tbl1.BUFFSIZE)
 		else
 			DebuffFilter:SetBuffIcon(scf, uid, tbl1.j, nil, nil, nil, nil, nil, nil, nil, nil, nil, nil,nil, nil, nil, nil,nil, tbl1.BUFFSIZE)
+		end
+	end
+
+	----------------------------------------------------------------------------------------------------------------------------------------------------------
+	-- Used for Raid Buffs
+	----------------------------------------------------------------------------------------------------------------------------------------------------------
+	if tbl2 then
+		if tbl2[1] then 
+			local j = 4
+			for i = 1, 4 do  
+				if tbl2[i] then
+					local name, icon, count, debuffType, duration, expirationTime, unitCaster, canStealOrPurge, _, spellId, canApplyAura, destGUID, position, index, filter = unpack(tbl2[i])
+					DebuffFilter:SetBuffIcon(scf, uid, j, name, icon, count, debuffType, duration, expirationTime, unitCaster, canStealOrPurge, _, spellId, canApplyAura, destGUID, position, index, filter, tbl2.BUFFSIZE)
+				else
+					DebuffFilter:SetBuffIcon(scf, uid, j, nil, nil, nil, nil, nil, nil, nil, nil, nil, nil,nil, nil, nil, nil,nil, tbl2.BUFFSIZE)
+				end
+				j = j + 1
+			end
+		else
+			for j = 4, 7 do  
+				DebuffFilter:SetBuffIcon(scf, uid, j, nil, nil, nil, nil, nil, nil, nil, nil, nil, nil,nil, nil, nil, nil,nil, tbl2.BUFFSIZE)
+			end
 		end
 	end
 
