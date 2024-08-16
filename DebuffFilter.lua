@@ -38,6 +38,17 @@ local substring = string.sub
 local SmokeBombAuras = {}
 local DuelAura = {}
 
+local GetSpellInfo = GetSpellInfo or function(spellID)
+	if not spellID then
+	  return nil;
+	end
+  
+	local spellInfo = C_Spell.GetSpellInfo(spellID);
+	if spellInfo then
+	  	return spellInfo.name, nil, spellInfo.iconID, spellInfo.castTime, spellInfo.minRange, spellInfo.maxRange, spellInfo.spellID, spellInfo.originalIconID;
+	end
+end
+
 local UnitAura = UnitAura
 if UnitAura == nil then
   --- Deprecated in 10.2.5
@@ -898,12 +909,8 @@ end
 
 
 local function ObjectDNE(guid) --Used for Infrnals and Ele
-	local tooltipData =  C_TooltipInfo.GetHyperlink('unit:' .. guid or '')
-	TooltipUtil.SurfaceArgs(tooltipData)
 
-	for _, line in ipairs(tooltipData.lines) do
-		TooltipUtil.SurfaceArgs(line)
-	end
+	local tooltipData =  C_TooltipInfo.GetHyperlink('unit:' .. guid or '')
 	--print(#tooltipData.lines)
 	if #tooltipData.lines == 1 then -- Fel Obelisk
 		return "Despawned"
@@ -1796,6 +1803,32 @@ end
 
 
 local function buffTooltip(buffFrame, uid, index, spellId, filter)
+	buffFrame.tooltip = _G[buffFrame:GetName().."Tooltip"] or CreateFrame("GameTooltip", buffFrame:GetName().."Tooltip", UIParent, "GameTooltipTemplate")
+	if index and uid and filter ==  "HELPFUL" then
+		buffFrame.tooltiptext = C_TooltipInfo.GetUnitBuff(uid, index, "HELPFUL")
+	elseif index and uid and filter ==  "HARMFUL" then
+		buffFrame.tooltiptext = C_TooltipInfo.GetUnitBuff(uid, index, "HARMFUL")
+	elseif spellId then
+		buffFrame.tooltiptext = C_TooltipInfo.GetSpellByID(spellId)
+	end
+	buffFrame:SetScript("OnEnter", function(self)	
+		buffFrame.tooltip:SetOwner(buffFrame.icon, "ANCHOR_RIGHT")
+		if buffFrame.tooltiptext then
+			if buffFrame.tooltiptext.lines[1].leftText then
+				buffFrame.tooltip:AddLine(buffFrame.tooltiptext.lines[1].leftText)
+			end
+			if buffFrame.tooltiptext.lines[2].leftText then
+				buffFrame.tooltip:AddLine("|cFFFFFFFF"..buffFrame.tooltiptext.lines[2].leftText)
+			end
+		end
+		buffFrame.tooltip:Show()
+	end)
+	buffFrame:SetScript("OnLeave", function(self)
+		buffFrame.tooltip:Hide()
+	end)
+end
+
+--[[local function buffTooltip(buffFrame, uid, index, spellId, filter)
 	buffFrame:SetScript("OnEnter", function(self)
 		GameTooltip:SetOwner(buffFrame.icon, "ANCHOR_RIGHT")
 		if index and uid and filter ==  "HELPFUL" then
@@ -1810,8 +1843,7 @@ local function buffTooltip(buffFrame, uid, index, spellId, filter)
 	buffFrame:SetScript("OnLeave", function(self)
 		GameTooltip:Hide()
 	end)
-end
-
+end]]
 
 local function buffCount(buffFrame, count, backCount)
 	if count or backCount then
